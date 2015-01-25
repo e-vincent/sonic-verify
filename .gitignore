@@ -26,3 +26,9 @@
 *.exe
 *.out
 *.app
+
+# LaTeX
+*.aux
+*.log
+*.synctex.gz
+*.fdb_latexmk
