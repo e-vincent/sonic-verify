@@ -644,7 +644,55 @@ in mind, this separate way of thinking about the programming environment is
 likely to produce more interesting projects as time develops.
 
 \subsection{Session Types}
-Over recent years there has been a massive increase in the amount of communication based systems, from network protocols over the Internet to server-client systems in local area networks to distributed applications on a global scale. The crucial observation amongst all of these systems is that while there may be some way to describe a one-time interaction between processes there is no real construct to structure a series of reciprocal interactions between two parties \cite{}.
+Over recent years there has been a massive increase in the amount of 
+communication based systems, from network protocols over the Internet to server
+-client systems in local area networks to distributed applications on a global 
+scale. The crucial observation amongst all of these systems is that while 
+there may be some way to describe a one-time interaction between processes 
+there is no real construct to structure a series of reciprocal interactions 
+between two parties \cite{HVM98}.
+
+Session Types present a solution to the issue of structing communication-based 
+software. In a similar way to how Object Oriented paradigms sought to solve 
+the issues presented by large scale system written largely with spaghetti 
+code, Session Types seek to restructure existing complex behaviours in a 
+manner which is more lucid, readible and ultimately more easy to verify. Honda 
+et al (98) present this in terms of simple concurrent primitives that build up 
+a basic structuring method for communication-based concurrent programming. In 
+terms of this project, we seek to use some of the binary notions of the 
+project to help with the verification of communication between live threads to 
+ensure safety during a system's performance. This is a very basic system to 
+apply the concept to but given the inherently dynamic and concurrent nature of 
+the program it presents itself as an interesting avenue of application. The 
+use of Session Types in terms of Sonic Pi will be the type discipline that 
+plays a fundamental role in guaranteeing the compatability of process 
+interaction - it is especially effective at detecting deadlocks in a system, 
+one of the primary sources of error in concurrent systems. Session Types are 
+also designed in a language agnostic manner, meaning it will be possible to 
+apply to Sonic Pi's Ruby-like syntax.
+
+Session Types consist of the following key ideas:
+
+A basic structural concept known as \emph{sessions}. These are designated via 
+\emph{channels}. The collection of session interactions is what constitutes a 
+program; those interactions are performed via the channels. As well as the 
+session, other concurrent programming contructs are provided: parallel 
+composition, name hiding, conditional and recursion. The combination of 
+recursion and sessions allow for the expression of unbounded thread of 
+interaction as a single abstraction unit.
+
+Three basic communication primitives that all other structures will be built 
+from: \emph{value passing} - standard synchronised message-passing, \emph{
+label branching} - purified method invocation, devoid of value passing - and \
+emph{delgation} - the passing of a channel to another process. Alongside 
+sessions, these allow for complex structures to be defined and described with 
+clarity.
+
+Finally there is a basic type discipline for the communication primitives. 
+Without this there would be no way to guarantee the typability of a program, 
+ensuring that two communicating processes always have compatible patterns of 
+communication. It is the incompatibility of interaction patterns that is one 
+of the main reasons for bugs in commmunication-based programming.
 % What are Session Types
 % Concurrency as a field, what does it address?
 % Comment on different between binary session types and multi-session types
@@ -672,6 +720,23 @@ outline of how the project will be evaluated.
 \subsection{Project Outline}
 
 \subsection{Evaluation Outline}
+As this is an educational program it would be ideal if some evaluation would 
+take the form of user studies of Sonic Pi and the extensions made in this 
+project. User groups could contain both those who have used the system before 
+and those who have not, split equally between those who have a technical 
+background and those who have none. It would be interesting to note whether 
+any of those in the User Groups maintained any other creative hobbies outside 
+of this field and how many had some kind of musical awareness and relate this 
+to their reports and the overall findings of the tests.
+
+Another piece that would be of interest would be discovering the execution 
+times of the project on the different architectures that are available. Part 
+of the objectives of the project is to provide a small verification system to 
+run in parallel with a currently running program thread. For this to be a 
+viable addition it must be fast and efficient enough not to interrupt with the 
+existing functionality. On the Windows and Mac versions of the system it is 
+unlikely to make much impact but the Raspberry Pi system is much smaller in 
+it's capabilities.
 
 \section{Final Thoughts}
 
