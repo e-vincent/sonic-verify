@@ -1,7 +1,40 @@
 \documentclass[11pt]{scrartcl}
 \usepackage{a4, fullpage}
 
-\setlength{\parskip}{0.3cm}
+\usepackage{color, xcolor}
+\usepackage{listings, caption, graphicx}
+\usepackage{multicol, titlesec}
+
+%\setcounter{secnumdepth}{4}
+
+\titleformat
+	{\paragraph}
+	{\normalfont\normalsize\bfseries}
+	{\theparagraph}{0.5em}{}
+\titlespacing*
+	{\paragraph}
+	{0pt}
+	{1ex plus 0.5ex minus .2ex}
+	{1ex plus .2ex}
+
+\renewcommand{\lstlistingname}{Snippet}
+
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{myformat}{#1#2#3\hrulefill}
+
+\captionsetup{format=myformat}
+\captionsetup[lstlisting]{position=bottom,format=myformat}
+
+\lstloadlanguages{ruby}
+\lstset{
+	basicstyle   = \ttfamily\color{black},
+	commentstyle = \ttfamily\color{red},
+	keywordstyle = \ttfamily\color{blue},
+	stringstyle  = \color{orange}
+}
+
+\setlength{\parskip}{0.4cm}
 \setlength{\parindent}{0cm}
 
 \begin{document}
@@ -83,7 +116,9 @@ programming. Sonic Pi seeks to provide an exploratory and invigorating
 introduction into programming whilst being complex enough to lead a user 
 through into much more complicated programming ideas and use cases with a 
 managable learning curve. By presenting a musical system it seeks to break 
-down the barrier between the technical elite and the hobbyist.
+down the barrier between the technical elite and the hobbyist. In this report 
+Sonic Pi will be presented in terms of the formalisation of its timing effects 
+and the existing concurrency primitives of the language.
 
 \subsection{Objectives}
 This project's aim is to formalise the concurrency and timing aspects of the 
@@ -114,7 +149,6 @@ project. We conclude with details on the related work in these areas of
 research.
 
 \subsection{Sonic Pi}
-% What is Sonic Pi?
 Sonic Pi is an imperative live programming language designed as an educational 
 first language. It is a ruby-based domain-specific language designed for 
 manipulation of synthesisers through time \cite{AB13}. It is currently in its 
@@ -172,20 +206,317 @@ already used within the industry. Python is well regarded as an educational
 language and given the semantic similarity between Python and Ruby it was easy 
 to defend Ruby as a choice of language implementation \cite{AB13}. 
 
+The immediate feature that Sonic Pi focuses on is sequential ordering in imperative programs; demonstrated in musical theory by the sequential playing of notes. 
+
+\begin{multicols}{2}
+The Code Snippets shown demonstrate two small Sonic Pi programs. The first 
+demonstates the situation where the MIDI notes would be played together. Sonic 
+Pi v1.0 takes advantage of fast clockspeeds of modern processors in order to 
+assume the sequence of instructions would be likely to execute quickly enough 
+to sounds together. In order to separate them into sequential notes they must 
+be separated with a sleep instruction as demonstrated by the second code 
+Snippet. The notation for sleep in Sonic Pi V1.0 is similar to that of the 
+POSIX sleep operation\cite{IG13}. The default sound that Sonic Pi uses in 
+these contexts is a pleasant bell sound from the SuperCollider synthesiers.
+
+\begin{minipage}{0.5\textwidth}
+	\begin{minipage}[t]{\textwidth}
+		\begin{lstlisting}[language = ruby]
+	play 60
+	play 61
+	play 62
+		\end{lstlisting}
+		\captionof{lstlisting}{Chord Form: Successive Notes}
+	\end{minipage}
+	\begin{minipage}[t]{\textwidth}
+		\begin{lstlisting}[language = ruby]
+	play 60
+	sleep 0.5
+	play 61
+	sleep 0.5
+	play 62
+		\end{lstlisting}
+		\captionof{lstlisting}{Arpeggio Form: Sleep Separation}
+	\end{minipage}
+\end{minipage}
+
+\end{multicols}
+
+The monadic structure of the statements may not be necessarily elegant to many 
+experienced programmers. However, it can be seen that the ability to skip the 
+arguably verbose nature of structured syntax makes it much more relevant in 
+the contexts of a classroom as pupils are able to start creating meaningful 
+programs with much more speed. From the point of view of providing any future 
+debugging interfaces, it has a small benefit in removing the code overhead for 
+finding and correcting such small syntactical issue such as missing \texttt{;}. 
+
+These semantics work well in an educational context but do not allow for the 
+correct timing of musical notation which puts them at odds with user 
+expectations. To demonstrate this more concretely, below are two further code 
+Snippets demonstrating Sonic Pi's basic threading abilities. Sampling is a 
+feature of Sonic Pi V2.0 but are presented here in the context of V1.0 
+programs as the two versions are semantically similar.
+
+\begin{multicols}{2}
+In Snippet 3 the desired outcome is to play MIDI note 60 together with the 
+drum kick with an interval of 0.5s between each hit. Unfortunately, this does 
+not take into account the execution time of each statement; there is a short 
+amount of execution time for each line of code, plus the desired sleep of 0.5s.
+Because of this the rhythm will gradually shift with each loop as the 
+clock time and the ``virtual time'' becomes further out of sync. The 
+actually length of time each line execution takes is variable between 
+processors depending on their speed and overall load. Regardless, we can see 
+that each loop in Snippet 3 will actually take longer than the desired 0.5s.
+
+This is further apparent when running Snippet 4. The desired outcome is to 
+play the drum kick every second and the MIDI 60 note at every half second, so 
+the two notes will play at the same time every second MIDI note, the threads 
+remain synchronised. On running the threads it is quickly apparent that this 
+is not the true result; due to differing execution times the thread rhythms 
+drift apart very quickly.
+
+	\begin{minipage}{0.5\textwidth}
+
+		\begin{minipage}{\textwidth}
+			\begin{lstlisting}[language = ruby]
+loop do
+    play 60
+    sample :drum_heavy_kick
+    sleep 0.5
+end
+			\end{lstlisting}
+			\captionof{lstlisting}{Repeating Bass and Drum}
+		\end{minipage}
+
+		\begin{minipage}{\textwidth}
+			\begin{lstlisting}[language = ruby]
+in_thread
+    loop do
+        play 60
+        sleep 0.5
+    end
+end
+
+in_thread
+    loop do
+        sample :drum_heavy_kick
+        sleep 1
+    end
+end
+			\end{lstlisting}
+			\captionof{lstlisting}{Concurrent Threads}
+		\end{minipage}
+
+	\end{minipage}
+
+\end{multicols}
+
+The $play$ and $sample$ calls are asynchronous and this compounds the present 
+timing issue due to additional costs in sending and interpreting the messages. 
+These issues are summarised in Figure 1. The left-most column represents the 
+real computation time of the statement whilst the right-most column shows the 
+point at which each statement would be run. Each statement duration is unique 
+as processor speed and system load variations affect the duration of each 
+statement separately. The durations are therefor non-deterministic in nature 
+and also not consistent across different runs of the same program.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/sonic-one.png}
+	\caption{Timing in Sonic Pi V1.0}
+\end{figure}
 
 
-% How is it currently being used?
-% What are the features of Sonic Pi?
-%% Details of how the relevant features work
-%% How Sleep Works {Old and New?}
+\subsubsection{Sonic Pi V2.0}
+
+\paragraph{Timing Sleep}
+Sonic Pi V2.0 sought to address this temporal issue and introduces the 
+interesting concept of a \emph{time system} and associated \emph{time safety}, 
+which draw an analogy from the familiar programming concepts of \emph{type 
+systems} and \emph{type safety}. As noted before, V2.0 maintains syntactic 
+compatability with V1.0, so it conceptually as useful to apply in the 
+educational context as before. The power behind V2.0 is that its temporal 
+semantics now react as a user would expect them to, making it a viable program 
+for the musically experienced who have some concept of what they want to 
+achieve as well as for those beginners who desire to learn.
+
+In Sonic Pi V2.0 the sleep command no longer mimics the POSIX command as 
+commented earlier. Instead the programming model allows a separation of the 
+ordering of effects from the timing of effects. Snippet 5 shows a simple 
+example that combines the different kind of effects; parallel, timed and 
+ordered effects. It also demonstrates further syntactic abilities of V2.0 as 
+we are now treating the code snippets as V2.0 programs.
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[language = ruby]
+		  play :C ; play :E ; play :G
+		  sleep 1
+		  play :F ; play :A ; play :C
+		  sleep 0.5
+		  play :G ; play :B ; play :D
+	\end{lstlisting}
+	\captionof{lstlisting}{V2.0 Program: Playing three chords (C major, F major, G major)}
+\end{minipage}
+
+Each chord line demonstrates Sonic Pi's ability to play notes in parallel, the 
+system still taking advantage of the capabilities of modern processors. \texttt
+{sleep} now acts as a ``temporal barrier'' between statements; it works by 
+clocking computation from proceeding until the given time has elapsed \emph{
+since the program began running}. It does \emph{not} block from the end of the 
+notes played. In terms of Snippet 5, this means that the second chord is 
+played once one second has elapsed and the third chord will not be played 
+until 1.5 seconds have elapsed. One can think of \texttt{sleep} as an ``at 
+least'' timing. In other words, once \texttt{sleep t} has been evaluated, we 
+can state that at least \texttt{t} seconds have elapsed since the last \texttt{
+sleep} statement was called. This is similar to how the language ChucK handles 
+the interaction of time using its (multiply) overloaded \texttt{=>} operator 
+\cite{WC03}.
+
+For completeness it was worth noting that Snippet 5 demonstrates the ordered effect as the three chords are played in the order written.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=0.8\textwidth]{images/sonic-two.png}
+	\caption{Timing in Sonic Pi V2.0}
+\end{figure}
+
+The semantics introduced here are achieved by implementing a previously 
+mentioned concept of ``virtual time''. In Sonic Pi V2.0, virtual time is a 
+thread-local variable that is only advanced by a new \texttt{sleep} command, 
+which means that the programmer has explicit control over the timing of the 
+program. Each thread maintains access to both the real time elapsed and the 
+virtual time elapsed whilst running a given program and used the virtual time 
+variable to scheduled requested effects. In order to keep time with the 
+explicit timing requirements of the program the \texttt{sleep} command will 
+take account of the execution time between the last \texttt{sleep} statement 
+and the current execution point. Referring back to Snippet 5, at the point at 
+which the program executes the second \texttt{sleep} command, if if execution 
+of the F major chord took 0.1s of execution time then the program will only 
+sleep for 0.4s. This is to ensure there is no rhythm drift. The only overhead 
+in the rhythm are from the play statements following the last \texttt{sleep} 
+executed. This is demonstrated visiually with Figure 2.
+
+To deal with the non-deterministic execution times within a sleep barrier, and 
+also to deal with the time cost for the synthesiser to schedule output 
+effects, a constant \texttt{scheduleAheadTime} value is added to the current 
+virtual time for all asynchronously scheduled effects. If the jitter time and 
+execution time between \texttt{sleep} commands never exceeds this value then 
+the temporal requirements of Sonic Pi are met. 
+
+It is possible that the time between \texttt{sleep} commands may over-run - 
+this may be common in the event someone requested a short \texttt{sleep} time 
+such as 0.1s or even 0.05s. In this case, the described programming model is 
+not useful for providing hard deadlines but can function with ``soft'' 
+deadlines (along the vein of Hansson and Jonsson \cite{HJ94}. In the event a 
+thread falls behind in execution time then the user is given explicit 
+warnings. Should the amount of time the thread is behind exceed a specific fall
+-behind value, as defined within Sonic Pi, then the system will stop that 
+thread and throw a time exception. This provides essential temporal 
+information about the program and its behaviour to the users. This is a 
+positive in terms of educational use but is something a live coder will aim to 
+avoid during a real performance. This feature also provides a safety mechanism 
+against common errors such as placing isolated \texttt{play} calls between \
+texttt{sleep} commands which would have the problem of taking up all of the 
+system resources; instead the thread self-termininates and allows any other 
+threads to continue executing.
+
+\paragraph{Threading}
+
+Threading has already been introduced breifly; this section focuses on the 
+further improvement that Sonic Pi V2.0 brings to its threading primitive. 
+Within V2.0 there are multiple commands which allow for easy synchronisation 
+of threads whilst the programming is running. Threads also implement thread-
+based inheritance wherein they take all of the synthiser settings of the 
+thread they were spawned from.
+
+The keyword \texttt{in\_thread} is enables Sonic Pi users to run pieces of 
+code concurrently. Threads can be named as shown in Snippet 6 in a similar way 
+to how functions are named in Sonic Pi. The simple nature of its loop syntax 
+enables this to be as easy a concept to grasp as the previously defined 
+temporal semantics. These threads alone do not allow for the live coding that Sonic Pi has been created for. With a simple \texttt{in\_thread} it is more verbose to change the program sound as the program is running. For this, Sonic Pi V2.0 provides a \texttt{live\_loop} functionality.
+
+An interesting point to note about Sonic Pi V2.0 is that actually running the program starts the current program in another thread. Because of this one can actually press run multiple times and have the program layered over the top of itself. There are no particular synchronisation primitivs defined over these ``global'' threads, but it makes for an interesting performance if timed correctly.
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[language = ruby]
+    in_thread(name: :bass) do
+        loop do
+          use_synth :prophet
+          play chord(:e2, :m7).choose, release: 0.6
+          sleep 0.5
+        end
+    end
+
+    in_thread(name: :drums) do
+        loop do
+          sample :elec_snare
+          sleep 1
+        end
+    end
+	\end{lstlisting}
+	\captionof{lstlisting}{Named Threads}
+\end{minipage}
+
+\texttt{live\_loops} can be named much more cleanly than \texttt{in\_threads} and are where Sonic Pi really comes into it's live coding roots. Whilst running a program, Sonic Pi's \texttt{live\_loops} will automatically update the program without skipping any beats. This gives the users a great amount of freedom to experiment with different sounds without having to stop the program and wait for anything to compile and run, as is the case with standard programming. This feature, however, is directly affected by the previously described temporal semantics, in that loops can easily become out of time with each other while a performance is happening. To combat this, Sonic Pi provides synchronisation semantics in the form of the \texttt{cue} and \texttt{sync} commands. Each time a live loop loops it will generate a new \texttt{cue} event which we are able to \texttt{sync} on to. 
+
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[language = ruby]
+live_loop :foo do
+    play :c1, release: 8, cutoff: rrand(70, 130)
+    sleep 8
+end
+	\end{lstlisting}
+	\captionof{lstlisting}{Live Loops}
+\end{minipage}
 
 %% Loops, cue and sync
 % Where does this project look to go in the future
+\clearpage
+\begin{multicols}{2}
+The Snippets to the right demonstrate a rough workflow of how a user would use the \texttt{cue} and \texttt{sync} features. To begin with the loops \texttt{foo} and \texttt{bar} are out of time with one another.
 
-% Some interesting remarks about Rasberry Pi itself?
+To work with the current example one would begin to fix the situation by changing the sleep time in \texttt{foo} to 0.5s. Most likely, this will still sound incorrect. This is because the two loops are likely to now be out of time with each other. Both \texttt{foo} and \texttt{bar} are producing \texttt{cue} events, but these are not being used and so both loops are running with no regard to the other. We can fix this by \emph{syncing} one thread to the other, so that it will only fire when the other thread has looped. In this case we have synced \texttt{bar} onto \texttt{foo}.
+
+This gives way to some very obvious deadlock scenario's that users must avoid. If you create two live loops, \texttt{one} and \texttt{two} writing a situation that results in either \texttt{cue :one} in the second thread and \texttt{cue :two} in the first, or similar with \texttt{sync} then this will result in a deadlock as both threads wait for the call from the other.
+	\begin{minipage}{0.5\textwidth}
+
+		\begin{minipage}{\textwidth}
+			\begin{lstlisting}[language = ruby]
+live_loop :foo do
+    play :e4, release: 0.5
+    sleep 0.4
+end
+
+live_loop :bar do
+    sample :bd_haus
+    sleep 1
+end
+			\end{lstlisting}
+			\captionof{lstlisting}{Out of Sync Live Loops}
+		\end{minipage}
+
+		\begin{minipage}{\textwidth}
+			\begin{lstlisting}[language = ruby]
+live_loop :foo do
+    play :e4, release: 0.5
+    sleep 0.5
+end
+
+live_loop :bar do
+    sync :foo
+    sample :bd_haus
+    sleep 1
+end
+			\end{lstlisting}
+			\captionof{lstlisting}{Synced Live Loops}
+		\end{minipage}
+
+	\end{minipage}
+\end{multicols}
 
 
-In this report Sonic Pi will be presented in terms of the formalisation of its timing effects and the existing concurrency primitives of the language.
+
 
 
 \subsection{Live Programming}
@@ -197,12 +528,12 @@ future, and the time between implementation and action has no effect on the
 results that the system will produce. In this way, there is a strong sense of 
 separation between the program, process and task domains where the progam is 
 the code implementation and specifications, the process is the running of the 
-code on a specific machine and the task is the visible real world results****. 
-This is a viewpoint that many would not think to challenge as it is natural to 
-assume that the methodology of a computer programmer would naturally lend 
-itself to implementation of actions that were set for execution in the future 
-and, in general, would process a deterministic set of results that can be 
-repeatedly used as the users required.
+code on a specific machine and the task is the visible real world results
+\cite{SG10}. This is a viewpoint that many would not think to challenge as it 
+is natural to assume that the methodology of a computer programmer would 
+naturally lend itself to implementation of actions that were set for execution 
+in the future and, in general, would process a deterministic set of results 
+that can be repeatedly used as the users required.
 
 Live programming (also referred to as With Time Programming or Just In Time 
 Programming) seeks to apply the improvisional nature of time to the existing 
@@ -216,8 +547,8 @@ programs being created.
 % What is Live Programming/Just In Time Programming?
 Given the nature of Live Programming the languages that invoke it are often 
 dynamic language which allow for the flexibility, conciseness and ease of 
-development*(5)* to enable the act of live programming to feel as natural as 
-standard programming practice.
+development \cite{McD07} to enable the act of live programming to feel as 
+natural as standard programming practice.
 
 Live Programming lends itself also to acts of performance, where Live Coders 
 will often perform to live audiences, often producing such things as live 
@@ -225,17 +556,13 @@ improvisational music or artwork, whilst having some means by which the
 audience will also see the code written at the same time. From a social and 
 cultural viewpoint, Live Programming lends itself to breaking down the 
 barriers that have been built up between software technology and the creative 
-users*(6)*.
+users \cite{McL13}.
 
 % How long has this been an area of research?
 % Critics of this as a way of programming?
 
 %% Frame it in the sense that Sonic Pi uses it
 %% Education - what makes this so lively
-
-****Programming with Time {Improcess}
-*(5)*Living it up with a Live Programming Language
-*(6)*The Textual X
 
 \subsection{Session Types}
 
@@ -271,18 +598,11 @@ outline of how the project will be evaluated.
 
 \begin{thebibliography}{9}
 
-\bibitem{number}
-  Auther,
-  \emph{\LaTeX: Title},
-  Publisher, Place,
-  Edition,
-  Year
-
 \bibitem{naec}
   \emph{http://www.naec.org.uk/events}
 
 \bibitem{sp}
-  \emph{http://Sonic Pi.net/}
+  \emph{http://sonic-pi.net/}
 
 \bibitem{rp}
   \emph{http://www.raspberrypi.org/about/}
@@ -337,12 +657,55 @@ outline of how the project will be evaluated.
   \emph{National curriculum in England: computing programmes of study (key stages 1 - 4)},
   2013
 
+\bibitem{HJ94}
+  Hansson, H., Jonsson, B.,
+  \emph{A Logic for Reasoning About Time and Reliability},
+  Formal Aspects of Computing 9,
+  no 5., pp. 512-535,
+  1994
+
+\bibitem{IG13}
+  The IEEE and The Open Group,
+  \emph{Sleep - The Open Group Base Specifications Issue 7, 2013},
+  http://pubs.opengroup.org/onlinepubs/9699919799/functions/sleep.html,
+  Retrieved 15 May,
+  2014
+
+\bibitem{McD07}
+  McDirmid, S.,
+  \emph{Living it Up with a Live Programming Language},
+  Proceedings of the 22Nd Annual ACM SIGPLAN Conference on Object-oriented Programming Systems and Applications,
+  New York, USA,
+  ACM, pp. 623-638
+  2007
+
+\bibitem{McL13}
+  McLean, A.,
+  \emph{The Textual X},
+  Proceedings of xCoAx2013: Computation Communication Aesthetics and X,
+  pp. 81-88,
+  2013
+
+\bibitem{SG10}
+  Sorensen, A., Gardner, H.,
+  \emph{Programming with Time: Cyber-Physical Programming with Impromptu},
+  ACM Sigplan Notcies 45,
+  no. 10, 822-834,
+  2010
+
 \bibitem{W10}
   Woolford, K., Blackwell, A.F., Norman, S.J. \& Chevalier, C.,
   \emph{Crafting a Critical Technical Practice},
   Leonardo 43(2),
   202-203,
   2010
+
+\bibitem{WC03}
+  Wang, G., Cook, P.R.,
+  \emph{ChucK: A Concurrent, On-The-Fly Audo Programming Language},
+  International Computer Music Conference,
+  pp. 1-8,
+  2003
 
 \bibitem{Wing06}
   Wing, J.M.,
