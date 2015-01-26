@@ -620,10 +620,12 @@ natural as standard programming practice.
 Live Programming lends itself also to acts of performance, where Live Coders 
 will often perform to live audiences, often producing such things as live 
 improvisational music or artwork, whilst having some means by which the 
-audience will also see the code written at the same time. From a social and 
-cultural viewpoint, Live Programming lends itself to breaking down the 
-barriers that have been built up between software technology and the creative 
-users \cite{McL13}.
+audience will also see the code written at the same time. For a Live Coder 
+there is frequently no desire to create a final software product or even a set 
+musical score as live programming is about the experimentation rather than the 
+manufacture. From a social and cultural viewpoint, Live Programming lends 
+itself to breaking down the barriers that have been built up between software 
+technology and the creative users \cite{McL13}.
 
 It is interesting that the users level as a musician will have specific 
 impacts on their experience with the systems in use in the context of live 
@@ -641,7 +643,18 @@ research area, with most of the popular languages appearing over the last
 decade. This comes as part of a wider movement of programming reaching more of 
 the general populace and as it is applied with more and more creative outlets 
 in mind, this separate way of thinking about the programming environment is 
-likely to produce more interesting projects as time develops.
+likely to produce more interesting projects as time develops. Lee et al. \cite{LDW87} proposed six features that would be required to exist in order to present a programming environment with a ``first class'' semantics for time:
+
+\begin{itemize}
+	\item The ability to express timing constraints
+	\item Timed communication
+	\item Enforcement of timing constraints
+	\item Tolerance to violations and constraints
+	\item Maintaining consistency in distributed realtime systems
+	\item Static timing verification
+\end{itemize}
+
+On the conclucion of the project we will seek to see how well the extended Sonic Pi application is able to address these issues, to see if it may be described as having a ``first class'' semantics.
 
 \subsection{Session Types}
 Over recent years there has been a massive increase in the amount of 
@@ -709,6 +722,82 @@ of the main reasons for bugs in commmunication-based programming.
 %% Finding a crossover would be great
 %% If none currently seem to exist, comment on that somewhere
 %% Either here or in Final Thoughts
+
+This section discusses much of the work discovered during the intial research 
+of the project. There are many interesting live programming environments out 
+in use in the world, with each having an interesting approach to the technical 
+challenges surrounding the issue of temporal semantics. We breifly discuss 
+some programs that have made use of the Session Types structures as described 
+previously as this gives a clearer picture of their use and viability within 
+the real world. It is worth noting that, to date, there is no apparent system 
+which seeks to apply the Session Typing structure to a live programming 
+paradigm to address some of the concurrency issues faced in that field.
+
+As noted by Rorhruber \cite{BMNR14}, there have been many publications and 
+discussions relating to alternative approaches for temporal semantics and 
+timing within Live Programming. There is much to be said about choosing 
+between explicit and implicit representation of time as well as between the 
+description of time using either internal or external state.
+
+The Tidal language \cite{McL13} uses an interesting formalisation of cyclic 
+time. Whilst drawing a continuing analogy with the act of knitting, McLean 
+describes the DSL for musical pattern embedded in the pure functional language 
+Haskell. Tidal represents music as a pure function, enabling the mapping of 
+the single dimension of time into multidimensional music, making full use of 
+iterative language to formalise cyclic time using both analogue and digital 
+pattern.
+
+Impromptu is a much fuller system, able to produce both audio and visual 
+outputs in the context of Live Programming \cite{SG10}. It uses ``temporal 
+recursion'' as a style of time-driven, discrete-event concurrency with real-
+time interrupt scheduling. This recursion acts as an extension to the already 
+existing support for real-time execution of arbitrary code blocks, with the 
+real-time scheduler being responsible for the execution of the blocks in the 
+correct ordering. Impromptu is designed to provide a reactive system with 
+timing accuracy and precision based on constraints of human perceptions. Its 
+choice of asynchronous concurrency allows a flexible architecture wherein 
+Impromptu's co-operative concurrency model leaves the programmer responsible 
+for time keeping and meeting real-time deadlines.
+
+One of the closest other languages to Sonic Pi V2.0, as mentioned earlier, is 
+the similarly imperative styled language ChucK \cite{WC03}. ChucK is a strongly
+-typed, imperative programming language whose syntax and semantics are 
+governed by its flexible type system. The strength of the language lies in its 
+(multibly) overloaded \texttt{=>} operator and its support of such features as 
+dynamic control rates and strong concurrency principles. The ordering of a 
+program is captured naturally by the logic of the operator and ChucK allows 
+the programmer, composer and performer to write truly concurrent code using 
+the framework of the timing semantic (as controlled by this overloaded 
+operator and a few select timing keywords). The manner in which ChucK advances 
+time allows a level of granularity that makes it a stronger system than Sonic 
+Pi in terms of musical performance but it is much less useable as a first 
+programming language.
+
+The timing effects of ChucK and the inherent expectation within music remind 
+us that we must be able to speak clearly about the location of events in time. 
+Therefore, any musical programming language must prove some form of time 
+semantics, even if only informally. As previously mentioned with Sonic Pi 
+V1.0, in the context of Live Programming this consideration extends to both 
+situations where the code runs too late and where the code runs too early. An 
+overlap between execution and creation time is a value of broader concern in 
+software engineering, as noted by the Glitch system \cite{ME14}. This system 
+allows the user to adjust notional execution time relative to a point in the 
+source code editing environment. It proposes the idea that programming 
+languages should address state update order by abstracting away from the 
+computer's existing model of time; i.e. they should manage time in a way that 
+draws analogy with memory management. 
+
+Live Programming is not purely limited to musical languages and has similar 
+applications is such areas as Logic, Dataflow and Artificial Intelligence.
+
+As a demonstration for the potential of the application of Session Types 
+within applications we breifly mention the protocol language Scribble 
+\cite{HMBCY11}, whose protocols are very clearly defined using this theory. 
+This has come about through the recognised need for widescale structing of 
+protocols in light of the increasing amount of communication-based networking. 
+We also present Pabble \cite{NY14}: a system based off of the Scribble design 
+and implemented using multiparty session types; a further extension to the 
+binary session types discussed earlier.
 
 \section{Going Forward}
 This section illustrates the plan of action laid out for the rest of the 
@@ -781,6 +870,13 @@ it's capabilities.
   pp. 120-130,
   (PPIG 2005)
 
+\bibitem{BMNR14}
+  Blackwell, A., McLean, A., Noble, J. and Rohrhuber, J.,
+  \emph{Collaboration and Learning Through Live Coding},
+  Dagsthul Seminar, Dagstuhl Reports 3,
+  no. 9, pp. 130-168,
+  (2014)
+
 \bibitem{Ch12}
   Church, L., Rothwell, N., Downie, M., deLahunta, S. and Blackwell, A.F.,
   \emph{Sketching by Programming in the Choreohraphic Language Agent},
@@ -807,6 +903,13 @@ it's capabilities.
   Formal Aspects of Computing 9,
   no 5., pp. 512-535,
   (1994)
+
+\bibitem{HMBCY11}
+  Honda, K., Mukhamedov, A., Brown, G., Chen, T. and Yoshida, N.,
+  \emph{Scribbling Interactions with a Formal Foundation},
+  In 7th International Conference on Distributed Computing and Internet Technology,
+  p. 55 - 75,
+  (ICDCIT 2011)
 
 \bibitem{HVM98}
   Honda, K., Vasconcelos, V.T. and Kubo, M.,
@@ -836,6 +939,26 @@ it's capabilities.
   Proceedings of xCoAx2013: Computation Communication Aesthetics and X,
   pp. 81-88,
   (2013)
+
+\bibitem{ME14}
+  McDirmid, S. and Edwards, J.,
+  \emph{Programming with Managed Time},
+  Tech. Report, Microsoft,
+  (2014)
+
+\bibitem{NY14}
+  Ng, N. and Yoshida, N.,
+  \emph{Pabble: Parameterised Scribble for Parallel Programming},
+  In 22nd Euromicro International Conference on Parallel, Distributed and Network-Based Processing, 
+  p. 707 - 714,
+  (PDP 2014)
+
+\bibitem{LDW87}
+  Lee, I., Davidson, S. and Wolfe, V.,
+  \emph{Motivating Time as a First Class Entity},
+  Technical Reports (CIS),
+  pp. 288,
+  (1987)
 
 \bibitem{SG10}
   Sorensen, A. and Gardner, H.,
