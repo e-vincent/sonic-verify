@@ -50,16 +50,16 @@
 
 \subsection{Motivation}
 For many years it has not been a requirement that children should learn much
-about the vast field of computing during their formative years in UK Education.
-Some of the earliest significant pieces of work towards the education of
-computing started with the invention of Logo, an adaptation of the LISP 
-language, most remembered for its use of ``turle graphics''. Some time after 
-this came the Computers in the Cirriculum Project, funded from 1972 to 1991 by 
-the Schools Council and subsequently by the Microelectronics Education 
-Programme in 1981. The first microcomputers appeared in both UK Primary and 
-Secondary Schools in 1979. The Commodore Pets aided both spelling and 
-arthimetic practice as well as the ability to teach either BASIC or Logo. The 
-1980's saw a huge amount of legislative reform and technical efforts in the 
+about the vast field of computing during their formative years in UK 
+Education. Some of the earliest significant pieces of work towards the 
+education of computing started with the invention of Logo, an adaptation of 
+the LISP language, most remembered for its use of ``turle graphics''. Some 
+time after this came the Computers in the Cirriculum Project, funded from 
+1972 to 1991 by the Schools Council and subsequently by the Microelectronics 
+Education Programme in 1981. The first microcomputers appeared in both UK 
+Primary and Secondary Schools in 1979. The Commodore Pets aided both spelling 
+and arthimetic practice as well as the ability to teach either BASIC or Logo. 
+The 1980's saw a huge amount of legislative reform and technical efforts in the 
 vein of giving young people the ability to work with computers during their 
 formative years but over the course of the late 80's and early 90's this focus 
 on programming ability gives way to simply the education of practical use of 
@@ -125,10 +125,10 @@ and the existing concurrency primitives of the language.
 This project's aim is to formalise the concurrency and timing aspects of the 
 language and develop a program analysis tool that can be used to identify 
 program bugs such as deadlock and thrashing behaviour. The formalism and 
-analysis will build on initial work describing timing and
-concurrent interaction via effect systems and session types. The project 
-combines theoretical aspects of type system and analysis design, as well as 
-practical work developing a responsive program analysis engine.
+analysis will build on initial work describing timing and concurrent 
+interaction via effect systems and session types. The project combines 
+theoretical aspects of type system and analysis design, as well as practical 
+work developing a responsive program analysis engine.
 
 \subsection{Report Structure}
 The remainder of this report is broken down as follows:
@@ -142,6 +142,7 @@ The remainder of this report is broken down as follows:
 	timeline of the project and ideas for how to evaluate progress during and 
 	at the conclusion of the project.
 \end{itemize}
+\newpage
 
 \section{Background}
 In this section we begin by explaining the ideas and features of Sonic Pi, 
@@ -484,7 +485,6 @@ synchronisation semantics in the form of the \texttt{cue} and \texttt{sync}
 commands. Each time a live loop loops it will generate a new \texttt{cue} 
 event which we are able to \texttt{sync} on to. 
 
-
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[language = ruby]
     live_loop :foo do
@@ -495,8 +495,6 @@ event which we are able to \texttt{sync} on to.
 	\captionof{lstlisting}{Live Loops}
 \end{minipage}
 
-%% Loops, cue and sync
-% Where does this project look to go in the future
 \clearpage
 \begin{multicols}{2}
 The Snippets to the right demonstrate a rough workflow of how a user would use 
@@ -706,23 +704,8 @@ Without this there would be no way to guarantee the typability of a program,
 ensuring that two communicating processes always have compatible patterns of 
 communication. It is the incompatibility of interaction patterns that is one 
 of the main reasons for bugs in commmunication-based programming.
-% What are Session Types
-% Concurrency as a field, what does it address?
-% Comment on different between binary session types and multi-session types
-%% Breif aside that this project currently only expects to use binary
-% How do Session Types help with discovering concurrency bugs?
-
-% Outline it in terms of the project
-% Concurrency is a hard thing to begin teaching
 
 \subsection{Related Work}
-% LP Section, many different languages to detail
-% Session Type section? Things that use session types already {Scribble}
-
-%% Finding a crossover would be great
-%% If none currently seem to exist, comment on that somewhere
-%% Either here or in Final Thoughts
-
 This section discusses much of the work discovered during the intial research 
 of the project. There are many interesting live programming environments out 
 in use in the world, with each having an interesting approach to the technical 
@@ -798,6 +781,7 @@ protocols in light of the increasing amount of communication-based networking.
 We also present Pabble \cite{NY14}: a system based off of the Scribble design 
 and implemented using multiparty session types; a further extension to the 
 binary session types discussed earlier.
+\newpage
 
 \section{Going Forward}
 This section illustrates the plan of action laid out for the rest of the 
@@ -807,6 +791,51 @@ with documentation and evaluation time factored in. After that is the
 outline of how the project will be evaluated.
 
 \subsection{Project Outline}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{images/gantt-two.png}
+\end{figure}
+
+The weeks of the 16\textsuperscript{th} and 23\textsuperscript{th} of March are reserved for revision and
+exam times. Before this work load is spread with consideration for courseworks
+and after this most of the time is allocated with project work in mind. Core
+requirements are aimed to be completed by the end of the Easter break. The weeks 
+after that can be used as contingency in the case of unforseen circumstances, or
+for some extension work as suggested below.
+
+\begin{itemize}
+	\item SetUp Parser: The bulk of the work cannot be completed without a good 
+	representation of the AST of the language. Some time will be spent finding 
+	one that is easy to use and descriptive.
+	\item Timing Effects Features: The aim will be for the program to parse a 
+	Sonic Pi code piece provided to it and be able to calculate the virtual time 
+	of the program at each stage. The implementation is broken into different 
+	steps, Constant Timing being the parsing of simple constant expression, 
+	Variable Timing and Function Timing being those more complex timing elements 
+	where variables are passed to different functions in the code or when the 
+	timing is dynamically calculated.
+	\item Formalise Session Types: The current form of Sonic Pi does not have a 
+	full description of the application of session types to the language. The 
+	focus on this will be extending the existing formulisation to include local 
+	branching, recursion and delegation of session types in Sonic Pi.
+	\item Implementing Types: This continues the previous point, the idea being 
+	to physically implement the features within the language. This will also act 
+	as tests that the formalisation is written well enough.
+	\item System Hook: Run the verification within the real Sonic Pi IDE
+	\item Cue/Sync Extensions: Currently the cue and sync primitives are very 
+	simplistic, they have no ability to choose what to send and receive in their 
+	messages. This extension will look into building on these primitives and 
+	consider channel passing within session types. There is time allocated for 
+	formalising the initial ideas and then implementing these into the language.
+\end{itemize}
+
+All items have been allocated some time to write up information about the tasks 
+completed, both in terms of report details and any evaluation data presented. 
+This will ensure maximum utilisation of the time allocated for reporting at the 
+end of the project. Report Submission is dated for the week of the 15
+\textsuperscript{th} of June. Presentation planning will overlap with this final 
+week of reporting as presentations will be given the following week.
 
 \subsection{Evaluation Outline}
 As this is an educational program it would be ideal if some evaluation would 
@@ -827,7 +856,7 @@ existing functionality. On the Windows and Mac versions of the system it is
 unlikely to make much impact but the Raspberry Pi system is much smaller in 
 it's capabilities.
 
-\section{Final Thoughts}
+% \section{Final Thoughts}
 
 \begin{thebibliography}{9}
 
