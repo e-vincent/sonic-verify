@@ -4,6 +4,7 @@
 \usepackage{color, xcolor}
 \usepackage{listings, caption, graphicx}
 \usepackage{multicol, titlesec}
+\usepackage{fancyvrb}
 
 \titleformat
 	{\paragraph}
@@ -33,6 +34,12 @@
 	commentstyle = \ttfamily\color{red},
 	keywordstyle = \ttfamily\color{blue},
 	stringstyle  = \color{orange}
+}
+
+\lstset{
+  mathescape,         
+  literate={->}{$\rightarrow$}{2}
+           {ε}{$\varepsilon$}{1}
 }
 
 \setlength{\parskip}{0.4cm}
@@ -223,14 +230,16 @@ Schools.
 \subsubsection{Sonic Pi V1.0}
 
 \begin{multicols}{2}
-Sonic Pi V1.0 was designed to port the language Overture to the 
-Raspberry Pi in order to focus on driving specific educational 
-objectives; the idea in mind was to teach a target audience of 12-year-olds that 
-had no previous experience with programming; it would bring them from the state 
-of ``this is a computer'' through to the ability to write a full length program, 
-that generated satisfying music, over the course of a few weeks. Sonic Pi is a Ruby-based language both due to the author's existing experience with 
-the language and to keep it in line with the languages already used within the 
-industry. Python is well regarded as an education language and the semantic similarity between the two makes Ruby easy to defend as a language choice.
+Sonic Pi V1.0 was designed to port the language Overture to the Raspberry Pi in 
+order to focus on driving specific educational objectives; the idea in mind was 
+to teach a target audience of 12-year-olds that had no previous experience with 
+programming; it would bring them from the state of ``this is a computer'' through 
+to the ability to write a full length program, that generated satisfying music, 
+over the course of a few weeks. Sonic Pi is a Ruby-based language both due to 
+the author's existing experience with the language and to keep it in line with 
+the languages already used within the industry. Python is well regarded as an 
+education language and the semantic similarity between the two makes Ruby easy 
+to defend as a language choice.
 \\
 
 \begin{minipage}{0.5\textwidth}
@@ -586,7 +595,7 @@ end
 	    sleep 1
 	end
 	\end{lstlisting}
-	\captionof{lstlisting}{Deadlock}
+	\captionof{lstlisting}{Deadlock - both loops waiting for cue}
 \end{minipage}
 
 \paragraph{The IDE}
@@ -680,22 +689,7 @@ research area, with most of the popular languages appearing over the last
 decade. This comes as part of a wider movement of programming reaching more of 
 the general populace and as it is applied with more and more creative outlets 
 in mind, this separate way of thinking about the programming environment is 
-likely to produce more interesting projects as time develops. Lee et al. 
-\cite{LDW87} proposed six features required for a programming environment with a 
-``first class'' semantics for time:
-
-\begin{itemize}
-	\item The ability to express timing constraints
-	\item Timed communication
-	\item Enforcement of timing constraints
-	\item Tolerance to violations and constraints
-	\item Maintaining consistency in distributed realtime systems
-	\item Static timing verification
-\end{itemize}
-
-On the conclucion of the project we will seek to see how well the extended Sonic 
-Pi application is able to address these issues, to see if it may be described as 
-having a ``first class'' semantics.
+likely to produce more interesting projects as time develops. 
 
 \subsection{Session Types}
 Over recent years there has been a massive increase in the amount of 
@@ -762,10 +756,28 @@ The syntax used to describe session types are as follows:
 
 \emph{processes}, ranged over by \texttt{P, Q...}, are given by the following 
 grammar:
+\\
 
-\begin{verbatim}
- 
-\end{verbatim}
+\begin{lstlisting}
+    P ::= request a(k) in P          session request
+        | accept a(k) in P           session acceptance
+        | k![$\tilde{e}$]; P                    data sending
+        | k?($\tilde{x}$) in P                  data reception
+        | k $\triangleleft$ $\ell$; P                     label selection
+        | k $\triangleright$ {$\ell$$_1$:P$_1$[] ... []$\ell$$_n$:P$_n$}         label branching
+        | throw k[k$_0$]; P              channel sending
+        | catch k(k$_0$) in P            channel reception
+        | if e then P else Q         conditional branch
+        | P | Q                      parallel composition
+        | inact                      inaction
+        | ($v$u)P                       name/channel hiding
+        | def D in P                 recursion
+        | X[$\tilde{e}\tilde{k}$]                        process variables
+\end{lstlisting}
+\begin{lstlisting}
+        declaration for recursion
+    D ::= X$_1$($\tilde{x}_1\tilde{k}_1$) = P1 and ... and X$_n$($\tilde{x}_n\tilde{k}_n$) = P$_n$ 
+\end{lstlisting}
 
 ``$|$'' is the weakest association; the others listed have the same association. 
 Parenthesis denote binders which bind the corresponding free occurrences. We use standard simulataneous substitution, written $ $. The sets of free names/channels/variables/process variables of, for example program \texttt{P}, are written as \texttt{fn(P), fc(P), fv(P) and fpv(P)} respectively. Processes without free variables or free channels are called programs.
@@ -777,9 +789,22 @@ is a set of reciprocal interactions between two parties and serves as a unit of
 abstraction for describing that interaction. Communications of sessions are done 
 via a \emph{channel} and can be initiated as follows:
 
-\begin{verbatim}
-	 request a(k) in P    accept a(k) in P 
-\end{verbatim}
+\begin{multicols}{2}
+%	\begin{minipage}{\textwidth}
+
+	\begin{minipage}{0.5\textwidth}
+		\begin{verbatim}
+  request a(k) in P    accept a(k) in P 
+		\end{verbatim}
+	\end{minipage}
+	
+	\begin{minipage}{0.5\textwidth}
+
+\hspace*{15pt}: Initiating a Session
+	\end{minipage}
+
+%	\end{minipage}
+\end{multicols}
 
 The \texttt{request} first requests the initiation of a \emph{session} (with 
 \emph{name a}) as well as the generation of a fresh \emph{channel} (with 
@@ -790,9 +815,17 @@ parenthesis and the keyword \texttt{in} show scope binding.
 
 Via this generated channel, we can then perform three kinds of atomic operation:
 
-\begin{verbatim}
+\begin{lstlisting}
+1) k![e$_1$, ..., e$_n$]; P      k?(x$_1$, ..., x$_n$) in P
+2) k $\triangleleft$ $\ell$; P                k $\triangleright$ {$\ell$$_1$:P$_1$[] ... []$\ell$$_n$:P$_n$}
+3) throw k[k$_0$]; P         catch k(k$_0$) in P 
+\end{lstlisting}	
 
-\end{verbatim}
+\begin{enumerate}
+  \item Data Sending/Receiving
+  \item Label Selection/Branching
+  \item Channel Sending/Receiving
+\end{enumerate}
 
 \emph{Data sending/receiving} is the standard synchronous message passing. 
 \emph{e\textsubscript{i}} denotes expression and we assume the \emph{x} 
@@ -809,9 +842,19 @@ the concept of the same name in object-based programming \cite{YT87}.
 We futher define the session types with the following standard constructs, 
 organised by session:
 
-\begin{verbatim}
+\begin{lstlisting}
+1) P1 | P2
+2) ($v$a)P ($v$k)P 
+3) if e then P else Q 
+4) def X$_1$($\tilde{x}$$_1$ $\tilde{k}$$_1$) = P$_1$ and ... and X$_n$($\tilde{x}$$_n$ $\tilde{k}$$_n$) = P$_n$ in P
+\end{lstlisting}
 
-\end{verbatim}
+\begin{enumerate}
+  \item Concurrent Composition
+  \item Name/Channel Hiding
+  \item Conditional
+  \item Recursion
+\end{enumerate}
 
 \emph{Hiding} declares a name/channel to be local in its scope (here 
 \texttt{P}). Whilst not used in regular programming it is needed in the 
@@ -819,7 +862,51 @@ Operation Semantics of session types. Recursion could be achieved through
 replication but multiple is preferable for well-structured programs.
 
 \subsubsection{Operational Semantics}
+The consise definition of the operational semantics of session types requires the 
+definition of the concept \emph{structural congruence}, $\equiv$ \cite{BB92, M92},
+as the smallest congruence relation on processes. The following equations are
+presented as examples:
+\\
 
+\begin{lstlisting}
+1) P $\equiv$ Q if P $\equiv_\alpha$ Q
+2) P | inact $\equiv$ P, 
+   P | Q $\equiv$ Q | P, 
+   (P | Q) | R $\equiv$ P | (Q | R)
+3) ($vu$)inact $\equiv$ inact, 
+   ($vuu$)P $\equiv$ ($vu$)P, 
+   ($vuu'$)P $\equiv$ ($vu'u$)P, 
+   ($vu$)P | Q $\equiv$ ($vu$)(P | Q) if $u \notin$ fu(Q), 
+   ($vu$)def D in P $\equiv$ def D in ($vu$)P if $u \notin$ fu(D)
+4) (def D in P) | Q $\equiv$ def D in (P | Q) if fpv(D) $\cap$ fpv(Q) = $\emptyset$
+5) def D in (def D' in P) $\equiv$ def D and D' in P 
+                                    if fpv(D) $\cap$ fpv(D') = $\emptyset$
+\end{lstlisting} 
+
+The operation semantics are then represented using the \emph{reduction relation}, 
+$\rightarrow$. It is assumed the \emph{evaluation relation}, $\downarrow$, 
+is given and $\rightarrow^*$ represents the reflexive, transistive closure of 
+$\rightarrow$. Reduction is the smallest relation on processes and is demonstrated 
+by the following equations:
+\\
+
+\begin{lstlisting}
+[Link]  (accept a(k) in P1) | (request a(k) in P2) 
+            $\rightarrow$ ($v$k)(P1 | P2)
+[Com]   (k![$\tilde{e}$]; P1) | (k?($\tilde{x}$) in P2) 
+            $\rightarrow$ P1 | P2[$\tilde{c}/\tilde{x}$]                   ($\tilde{e} \downarrow \tilde{c}$)
+[Label] (k $\triangleleft$ $\ell_i$; P) | (k $\triangleright$ {$\ell_1$:P$_1$[] ... []$\ell_n$:P$_n$}) 
+            $\rightarrow$ P | Pi                      (1 $\leq$ i $\leq$ n)
+[Pass]  (throw k[k$_0$]; P$_1$) | (catch k(k$_0$) in P$_2$) 
+            $\rightarrow$ P1 | P2
+[If1]   if e then P1 else P2 $\rightarrow$ P1         (e $\downarrow$ true)
+[If2]   if e then P1 else P2 $\rightarrow$ P2         (e $\downarrow$ false)
+[Def]   def D in (X[$\tilde{e}\tilde{k}$] | Q) 
+            $\rightarrow$ def D in (P[$\tilde{c}/\tilde{x}$] | Q)          ($\tilde{e} \downarrow \tilde{c}$, $\tilde{X}$ ($\tilde{x}\tilde{k}$) = P $\subset$ D)
+[Scop]  P $\rightarrow$ P' $\Rightarrow$ ($v$u)P $\rightarrow$ ($v$u)P0
+[Par]   P $\rightarrow$ P' $\Rightarrow$ P | Q $\rightarrow$ P' | Q
+[Str]   P $\equiv$ P' and P' $\rightarrow$ Q' and Q' $\equiv$ Q $\Rightarrow$ P $\rightarrow$ Q
+\end{lstlisting}
 
 \subsection{Related Work}
 This section discusses much of the work discovered during the intial research 
@@ -973,6 +1060,22 @@ existing functionality. On the Windows and Mac versions of the system it is
 unlikely to make much impact but the Raspberry Pi system is much smaller in 
 it's capabilities.
 
+Lee et al. \cite{LDW87} proposed six features required for a programming environment 
+with a ``first class'' semantics for time:
+
+\begin{itemize}
+	\item The ability to express timing constraints
+	\item Timed communication
+	\item Enforcement of timing constraints
+	\item Tolerance to violations and constraints
+	\item Maintaining consistency in distributed realtime systems
+	\item Static timing verification
+\end{itemize}
+
+On the conclucion of the project we will seek to see how well the extended Sonic 
+Pi application is able to address these issues, to see if it may be described as 
+having a ``first class'' semantics.
+
 % \section{Final Thoughts}
 
 \begin{thebibliography}{9}
@@ -1007,6 +1110,12 @@ it's capabilities.
   In B. du Boulay and J. Good (Eds) Proceedings of the Psychology of Programming Interest Group Annual Conference, 
   pp. 147-158,
   (PPIG 2014)
+
+\bibitem{BB92}
+  Berry, G. and Boudol, G.,
+  \emph{The chemical abstract machine},
+  TCS, 96 pp.217–248, 
+  (1992)
 
 \bibitem{BC05}
   Blackwell, A.F. and Collins, N.,
@@ -1069,6 +1178,12 @@ it's capabilities.
   http://pubs.opengroup.org/onlinepubs/9699919799/functions/sleep.html,
   Retrieved 15 May,
   (2014)
+
+\bibitem{M92}
+   Milner, R.,
+   \emph{Functions as processes},
+   MSCS, 2(2) pp.119–141,
+   (1992)
 
 \bibitem{McD07}
   McDirmid, S.,
