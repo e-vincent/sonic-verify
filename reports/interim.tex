@@ -51,43 +51,24 @@
 \subsection{Motivation}
 For many years it has not been a requirement that children should learn much
 about the vast field of computing during their formative years in UK 
-Education. Some of the earliest significant pieces of work towards the 
-education of computing started with the invention of Logo, an adaptation of 
-the LISP language, most remembered for its use of ``turle graphics''. Some 
-time after this came the Computers in the Cirriculum Project, funded from 
-1972 to 1991 by the Schools Council and subsequently by the Microelectronics 
-Education Programme in 1981. The first microcomputers appeared in both UK 
-Primary and Secondary Schools in 1979. The Commodore Pets aided both spelling 
-and arthimetic practice as well as the ability to teach either BASIC or Logo. 
-The 1980's saw a huge amount of legislative reform and technical efforts in the 
-vein of giving young people the ability to work with computers during their 
-formative years but over the course of the late 80's and early 90's this focus 
-on programming ability gives way to simply the education of practical use of 
-existing computer software instead of a focus on the fundamentals behind these 
-applications \cite{naec}.
+Education. In 2012, the Government began to re-recognise the signifiance of 
+Computer Science and has replaced the National ICT curriculum with a revised 
+Computing cirruculum. The new Computing Program of Study \cite{DfE13} aims to 
+enable pupils to understand the world of computing, giving them the ability to 
+think logically and apply the fundamental principles of the discpline to their 
+real-world environments.
 
-In 2013, Ofsted published a report documenting their findings relating to ICT 
-in UK schools from 2008 to 2011 and found that in half of all secondary 
-schools, school leavers had not been given adequete education to move into a 
-technical career in their future. In 2007, 81,100 pupils were enrolled in the 
-ICT GCSE but this had fallen to 31,800 pupils by 2011 \cite{DfEO13} with a 
-notable lack in the education of key skills such as computer programming 
-itself. This lack was found to be as much a lack in knowledge from the 
-teacher's as much as the cirriculum's failure to address the issues.
+The movement is not purely restriced to the UK. In the US there is a similarly 
+led campaign calling to recognise the topic as relevant to all contempary 
+sciences. It calls ``Computational Thinking'' a universally applicable 
+attitude and skill set everyone, not just computer scientists, would be eager 
+to learn and use \cite{Wing06}.
 
-In 2012, the Government began to recog the signifiance of Computer Science and 
-has replaced the National ICT curriculum with a revised Computing cirruculum. 
-The new Computing Program of Study \cite{DfE13} aims to enable pupils to 
-understand the world of computing, giving them the ability to think logically 
-and apply the fundamental principles of the discpline to their real-world 
-environments.
-
-Along a similar vein there is a general struggle within the humanties courses 
-available in schools to remain relevant in light of a quickly developing 
-technical world. Music schemes within the UK frequently report to have 
-suffered funding cuts and education is focused on learning a variety of 
-specific instruments, with little focus on musical technology until the later 
-years of education.
+There is a general struggle within the humanties courses available in schools to 
+remain relevant in light of a quickly developing technical world. Music schemes 
+within the UK frequently report to have suffered funding cuts and education is 
+focused on learning a variety of specific instruments, with little focus on 
+musical technology.
 
 As well as the necessity of Computer Science and Music within schools, there 
 is an increasing recognition of the power of programming amongst the general 
@@ -101,34 +82,50 @@ reported at PPIG \cite{Ch12,BC05}, and investigations into the craft practices
 of existing professional software developers who work in professional art 
 contexts \cite{W10}.
 
-The movement is not purely restriced to the UK. In the US there is a similarly 
-led campaign calling to recognise the topic as relevant to all contempary 
-sciences. It calls ``Computational Thinking'' a universally applicable 
-attitude and skill set everyone, not just computer scientists, would be eager 
-to learn and use \cite{Wing06}.
-
 Sonic Pi is one of many projects designed to support both computing and music 
 lessons within schools. Sonic Pi is an environment for creating live-coded 
 music at a level of complexity which is well suited to a first-programming 
-language \cite{sp}. There are many languages in existence which are simply 
-enough to also constitute as a good first-programming language, but many do 
-not attempt to make themselves an inviting gateway into the realm of technical 
-programming. Sonic Pi seeks to provide an exploratory and invigorating 
-introduction into programming whilst being complex enough to lead a user 
-through into much more complicated programming ideas and use cases with a 
-managable learning curve. By presenting a musical system it seeks to break 
-down the barrier between the technical elite and the hobbyist. In this report 
-Sonic Pi will be presented in terms of the formalisation of its timing effects 
-and the existing concurrency primitives of the language.
+language \cite{sp}. Many available languages are suitable as a first-programming 
+language, but not all attempt to make themselves an inviting gateway into the 
+realm of technical programming and innovation. Sonic Pi seeks to provide an 
+exploratory and invigorating introduction into programming whilst being complex 
+enough to lead a user through into much more complicated programming ideas and 
+use cases with a managable learning curve. By presenting a musical system it 
+seeks to break down the barrier between the technical elite and the hobbyist. In 
+this report Sonic Pi will be presented in terms of the formalisation of its 
+timing effects and the existing concurrency primitives of the language. 
 
 \subsection{Objectives}
-This project's aim is to formalise the concurrency and timing aspects of the 
-language and develop a program analysis tool that can be used to identify 
-program bugs such as deadlock and thrashing behaviour. The formalism and 
-analysis will build on initial work describing timing and concurrent 
-interaction via effect systems and session types. The project combines 
-theoretical aspects of type system and analysis design, as well as practical 
-work developing a responsive program analysis engine.
+In the current version of Sonic Pi there is no means to verify the timing effects
+or the communication patterns of the pattern. This is to say, user's must judge
+themselves that the program is timed correctly and that the program is free from
+concurrency bugs. The first point can be difficult for novice programmers, 
+potentially moreso for those with little musical experience. The later can be
+difficult for even some experienced programmers due to the nondeterministic 
+nature of some concurrency bugs.
+
+In building analysis for the timing effects of the program, we hope to develop
+something that is sufficiently lightweight so that it may eventually be run
+during a live performance of the program. This leads to interesting challenges
+in terms of the heuristics used when parsing the program and what solutions will 
+lead to the best possible results. We plan to utilise the speed of the platform
+and program architecture and efficient design for this matter.
+
+In developing the communication patterns of Sonic Pi we aim to utilise the
+theory of Session Types and apply them to this context. Session Types will
+enable us to define a clearly understandable structure to the communication
+patterns of the program; this will enable the tool to identify difficult bugs
+such as deadlocks and thrashing behaviour. This is possibly the first application
+of this concept to the live programming paradigm of which Sonic Pi is a part.
+
+%% Initial Project Outline %%%%%%%%%%%%%%%%
+% This project's aim is to formalise the concurrency and timing aspects of the 
+% language and develop a program analysis tool that can be used to identify 
+% program bugs such as deadlock and thrashing behaviour. The formalism and 
+% analysis will build on initial work describing timing and concurrent 
+% interaction via effect systems and session types. The project combines 
+% theoretical aspects of type system and analysis design, as well as practical 
+% work developing a responsive program analysis engine.
 
 \subsection{Report Structure}
 The remainder of this report is broken down as follows:
@@ -145,17 +142,43 @@ The remainder of this report is broken down as follows:
 \newpage
 
 \section{Background}
-In this section we begin by explaining the ideas and features of Sonic Pi, 
-the living coding program that forms the basis of this project. We then 
-move on to explain the subject of both Living Programming and Session Types
-in further detail and seek to relate them back to the current aims of the
-project. We conclude with details on the related work in these areas of
-research.
+In this section we begin with a short history of Computing in Schools followed 
+by explaining the ideas and features of Sonic Pi, the live coding IDE that forms 
+the basis of this project. We then move on to explain the subject of both Living 
+Programming and Session Types in further detail and seek to relate them back to 
+the current aims of the project. We conclude with details on some of the related 
+work in these areas of research.
+
+\subsection{Computing in Schools}
+Some of the earliest significant pieces of work towards the 
+education of computing started with the invention of Logo, an adaptation of 
+the LISP language, most remembered for its use of ``turtle graphics''. Some 
+time after this came the Computers in the Cirriculum Project, funded from 
+1972 to 1991 by the Schools Council with addition aid from the Microelectronics 
+Education Programme introduced in 1981. The first microcomputers appeared in 
+both UK Primary and Secondary Schools in 1979. The Commodore Pets aided both 
+spelling and arthimetic practice as well as the ability to teach either BASIC or 
+Logo. The 1980's saw a huge amount of legislative reform and technical efforts 
+to give young people the ability to work with computers. Unfortunately, over the 
+course of the late 80's and early 90's, this focus on programming ability gave 
+way to simply the education of practical use of existing computer software; 
+there was little to no focus on the programming fundamentals behind 
+these applications \cite{naec}.
+
+In 2013, Ofsted published a report documenting their findings relating to ICT 
+in UK schools from 2008 to 2011 and found that in half of all secondary 
+schools, school leavers had not been given adequete education to move into a 
+technical career in their future. In 2007, 81,100 pupils were enrolled in the 
+ICT GCSE but this had fallen to 31,800 pupils by 2011 \cite{DfEO13} with a 
+notable lack in the education of key skills such as computer programming 
+itself. This lack was found to be as much a lack in knowledge from the 
+teacher's as much as the cirriculum's failure to address the issues.
 
 \subsection{Sonic Pi}
 Sonic Pi is an imperative live programming language designed as an educational 
-first language. It is a ruby-based domain-specific language designed for 
-manipulation of synthesisers through time \cite{AB13}. It is currently in its 
+first language. It is a Ruby-based Domain-Specific Language designed for 
+manipulation of synthesisers through time \cite{AB13}. It is interpreted through 
+a VM rather than being directly compiled. It is currently in its 
 second iteration, with the main extension between the two languages being the 
 work done to improve the timing system of the project, which is discussed in 
 more detail below. Sonic Pi is built on top of the SuperCollider synthesis 
@@ -168,20 +191,20 @@ include such things as multi-threading and hot-swapping of code as these are
 likely to be of crucial importance in the future of programming contexts \cite{
 AOB14}.
 
-This section first gives a breif description of the Raspberry Pi then explores 
+This section first gives a brief description of the Raspberry Pi then explores 
 the implementation of Sonic Pi V1.0, mainly to give appropriate context to the 
-timing effects system that Sonic Pi V2.0 currently imeplments. There is then 
-be some short discussion on the particular features of Sonic Pi V2.0.
+timing system that Sonic Pi V2.0 currently imeplments. There is then be some 
+short discussion on the particular features of Sonic Pi V2.0.
 
 \subsubsection{Raspberry Pi}
 The Raspberry Pi was developed as a very low cost computer system to enable 
-technical experimentation amongst young people who had little other contact 
-with computer systems. The idea came about in 2006 as an answer to the 
-steadily decreasing levels of pupils applying to take up Computer Science 
-after their A-Levels. The reasons for this were attributed to many 
-contributing events such as the end of the dot come boom, the focus of IT 
-lessons on Microsoft software and building very basic HTML websites and the 
-increased availability of out-of-the-box games consoles over the Amigos, BBC 
+technical experimentation amongst people who have little access to computers 
+they could tinker with or expose the programming layer. The idea came about in 
+2006 as an answer to the steadily decreasing levels of pupils applying to take 
+up Computer Science after their A-Levels. The reasons for this were attributed 
+to many contributing events such as the end of the ``dot com'' boom, the focus 
+of IT lessons on Microsoft software and building very basic HTML websites and 
+the increased availability of out-of-the-box games consoles over the Amigo, BBC 
 Micro, Spectrum ZX and Commodore 64 machines that promoted individual 
 experimentation so freely in the past \cite{rp}.
 
@@ -198,32 +221,17 @@ successfully within the new movement towards better Computing education within
 Schools. 
 
 \subsubsection{Sonic Pi V1.0}
-The initial development time given to Sonic Pi v1.0 was roughly three weeks. 
-It was designed largely as a port from the language Overture to focus on 
-driving specific educational objectives with the idea in mind to teach a 
-target audience of 12-year-olds that had no previous experience with 
-programming; it would bring them from the introduction of a computer through 
-to the ability to write a full length program over the course of a few weeks. 
-Sonic Pi was built as a ruby-based language both through the author's existing 
-experience with the language and also to keep it in line with languages 
-already used within the industry. Python is well regarded as an educational 
-language and given the semantic similarity between Python and Ruby it was easy 
-to defend Ruby as a choice of language implementation \cite{AB13}. 
-
-The immediate feature that Sonic Pi focuses on is sequential ordering in 
-imperative programs; demonstrated in musical theory by the sequential playing 
-of notes. 
 
 \begin{multicols}{2}
-The Code Snippets shown demonstrate two small Sonic Pi programs. The first 
-demonstates the situation where the MIDI notes would be played together. Sonic 
-Pi v1.0 takes advantage of fast clockspeeds of modern processors in order to 
-assume the sequence of instructions would be likely to execute quickly enough 
-to sounds together. In order to separate them into sequential notes they must 
-be separated with a sleep instruction as demonstrated by the second code 
-Snippet. The notation for sleep in Sonic Pi V1.0 is similar to that of the 
-POSIX sleep operation\cite{IG13}. The default sound that Sonic Pi uses in 
-these contexts is a pleasant bell sound from the SuperCollider synthesiers.
+Sonic Pi V1.0 was designed to port the language Overture to the 
+Raspberry Pi in order to focus on driving specific educational 
+objectives; the idea in mind was to teach a target audience of 12-year-olds that 
+had no previous experience with programming; it would bring them from the state 
+of ``this is a computer'' through to the ability to write a full length program, 
+that generated satisfying music, over the course of a few weeks. Sonic Pi is a Ruby-based language both due to the author's existing experience with 
+the language and to keep it in line with the languages already used within the 
+industry. Python is well regarded as an education language and the semantic similarity between the two makes Ruby easy to defend as a language choice.
+\\
 
 \begin{minipage}{0.5\textwidth}
 	\begin{minipage}[t]{\textwidth}
@@ -234,6 +242,7 @@ these contexts is a pleasant bell sound from the SuperCollider synthesiers.
 		\end{lstlisting}
 		\captionof{lstlisting}{Chord Form: Successive Notes}
 	\end{minipage}
+
 	\begin{minipage}[t]{\textwidth}
 		\begin{lstlisting}[language = ruby]
 	play 60
@@ -248,20 +257,31 @@ these contexts is a pleasant bell sound from the SuperCollider synthesiers.
 
 \end{multicols}
 
-The monadic structure of the statements may not be necessarily elegant to many 
-experienced programmers. However, it can be seen that the ability to skip the 
-arguably verbose nature of structured syntax makes it much more relevant in 
-the contexts of a classroom as pupils are able to start creating meaningful 
-programs with much more speed. From the point of view of providing any future 
-debugging interfaces, it has a small benefit in removing the code overhead for 
-finding and correcting such small syntactical issue such as missing \texttt{;}. 
+The immediate feature that Sonic Pi focuses on is sequential ordering in 
+imperative programs; demonstrated in musical theory by the sequential playing 
+of notes. Code Snippets 1 and 2 demonstrate two small Sonic Pi programs. The 
+first demonstrates the situation where the MIDI notes would be played together. 
+Sonic Pi v1.0 takes advantage of fast clockspeeds of modern processors in order 
+to assume the sequence of instructions would execute quickly enough 
+to sounds together. In order to separate them into sequential notes they must 
+be separated with a sleep instruction as demonstrated by Snippet 2. The notation 
+for sleep in Sonic Pi V1.0 is similar to that of the POSIX sleep operation 
+\cite{IG13}. The default sound that Sonic Pi uses in these contexts is a 
+pleasant bell sound from the SuperCollider synthesiers.
+
+It can be seen that the ability to skip the arguably verbose nature of 
+structured syntax makes it much more relevant in the contexts of a classroom; 
+pupils are able to start creating meaningful programs with much more speed. From 
+the point of view of providing any future debugging interfaces, it has a small 
+benefit in removing the code overhead for finding and correcting such small 
+syntactical issue such as missing \texttt{;}. 
 
 These semantics work well in an educational context but do not allow for the 
 correct timing of musical notation which puts them at odds with user 
 expectations. To demonstrate this more concretely, below are two further code 
-Snippets demonstrating Sonic Pi's basic threading abilities. Sampling is a 
-feature of Sonic Pi V2.0 but are presented here in the context of V1.0 
-programs as the two versions are semantically similar.
+snippets demonstrating Sonic Pi's basic threading abilities. Sampling is a 
+feature of Sonic Pi V2.0 but is presented here in the context of V1.0 
+programs as the two versions are syntaxtically similar.
 
 \begin{multicols}{2}
 In Snippet 3 the desired outcome is to play MIDI note 60 together with the 
@@ -329,7 +349,7 @@ and also not consistent across different runs of the same program.
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.9\textwidth]{images/sonic-one.png}
-	\caption{Timing in Sonic Pi V1.0}
+	\caption{Timing in Sonic Pi V1.0 \cite{AOB14}}
 \end{figure}
 
 
@@ -367,7 +387,7 @@ we are now treating the code snippets as V2.0 programs.
 Each chord line demonstrates Sonic Pi's ability to play notes in parallel, the 
 system still taking advantage of the capabilities of modern processors. \texttt
 {sleep} now acts as a ``temporal barrier'' between statements; it works by 
-clocking computation from proceeding until the given time has elapsed \emph{
+blocking computation from proceeding until the given time has elapsed \emph{
 since the program began running}. It does \emph{not} block from the end of the 
 notes played. In terms of Snippet 5, this means that the second chord is 
 played once one second has elapsed and the third chord will not be played 
@@ -378,17 +398,17 @@ sleep} statement was called. This is similar to how the language ChucK handles
 the interaction of time using its (multiply) overloaded \texttt{=>} operator 
 \cite{WC03}.
 
-For completeness it was worth noting that Snippet 5 demonstrates the ordered 
+For completeness it is worth noting that Snippet 5 demonstrates the ordered 
 effect as the three chords are played in the order written.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.8\textwidth]{images/sonic-two.png}
-	\caption{Timing in Sonic Pi V2.0}
+	\caption{Timing in Sonic Pi V2.0 \cite{AOB14}}
 \end{figure}
 
-The semantics introduced here are achieved by implementing a previously 
-mentioned concept of ``virtual time''. In Sonic Pi V2.0, virtual time is a 
+The semantics introduced here are achieved by implementing the concept of 
+``virtual time''. In Sonic Pi V2.0, virtual time is a 
 thread-local variable that is only advanced by a new \texttt{sleep} command, 
 which means that the programmer has explicit control over the timing of the 
 program. Each thread maintains access to both the real time elapsed and the 
@@ -397,16 +417,16 @@ variable to scheduled requested effects. In order to keep time with the
 explicit timing requirements of the program the \texttt{sleep} command will 
 take account of the execution time between the last \texttt{sleep} statement 
 and the current execution point. Referring back to Snippet 5, at the point at 
-which the program executes the second \texttt{sleep} command, if if execution 
+which the program executes the second \texttt{sleep} command, if execution 
 of the F major chord took 0.1s of execution time then the program will only 
-sleep for 0.4s. This is to ensure there is no rhythm drift. The only overhead 
-in the rhythm are from the play statements following the last \texttt{sleep} 
-executed. This is demonstrated visiually with Figure 2.
+sleep for 0.4s. This is to ensure there is no rhythm drift; the only overhead 
+in the rhythm is from the play statements following the last \texttt{sleep} 
+executed. This is demonstrated visually with Figure 2.
 
 To deal with the non-deterministic execution times within a sleep barrier, and 
 also to deal with the time cost for the synthesiser to schedule output 
 effects, a constant \texttt{scheduleAheadTime} value is added to the current 
-virtual time for all asynchronously scheduled effects. If the jitter time and 
+virtual time for all asynchronously scheduled effects. If the 
 execution time between \texttt{sleep} commands never exceeds this value then 
 the temporal requirements of Sonic Pi are met. 
 
@@ -414,7 +434,7 @@ It is possible that the time between \texttt{sleep} commands may over-run -
 this may be common in the event someone requested a short \texttt{sleep} time 
 such as 0.1s or even 0.05s. In this case, the described programming model is 
 not useful for providing hard deadlines but can function with ``soft'' 
-deadlines (along the vein of Hansson and Jonsson \cite{HJ94}. In the event a 
+deadlines (along the vein of Hansson and Jonsson \cite{HJ94}). In the event a 
 thread falls behind in execution time then the user is given explicit 
 warnings. Should the amount of time the thread is behind exceed a specific fall
 -behind value, as defined within Sonic Pi, then the system will stop that 
@@ -422,9 +442,9 @@ thread and throw a time exception. This provides essential temporal
 information about the program and its behaviour to the users. This is a 
 positive in terms of educational use but is something a live coder will aim to 
 avoid during a real performance. This feature also provides a safety mechanism 
-against common errors such as placing isolated \texttt{play} calls between \
-texttt{sleep} commands which would have the problem of taking up all of the 
-system resources; instead the thread self-termininates and allows any other 
+against common errors such as placing isolated \texttt{play} calls between 
+\texttt{sleep} commands which would have the problem of taking up all of the 
+system resources; instead the thread self-terminates and allows any other 
 threads to continue executing.
 
 \paragraph{Threading}
@@ -432,23 +452,23 @@ threads to continue executing.
 Threading has already been introduced breifly; this section focuses on the 
 further improvement that Sonic Pi V2.0 brings to its threading primitive. 
 Within V2.0 there are multiple commands which allow for easy synchronisation 
-of threads whilst the programming is running. Threads also implement thread-
-based inheritance wherein they take all of the synthiser settings of the 
+of threads whilst the program is running. Threads also implement thread-
+based inheritance wherein they take all of the synthesiser settings of the 
 thread they were spawned from.
 
-The keyword \texttt{in\_thread} is enables Sonic Pi users to run pieces of 
+The keyword \texttt{in\_thread} enables Sonic Pi users to run pieces of 
 code concurrently. Threads can be named as shown in Snippet 6 in a similar way 
 to how functions are named in Sonic Pi. The simple nature of its loop syntax 
 enables this to be as easy a concept to grasp as the previously defined 
 temporal semantics. These threads alone do not allow for the live coding that 
 Sonic Pi has been created for. With a simple \texttt{in\_thread} it is more 
 verbose to change the program sound as the program is running. For this, Sonic 
-Pi V2.0 provides a \texttt{live\_loop} functionality.
+Pi V2.0 provides \texttt{live\_loop}.
 
 An interesting point to note about Sonic Pi V2.0 is that actually running the 
 program starts the current program in another thread. Because of this one can 
 actually press run multiple times and have the program layered over the top of 
-itself. There are no particular synchronisation primitivs defined over these 
+itself. There are no particular synchronisation primitives defined over these 
 ``global'' threads, but it makes for an interesting performance if timed 
 correctly.
 
@@ -473,7 +493,7 @@ correctly.
 \end{minipage}
 
 \texttt{live\_loops} can be named much more cleanly than \texttt{in\_threads} 
-and are where Sonic Pi really comes into it's live coding roots. Whilst 
+and are where Sonic Pi really comes into its live coding roots. Whilst 
 running a program, Sonic Pi's \texttt{live\_loops} will automatically update 
 the program without skipping any beats. This gives the users a great amount of 
 freedom to experiment with different sounds without having to stop the program 
@@ -498,8 +518,8 @@ event which we are able to \texttt{sync} on to.
 \clearpage
 \begin{multicols}{2}
 The Snippets to the right demonstrate a rough workflow of how a user would use 
-the \texttt{cue} and \texttt{sync} features. To begin with the loops 
-\texttt{foo} and \texttt{bar} are out of time with one another.
+the \texttt{cue} and \texttt{sync} features. To begin with we assume the loops 
+\texttt{foo} and \texttt{bar} are out of time.
 
 To work with the current example one would begin to fix the situation by 
 changing the sleep time in \texttt{foo} to 0.5s. Most likely, this will still 
@@ -510,11 +530,12 @@ no regard to the other. We can fix this by \emph{syncing} one thread to the
 other, so that it will only fire when the other thread has looped. In this 
 case we have synced \texttt{bar} onto \texttt{foo}.
 
-This gives way to some very obvious deadlock scenario's that users must avoid. 
-If you create two live loops, \texttt{one} and \texttt{two} writing a 
-situation that results in either \texttt{cue :one} in the second thread and 
-\texttt{cue :two} in the first, or similar with \texttt{sync} then this will 
-result in a deadlock as both threads wait for the call from the other.
+This gives way to some very obvious deadlock scenarios (shown in Snippet 10) 
+that users must avoid. If you create two live loops, \texttt{one} and 
+\texttt{two} writing a situation that results in either \texttt{cue :one} in the 
+second thread and \texttt{cue :two} in the first, or similar with \texttt{sync} 
+then this will result in a deadlock as both threads wait for the call from the 
+other.
 	\begin{minipage}{0.5\textwidth}
 
 		\begin{minipage}{\textwidth}
@@ -551,6 +572,23 @@ end
 	\end{minipage}
 \end{multicols}
 
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[language = ruby]
+	live_loop :foo do
+	    cue :bar
+	    play :e4, release: 0.5
+	    sleep 0.5
+	end
+
+	live_loop :bar do
+	    cue :foo
+	    sample :bd_haus
+	    sleep 1
+	end
+	\end{lstlisting}
+	\captionof{lstlisting}{Deadlock}
+\end{minipage}
+
 \paragraph{The IDE}
 The IDE is as much a part of the educational experience as the language 
 itself. Sonic Pi features a bespoke environment that contains only the bare 
@@ -565,7 +603,7 @@ minmal confusion. For this reason the IDE only consists of five key components:
 	\item Error Pane
 \end{itemize}
 
-\begin{figure}[ht]
+\begin{figure}[t]
 	\centering
 	\includegraphics[width=\textwidth]{images/sonic-ide.png}
 	\caption{Sonic Pi V2.1.1 IDE - Apple Mac View}
@@ -581,7 +619,7 @@ Since then, in Sonic Pi V2.1.1, it has added the ability to save the current
 workspace to your file system, the ability to record what is playing and save 
 as a .wav file type, basic formatting buttons, the ability to import other 
 music files as custom samples, information and tutorial sections, all whilst 
-remainind simplistic and easily useable. Features are non-intrusive but 
+remain simplistic and easily useable. Features are non-intrusive but 
 incredibly useful in terms of allowing those pupils who thrive with the system 
 to continue to experiment outside the scope of the regular cirruculum lessons.
 
@@ -611,12 +649,12 @@ specification and allows for new level of freedom and creativity in the
 programs being created. 
 
 Given the nature of Live Programming the languages that invoke it are often 
-dynamic language which allow for the flexibility, conciseness and ease of 
+dynamic languages which allow for the flexibility, conciseness and ease of 
 development \cite{McD07} to enable the act of live programming to feel as 
 natural as standard programming practice.
 
 Live Programming lends itself also to acts of performance, where Live Coders 
-will often perform to live audiences, often producing such things as live 
+perform to live audiences, often producing such things as live 
 improvisational music or artwork, whilst having some means by which the 
 audience will also see the code written at the same time. For a Live Coder 
 there is frequently no desire to create a final software product or even a set 
@@ -625,13 +663,14 @@ manufacture. From a social and cultural viewpoint, Live Programming lends
 itself to breaking down the barriers that have been built up between software 
 technology and the creative users \cite{McL13}.
 
-It is interesting that the users level as a musician will have specific 
+It is interesting that the user's level as a musician will have specific 
 impacts on their experience with the systems in use in the context of live 
-programming and audio languages. Musical scores will provide an implicit time 
-representation whilst most musical languages will use explicit temporal 
+programming and audio languages. Musical scores provide an implicit time 
+representation whilst most musical languages tend to use explicit temporal 
 structures. This generally makes the representation of rhythm within the 
 language guarantee only the ordering of the notes and not the time elapsed 
-between playing each one. In terms of musical experience, non-experienced 
+between playing each one; the temporal structure provides no clear guarantee as 
+to execution length. In terms of musical experience, non-experienced 
 users may be able to identify an odd sound within this system but be unable to 
 pinpoint exactly what causes the problem. 
 
@@ -641,7 +680,9 @@ research area, with most of the popular languages appearing over the last
 decade. This comes as part of a wider movement of programming reaching more of 
 the general populace and as it is applied with more and more creative outlets 
 in mind, this separate way of thinking about the programming environment is 
-likely to produce more interesting projects as time develops. Lee et al. \cite{LDW87} proposed six features that would be required to exist in order to present a programming environment with a ``first class'' semantics for time:
+likely to produce more interesting projects as time develops. Lee et al. 
+\cite{LDW87} proposed six features required for a programming environment with a 
+``first class'' semantics for time:
 
 \begin{itemize}
 	\item The ability to express timing constraints
@@ -652,7 +693,9 @@ likely to produce more interesting projects as time develops. Lee et al. \cite{L
 	\item Static timing verification
 \end{itemize}
 
-On the conclucion of the project we will seek to see how well the extended Sonic Pi application is able to address these issues, to see if it may be described as having a ``first class'' semantics.
+On the conclucion of the project we will seek to see how well the extended Sonic 
+Pi application is able to address these issues, to see if it may be described as 
+having a ``first class'' semantics.
 
 \subsection{Session Types}
 Over recent years there has been a massive increase in the amount of 
@@ -668,18 +711,14 @@ software. In a similar way to how Object Oriented paradigms sought to solve
 the issues presented by large scale system written largely with spaghetti 
 code, Session Types seek to restructure existing complex behaviours in a 
 manner which is more lucid, readible and ultimately more easy to verify. Honda 
-et al (98) present this in terms of simple concurrent primitives that build up 
-a basic structuring method for communication-based concurrent programming. In 
-terms of this project, we seek to use some of the binary notions of the 
-project to help with the verification of communication between live threads to 
-ensure safety during a system's performance. This is a very basic system to 
-apply the concept to but given the inherently dynamic and concurrent nature of 
-the program it presents itself as an interesting avenue of application. The 
-use of Session Types in terms of Sonic Pi will be the type discipline that 
-plays a fundamental role in guaranteeing the compatability of process 
-interaction - it is especially effective at detecting deadlocks in a system, 
-one of the primary sources of error in concurrent systems. Session Types are 
-also designed in a language agnostic manner, meaning it will be possible to 
+et al \cite{HVM98} present this in terms of simple concurrent primitives that 
+build up a basic structuring method for communication-based concurrent 
+programming. In terms of this project, we will initially be using simple 
+communication primitives to check the program for such concurrency bugs as 
+deadlocks. Sonic Pi appears a simple language to apply the theory of Session 
+Types to but the dynamic and concurrent nature of the language give it some 
+interesting communication patterns to formalise. Session Types 
+are also designed in a language agnostic manner, meaning it will be possible to 
 apply to Sonic Pi's Ruby-like syntax.
 
 Session Types consist of the following key ideas:
@@ -689,15 +728,15 @@ A basic structural concept known as \emph{sessions}. These are designated via
 program; those interactions are performed via the channels. As well as the 
 session, other concurrent programming contructs are provided: parallel 
 composition, name hiding, conditional and recursion. The combination of 
-recursion and sessions allow for the expression of unbounded thread of 
+recursion and sessions allow for the expression of an unbounded thread of 
 interaction as a single abstraction unit.
 
 Three basic communication primitives that all other structures will be built 
 from: \emph{value passing} - standard synchronised message-passing, \emph{
-label branching} - purified method invocation, devoid of value passing - and \
-emph{delgation} - the passing of a channel to another process. Alongside 
-sessions, these allow for complex structures to be defined and described with 
-clarity.
+label branching} - purified method invocation, devoid of value passing - and 
+\emph{delgation} - the passing of a channel to another process. Alongside 
+sessions, these allow for complex communication structures to be defined and 
+described with clarity.
 
 Finally there is a basic type discipline for the communication primitives. 
 Without this there would be no way to guarantee the typability of a program, 
@@ -705,16 +744,94 @@ ensuring that two communicating processes always have compatible patterns of
 communication. It is the incompatibility of interaction patterns that is one 
 of the main reasons for bugs in commmunication-based programming.
 
+% Relate Session Types to project
+
+\subsubsection{Syntax Summary}
+
+The syntax used to describe session types are as follows:
+
+\begin{itemize}
+	\item \emph{names}: ranged over by \emph{a,b...}
+	\item \emph{channels}: ranged over by \emph{k, k'...}
+	\item \emph{variables}: ranged over by \emph{x, y...}
+	\item \emph{constants}: ranged over by \emph{c, c'...}
+	\item \emph{expressions}: ranged over by \emph{e, e'...}
+	\item \emph{labels}: ranged over by \emph{l,l'...}
+	\item \emph{process variables}: ranged over by \emph{X, Y... u, u'...}
+\end{itemize}
+
+\emph{processes}, ranged over by \texttt{P, Q...}, are given by the following 
+grammar:
+
+\begin{verbatim}
+ 
+\end{verbatim}
+
+``$|$'' is the weakest association; the others listed have the same association. 
+Parenthesis denote binders which bind the corresponding free occurrences. We use standard simulataneous substitution, written $ $. The sets of free names/channels/variables/process variables of, for example program \texttt{P}, are written as \texttt{fn(P), fc(P), fv(P) and fpv(P)} respectively. Processes without free variables or free channels are called programs.
+
+\subsubsection{Basic Concepts}
+
+The central idea to presenting structure is the \emph{session}. A \emph{session} 
+is a set of reciprocal interactions between two parties and serves as a unit of 
+abstraction for describing that interaction. Communications of sessions are done 
+via a \emph{channel} and can be initiated as follows:
+
+\begin{verbatim}
+	 request a(k) in P    accept a(k) in P 
+\end{verbatim}
+
+The \texttt{request} first requests the initiation of a \emph{session} (with 
+\emph{name a}) as well as the generation of a fresh \emph{channel} (with 
+\emph{name k}) which \texttt{program P} will then use for later communication. 
+On the other hand, \texttt{accept} receives the request to initiate the session 
+\emph{a} and generates channel \emph{k} for use in \texttt{P}. In this function, 
+parenthesis and the keyword \texttt{in} show scope binding.
+
+Via this generated channel, we can then perform three kinds of atomic operation:
+
+\begin{verbatim}
+
+\end{verbatim}
+
+\emph{Data sending/receiving} is the standard synchronous message passing. 
+\emph{e\textsubscript{i}} denotes expression and we assume the \emph{x} 
+variables are all distinct.
+
+\emph{Brancing/Selection} is the minimisation of method invocation in object-
+based programming. The labels are assumed to be pairwise distinct. 
+
+\emph{Channel Passing}, also referred to as \emph{Delegation}, passes a channel 
+which is being used in a session to another process, enabling us to radically 
+chance the structure of a session. \emph{Delegation} is the generalisation of 
+the concept of the same name in object-based programming \cite{YT87}.
+
+We futher define the session types with the following standard constructs, 
+organised by session:
+
+\begin{verbatim}
+
+\end{verbatim}
+
+\emph{Hiding} declares a name/channel to be local in its scope (here 
+\texttt{P}). Whilst not used in regular programming it is needed in the 
+Operation Semantics of session types. Recursion could be achieved through 
+replication but multiple is preferable for well-structured programs.
+
+\subsubsection{Operational Semantics}
+
+
 \subsection{Related Work}
 This section discusses much of the work discovered during the intial research 
 of the project. There are many interesting live programming environments out 
 in use in the world, with each having an interesting approach to the technical 
-challenges surrounding the issue of temporal semantics. We breifly discuss 
-some programs that have made use of the Session Types structures as described 
-previously as this gives a clearer picture of their use and viability within 
-the real world. It is worth noting that, to date, there is no apparent system 
-which seeks to apply the Session Typing structure to a live programming 
-paradigm to address some of the concurrency issues faced in that field.
+challenges surrounding the issue of temporal semantics. We briefly discuss 
+some languages/environments that have made use of the Session Types structures 
+as described previously as this gives a clearer picture of their use and 
+viability within the real world. It is worth noting that, to date, there is no 
+apparent system which seeks to apply the Session Typing structure to a live 
+programming paradigm to address some of the concurrency issues faced in that 
+field.
 
 As noted by Rorhruber \cite{BMNR14}, there have been many publications and 
 discussions relating to alternative approaches for temporal semantics and 
@@ -746,7 +863,7 @@ One of the closest other languages to Sonic Pi V2.0, as mentioned earlier, is
 the similarly imperative styled language ChucK \cite{WC03}. ChucK is a strongly
 -typed, imperative programming language whose syntax and semantics are 
 governed by its flexible type system. The strength of the language lies in its 
-(multibly) overloaded \texttt{=>} operator and its support of such features as 
+(multiply) overloaded \texttt{=>} operator and its support of such features as 
 dynamic control rates and strong concurrency principles. The ordering of a 
 program is captured naturally by the logic of the operator and ChucK allows 
 the programmer, composer and performer to write truly concurrent code using 
@@ -816,9 +933,9 @@ for some extension work as suggested below.
 	where variables are passed to different functions in the code or when the 
 	timing is dynamically calculated.
 	\item Formalise Session Types: The current form of Sonic Pi does not have a 
-	full description of the application of session types to the language. The 
-	focus on this will be extending the existing formulisation to include local 
-	branching, recursion and delegation of session types in Sonic Pi.
+	full description of the application of session types to the language. The
+	idea is to define the formalisation of the theory of session types applied
+	to Sonic Pi, including local branching, recursion and delegation.
 	\item Implementing Types: This continues the previous point, the idea being 
 	to physically implement the features within the language. This will also act 
 	as tests that the formalisation is written well enough.
@@ -881,8 +998,7 @@ it's capabilities.
   Aaron, S., Orchard, D. and Blackwell, A.F.,
   \emph{Temporal Semanics for a Living Coding Language},
   Proceedings of the 2nd ACM SIGPLAN International Workshop on Functional Art, Music, Modeling \& Design,
-  Boston, Massachusetts, USA,
-  ACM, pp. 37-47,
+  Sweden, ACM, pp. 37-47,
   (2014)
 
 \bibitem{BAD14}
@@ -1016,6 +1132,12 @@ it's capabilities.
   Communication of the ACM,
   Vol. 49, pp. 33-35,
   (2006)
+
+\bibitem{YT87}
+  Yonezawa, A. and Tokoro, M.,
+  \emph{Object-Oriented Concurrent Programming},
+  MIT Press,
+  (1987)
 
 \end{thebibliography}
 
