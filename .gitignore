@@ -36,3 +36,7 @@
 # Mac
 
 *.DS_Store
+
+# Make Build
+
+.depend

@@ -1,0 +1,14 @@
+Parser
+
+- ruby is not easy to parse
+see: http://programmingisterrible.com/post/42432568185/how-to-parse-ruby
+{maybe find something that isn't actually a tumblr blog?}
+
+
+most available parsers are slim, only really building an ast with no other information to use
+- not the worst thing for this project
+most written in ruby, this project wants to be written in C++ {for reasons} which requires the use of ruby's FFI stuff to get data across
+
+using rice as it seems to have clear docs and a nice wrapper around the FFI and is specific to C++ as an output
+-> required writting the C++ AST first for correct 'annotations'
+

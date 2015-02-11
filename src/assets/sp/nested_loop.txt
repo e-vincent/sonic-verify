@@ -1,0 +1,7 @@
+loop do
+  28.times do
+    play 62
+    play 64
+  end
+  sleep 4
+end
