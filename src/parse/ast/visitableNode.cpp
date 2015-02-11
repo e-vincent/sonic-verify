@@ -3,9 +3,6 @@
 namespace ast
 {
 
-void accept(ast::Visitor)
-{
-	// stub
-}
+
 
 } // namespace ast

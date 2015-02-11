@@ -1,4 +1,5 @@
 #include "parse/ast/rootNode.h"
+#include "parse/ast/visitor.h"
 
 namespace ast
 {

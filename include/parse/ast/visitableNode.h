@@ -1,14 +1,15 @@
 #ifndef __VISITABLE_NODE_H__
 #define __VISITABLE_NODE_H__
 
-#include "parse/ast/visitor.h"
-
 namespace ast
 {
 
+class Visitor;
+
 class VisitableNode
 {
-	virtual void accept(Visitor v);
+public:
+	void accept(Visitor v);
 };
 
 } // ast

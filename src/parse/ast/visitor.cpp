@@ -3,9 +3,10 @@
 namespace ast
 {
 
-void accept(ast::RootNode rootNode)
+void Visitor::visit(ast::RootNode* rootNode)
 {
 	// stub for now?
+	std::cout << rootNode << "\n";
 }
 
 }

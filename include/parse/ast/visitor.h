@@ -1,6 +1,7 @@
 #ifndef __VISITOR_H__
 #define __VISITOR_H__
 
+#include <iostream>
 #include "parse/ast/rootNode.h"
 
 namespace ast
@@ -8,7 +9,8 @@ namespace ast
 
 class Visitor
 {
-	void visit(ast::RootNode rootNode);
+public:
+	void visit(ast::RootNode* rootNode);
 };
 
 } // namespace ast
