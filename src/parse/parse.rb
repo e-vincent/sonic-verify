@@ -1,6 +1,7 @@
 require 'parser/current'
+require_relative './../builder'
 
-path = "../assets/sp/"
+path = "assets/sp/"
 filename = path + "nested_loop.txt"
 #filename = path + "simple_sequence.txt"
 #filename = path + "simple_chord.txt"
@@ -18,6 +19,8 @@ buffer = Parser::Source::Buffer.new(filename)
 buffer.source = contents
 p = parser.parse(buffer)
 
-p p
+#p p
+builder = Builder.new
+builder.entry(5)
 
 file.close

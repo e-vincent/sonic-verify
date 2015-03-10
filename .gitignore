@@ -34,7 +34,6 @@
 *.fdb_latexmk
 
 # Mac
-
 *.DS_Store
 
 # Make Build
