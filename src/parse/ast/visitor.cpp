@@ -3,12 +3,12 @@
 namespace ast
 {
 
-void Visitor::visit(ast::RootNode* rootNode)
+void Visitor::visit(ast::VisitableNode* visitableNode)
 {
 	// stub for now?
 
 	// for compile purposes...
-	std::cout << rootNode << "\n";
+	std::cout << visitableNode << "\n";
 }
 
 }

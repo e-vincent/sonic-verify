@@ -1,0 +1,13 @@
+loop do
+    2.times do
+        play 50
+        sleep 0.5
+    end
+end
+
+loop do
+    2.times do
+        play 50
+        sleep 0.5
+    end
+end

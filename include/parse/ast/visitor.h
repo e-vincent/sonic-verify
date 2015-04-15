@@ -2,7 +2,7 @@
 #define __VISITOR_H__
 
 #include <iostream>
-#include "parse/ast/rootNode.h"
+#include "parse/ast/visitableNode.h"
 
 namespace ast
 {
@@ -10,7 +10,7 @@ namespace ast
 class Visitor
 {
 public:
-	void visit(ast::RootNode* rootNode);
+	void visit(ast::VisitableNode* visitableNode);
 };
 
 } // namespace ast
