@@ -2,6 +2,7 @@
 #define __VISITOR_H__
 
 #include <iostream>
+
 #include "parse/ast/visitableNode.h"
 
 namespace ast

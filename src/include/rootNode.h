@@ -14,9 +14,9 @@ protected:
 
 public:
 	RootNode();
-	RootNode(std::string root);
+	RootNode(std::string root, int index, int parent);
 
-	void accept(IVisitor v);
+	void accept(Visitor v);
 };
 
 } // namespace ast

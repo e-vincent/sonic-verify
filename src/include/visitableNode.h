@@ -9,21 +9,21 @@
 namespace ast
 {
 
-class IVisitor;
+class Visitor;
 
 class VisitableNode
 {
 private:
 
 protected:
-	std::list<ast::VisitableNode*> _children;
-
-public:
 	std::string value;
 	int index;
 	int parent;
 
-	void accept(IVisitor v);
+	std::list<ast::VisitableNode*> _children;
+
+public:
+	void accept(Visitor v);
 };
 
 } // namespace ast

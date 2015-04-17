@@ -1,43 +1,68 @@
 #include <iostream>
-
 #include <ruby.h>
 
-//#include "rice/Class.hpp"
 #include "rice/Data_Type.hpp"
 #include "rice/Constructor.hpp"
 
-//#include "lib/parser"
+#include "parse/ast/nodeTree.h"
+#include "parse/ast/rootNode.h"
+#include "parse/ast/bodyNode.h"
 
 class Builder
 {
 
+private:
+	
+	ast::NodeTree* _tree;
+
 public:
-	Builder(){}
+	Builder()
+	{
+		_tree = new ast::NodeTree();
+	}
 
 	void entry(Rice::Symbol thing)
 	{
 		std::cout << "Current Node: <" << thing << ">\n";	
 	}
 
-	void makeRoot(Rice::Symbol root, int index)
+	ast::BodyNode* makeNode(Rice::Symbol token, 
+		int index, int parent)
+	{
+		return new ast::BodyNode(token.str(), index, parent);
+	}
+
+	void makeRoot(Rice::Symbol root)
 	{
 		// has node marker 0
-		std::cout << "Node Index::: " << index << "\n";
-		std::cout << "Root is Symbol Type: <" << root << ">\n";
+		// std::cout << "Node Index::: 0\n";
+		// std::cout << "Root is Symbol Type: <" << root << ">\n";
+
+		ast::RootNode* rootNode = new ast::RootNode(root.str());
+		_tree->setRoot(rootNode);
+		std::cout << "\n";
 	}
 
 	void addNode(Rice::Symbol nodeType, int index, int parent)
 	{
-		std::cout << "Node Index::: " << index << "\n";
-		std::cout << "Given Node: <" << nodeType << "> has parent ";
-		std::cout << parent << "\n";
+		// std::cout << "Node Index::: " << index << "\n";
+		// std::cout << "Given Node: <" << nodeType << "> has parent ";
+		// std::cout << parent << "\n";
+
+		ast::BodyNode* node = makeNode(nodeType.str(), index, parent);
+		_tree->addNode(node, index, parent);
+		std::cout << "\n";
 	}
 
 	void addValue(std::string val, int index, int parent)
 	{
-		std::cout << "Node Index::: " << index << "\n";
-		std::cout << "Leaf Value: <" << val << "> has parent";
-		std::cout << parent << "\n";
+		// std::cout << "Node Index::: " << index << "\n";
+		// std::cout << "Leaf Value: <" << val << "> has parent";
+		// std::cout << parent << "\n";
+
+		ast::BodyNode* node = makeNode(val, index, parent);
+		_tree->addNode(node, index, parent);
+		std::cout << "\n";
 	}
 
 };
@@ -53,4 +78,3 @@ void Init_builder()
 		.define_method("addNode", &Builder::addNode)
 		.define_method("addValue", &Builder::addValue);
 }
-
