@@ -17,7 +17,6 @@ public:
 
 	ast::VisitableNode* root();
 	ast::VisitableNode* findNode(int index);
-	//ast::VisitableNode* makeNode(Rice::Symbol token, int index, int parent);
 	
 	void setRoot(ast::VisitableNode* rootNode);
 	void addNode(ast::VisitableNode* node, int index, int parent);
