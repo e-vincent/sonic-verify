@@ -13,7 +13,46 @@ ast::VisitableNode* NodeTree::root()
 ast::VisitableNode* NodeTree::findNode(int index)
 {
 	std::cout << "Find Node: " << index << "\n";
-	return NULL;
+
+	ast::VisitableNode* curr = this->rootNode;
+	ast::VisitableNode* result = NULL;
+
+	while (curr != NULL)
+	{
+		if (curr->index == index)
+		{
+			result = curr;
+		}
+
+		// this is written terribly
+		std::cout << "Kid Count: " << curr->children.size() << "\n";
+		if (!curr->children.size())
+		{
+			break;
+		}
+
+		ast::VisitableNode* old = curr;		
+		for (ast::VisitableNode* child : curr->children)
+		{
+			if (child->index <= index)
+			{
+				curr = child;
+			}
+		}
+
+		// if curr didn't change there were no children to search further
+		if (curr == old)
+		{
+			curr = NULL;
+		}
+	}
+
+	if (result)
+	{	
+		std::cout << "Found result: " << result->value << " ";
+		std::cout << result->index << "\n";
+	}
+	return result;
 }
 
 void NodeTree::setRoot(ast::VisitableNode* rootNode)
@@ -27,6 +66,9 @@ void NodeTree::addNode(ast::VisitableNode* node,
 	std::cout << node->value << "\n";
 	std::cout << "Add Node: " << index;
 	std::cout << " with parents " << parent << "\n";
+
+	ast::VisitableNode* parNode = findNode(parent);
+	parNode->children.push_back(node);
 }
 
 } // namespace ast

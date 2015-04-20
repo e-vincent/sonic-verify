@@ -20,7 +20,6 @@ buffer = Parser::Source::Buffer.new(filename)
 buffer.source = contents
 data = parser.parse(buffer)
 
-puts "====Kids: "
 children = data.children
 
 builder = Builder.new

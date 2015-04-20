@@ -21,6 +21,11 @@ public:
 		_tree = new ast::NodeTree();
 	}
 
+	~Builder()
+	{
+		delete _tree;
+	}
+
 	void entry(Rice::Symbol thing)
 	{
 		std::cout << "Current Node: <" << thing << ">\n";	

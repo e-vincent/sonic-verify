@@ -16,9 +16,9 @@ class VisitableNode
 private:
 
 protected:
-	std::list<ast::VisitableNode*> _children;
 
 public:
+	std::list<ast::VisitableNode*> children;
 	std::string value;
 	int index;
 	int parent;
