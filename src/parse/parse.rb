@@ -1,5 +1,5 @@
 require 'parser/current'
-require_relative '../../bin/builder'
+require_relative '../../bin/verify'
 
 path = "src/assets/sp/"
 
@@ -23,6 +23,8 @@ data = parser.parse(buffer)
 children = data.children
 
 builder = Builder.new
+analyser = TimeMarker.new
+
 stack   = Array.new
 parentIndex = 0
 nodeIndex   = 0
@@ -49,5 +51,7 @@ data.children.each do |child|
 		end
 	end
 end
+
+
 
 file.close

@@ -1,10 +1,10 @@
 # V=0 quiet, V=1 verbose.  other values don't work.
-V  	  = 0
-Q1	  = $(V:1=)
-Q  	  = $(Q1:0=@)
-n 	  = $(NULLCMD)
-ECHO1 = $(V:1=@$n)
-ECHO  = $(ECHO1:0=@echo)
+V	= 0
+Q1	= $(V:1=)
+Q	= $(Q1:0=@)
+n 	= $(NULLCMD)
+ECHO1	= $(V:1=@$n)
+ECHO	= $(ECHO1:0=@echo)
 
 LIBMODS		:=
 MODULES		:=
@@ -13,7 +13,7 @@ INCDIR		:= include
 BINDIR		:= bin
 BUILDDIR	:= build
 BINMODS		:= $(addprefix bin/,$(MODULES))
-TARGET		:= $(BINDIR)/builder
+TARGET		:= $(BINDIR)/verify
 SRCS		:= $(shell find $(SRCDIR) -name '*.cpp')
 HEADERS		:= $(shell find $(INCDIR) -name '*.h')
 OBJECTS 	:= $(subst src,$(BUILDDIR),$(SRCS:%.cpp=%.o))

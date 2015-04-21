@@ -19,7 +19,7 @@ public:
 	ast::VisitableNode* findNode(int index);
 	
 	void setRoot(ast::VisitableNode* rootNode);
-	void addNode(ast::VisitableNode* node, int index, int parent);
+	void addNode(ast::VisitableNode* node, int parent);
 
 };
 

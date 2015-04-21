@@ -52,8 +52,7 @@ void NodeTree::setRoot(ast::VisitableNode* rootNode)
 	this->rootNode = rootNode;
 }
 
-void NodeTree::addNode(ast::VisitableNode* node, 
-		int index, int parent)
+void NodeTree::addNode(ast::VisitableNode* node, int parent)
 {
 	ast::VisitableNode* parNode = findNode(parent);
 	parNode->children.push_back(node);
