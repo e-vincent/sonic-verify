@@ -22,6 +22,7 @@ data = parser.parse(buffer)
 
 children = data.children
 
+# pass builder through to avoid static use of tree
 builder = Builder.new
 analyser = TimeMarker.new
 

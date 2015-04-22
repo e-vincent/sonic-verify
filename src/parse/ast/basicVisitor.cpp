@@ -2,6 +2,7 @@
 
 namespace ast
 {
+	
 BasicVisitor::BasicVisitor() {}
 
 void BasicVisitor::visit(ast::RootNode* rootNode)

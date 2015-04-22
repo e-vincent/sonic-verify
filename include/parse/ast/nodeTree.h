@@ -3,23 +3,37 @@
 
 #include <iostream>
 
-#include "parse/ast/visitableNode.h"
+//#include "parse/ast/visitableNode.h"
 
 namespace ast
 {
 
+// forward declaration
+template <class T> class TreeIterator;
+template <class T> class TreeCIterator;
+
+template <class T>
 class NodeTree
 {
 public:
-	ast::VisitableNode* rootNode;
+	friend class TreeIterator<T>;
+	typedef TreeIterator<T> iterator;
+	typedef TreeCIterator<T> const_iterator;
+	//typedef ptrdiff_t difference_type;
+	typedef size_t size_type;
+	typedef T value_type;
+	typedef T* pointer;
+	typedef T& reference;
 
-	NodeTree();
+	std::shared_ptr<T> rootNode;
 
-	ast::VisitableNode* root();
-	ast::VisitableNode* findNode(int index);
+	NodeTree<T>();
+
+	T root();
+	T findNode(int index);
 	
-	void setRoot(ast::VisitableNode* rootNode);
-	void addNode(ast::VisitableNode* node, int parent);
+	void setRoot(T rootNode);
+	void addNode(T node, int parent);
 
 };
 

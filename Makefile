@@ -25,7 +25,7 @@ CC		= clang-3.5
 CXX		= clang++-3.5
 LD		= clang++-3.5 
 LDSO		= clang++-3.5 -shared
-CFLAGS		= -fPIC -Wall -Werror -Wextra -std=c++11 -g -g -Wno-deprecated
+CFLAGS		= -std=c++11 -stdlib=libc++ -fPIC -Wall -Werror -Wextra -std=c++11 -g -g -Wno-deprecated
 LDFLAGS		= -L/build/buildd/ruby1.9.1-1.9.3.484/debian/lib -L/var/lib/gems/1.9.1/gems/rice-1.7.0/ruby/lib/lib -lrice -lruby-1.9.1-static -lcrypt -ldl -pthread
 DEFS		= 
 INCFLAGS	= $(addprefix -I,$(INCDIR)) -I/usr/include/ruby-1.9.1/$(arch) -I/var/lib/gems/1.9.1/gems/rice-1.7.0/ruby/lib/include -I/usr/include/ruby-1.9.1/ruby/backward -I/usr/include/ruby-1.9.1
@@ -52,8 +52,6 @@ $(DLLIB): $(OBJECTS) Makefile
 	-$(Q)rm -f $(@)
 	$(DIRGUARD)
 	$(Q) $(LDSO) -o $@ $(OBJECTS) $(LDFLAGS)
-
-$(OBJS): $(hdrdir)/ruby.h $(hdrdir)/ruby/defines.h $(arch_hdrdir)/ruby/config.h
 
 depend: .depend
 

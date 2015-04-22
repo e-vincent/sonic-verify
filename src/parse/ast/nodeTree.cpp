@@ -3,17 +3,20 @@
 namespace ast
 {
 
-NodeTree::NodeTree() {}
+template <class T>
+NodeTree<T>::NodeTree() {}
 
-ast::VisitableNode* NodeTree::root()
+template <class T>
+T NodeTree<T>::root()
 {
 	return NodeTree::rootNode;
 }
 
-ast::VisitableNode* NodeTree::findNode(int index)
+template <class T>
+T NodeTree<T>::findNode(int index)
 {
-	ast::VisitableNode* curr = this->rootNode;
-	ast::VisitableNode* result = NULL;
+	T curr = this->rootNode;
+	T result = NULL;
 
 	while (curr != NULL)
 	{
@@ -28,8 +31,8 @@ ast::VisitableNode* NodeTree::findNode(int index)
 			break;
 		}
 
-		ast::VisitableNode* old = curr;		
-		for (ast::VisitableNode* child : curr->children)
+		T old = curr;		
+		for (T child : curr->children)
 		{
 			if (child->index <= index)
 			{
@@ -47,14 +50,16 @@ ast::VisitableNode* NodeTree::findNode(int index)
 	return result;
 }
 
-void NodeTree::setRoot(ast::VisitableNode* rootNode)
+template <class T>
+void NodeTree<T>::setRoot(T rootNode)
 {
 	this->rootNode = rootNode;
 }
 
-void NodeTree::addNode(ast::VisitableNode* node, int parent)
+template <class T>
+void NodeTree<T>::addNode(T node, int parent)
 {
-	ast::VisitableNode* parNode = findNode(parent);
+	T parNode = findNode(parent);
 	parNode->children.push_back(node);
 }
 
