@@ -1,15 +1,18 @@
 # V=0 quiet, V=1 verbose.  other values don't work.
-V	= 0
-Q1	= $(V:1=)
-Q	= $(Q1:0=@)
-n 	= $(NULLCMD)
-ECHO1	= $(V:1=@$n)
-ECHO	= $(ECHO1:0=@echo)
+V  	  = 0
+Q1	  = $(V:1=)
+Q  	  = $(Q1:0=@)
+n 	  = $(NULLCMD)
+ECHO1 = $(V:1=@$n)
+ECHO  = $(ECHO1:0=@echo)
 
 LIBMODS		:=
 MODULES		:=
 SRCDIR		:= src $(addprefix src/,$(MODULES))
-INCDIR		:= include
+RUBYINC		:= $(shell ruby -rrbconfig -e 'print RbConfig::CONFIG["rubyhdrdir"]')
+RUBYARCHINC	:= $(shell ruby -rrbconfig -e 'print RbConfig::CONFIG["rubyarchhdrdir"]')
+RICEINC		:= $(shell ruby -e "print File.join(Gem::Specification.find_by_name('rice').gem_dir, 'ruby/lib/include')")
+INCDIR		:= include $(RUBYINC) $(RUBYINC)/ruby/backward $(RUBYARCHINC) $(RICEINC)
 BINDIR		:= bin
 BUILDDIR	:= build
 BINMODS		:= $(addprefix bin/,$(MODULES))
@@ -17,6 +20,9 @@ TARGET		:= $(BINDIR)/verify
 SRCS		:= $(shell find $(SRCDIR) -name '*.cpp')
 HEADERS		:= $(shell find $(INCDIR) -name '*.h')
 OBJECTS 	:= $(subst src,$(BUILDDIR),$(SRCS:%.cpp=%.o))
+RUBYLIBDIR	:= $(shell ruby -rrbconfig -e 'print RbConfig::CONFIG["rubylibdir"]')
+RUBYLIB		:= $(shell ruby -rrbconfig -e 'print RbConfig::CONFIG["LIBRUBYARG_STATIC"]')
+RICELIBDIR	:= $(shell ruby -e "print File.join(Gem::Specification.find_by_name('rice').gem_dir, 'ruby/lib/lib')")
 
 vpath $(SRCDIR)
 
@@ -25,13 +31,10 @@ CC		= clang-3.5
 CXX		= clang++-3.5
 LD		= clang++-3.5 
 LDSO		= clang++-3.5 -shared
-CFLAGS		= -std=c++11 -stdlib=libc++ -fPIC -Wall -Werror -Wextra -std=c++11 -g -g -Wno-deprecated
-LDFLAGS		= -L/build/buildd/ruby1.9.1-1.9.3.484/debian/lib -L/var/lib/gems/1.9.1/gems/rice-1.7.0/ruby/lib/lib -lrice -lruby-1.9.1-static -lcrypt -ldl -pthread
+CFLAGS		= -fPIC -Wall -Werror -Wextra -std=c++11 -g -g -Wno-deprecated
+LDFLAGS		= -L$(RUBYLIBDIR) -L$(RICELIBDIR) -lrice $(RUBYLIB) -lcrypt -ldl -pthread
 DEFS		= 
-INCFLAGS	= $(addprefix -I,$(INCDIR)) -I/usr/include/ruby-1.9.1/$(arch) -I/var/lib/gems/1.9.1/gems/rice-1.7.0/ruby/lib/include -I/usr/include/ruby-1.9.1/ruby/backward -I/usr/include/ruby-1.9.1
-
-hdrdir 		= /usr/include/ruby-1.9.1
-arch_hdrdir = /usr/include/ruby-1.9.1/$(arch)
+INCFLAGS	= $(addprefix -I,$(INCDIR))
 
 DLLIB		 = $(TARGET).so
 

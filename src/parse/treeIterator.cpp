@@ -12,7 +12,7 @@ TreeIterator<T>::TreeIterator()
 }
 
 template <class T>
-TreeIterator<T>::TreeIterator(ast::NodeTree<T>& tree) 
+TreeIterator<T>::TreeIterator(ast::NodeTree<std::shared_ptr<T>>& tree) 
 		: _nodeTree(tree), _curr(*tree->rootNode) { }
 
 template <class T>
@@ -60,7 +60,7 @@ TreeCIterator<T>::TreeCIterator()
 }
 
 template <class T>
-TreeCIterator<T>::TreeCIterator(ast::NodeTree<T>& tree) 
+TreeCIterator<T>::TreeCIterator(ast::NodeTree<std::shared_ptr<T>>& tree) 
 		: _c_nodeTree(tree), _c_curr(*tree->rootNode) { }
 
 template <class T>

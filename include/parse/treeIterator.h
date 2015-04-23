@@ -13,12 +13,12 @@ template <class T>
 class TreeIterator
 {
 private:
-	ast::NodeTree<T>& _nodeTree;
+	ast::NodeTree<std::shared_ptr<T>>& _nodeTree;
 	T _curr;
 
 public:
 	TreeIterator<T>();
-	TreeIterator<T>(ast::NodeTree<T>& tree);
+	TreeIterator<T>(ast::NodeTree<std::shared_ptr<T>>& tree);
 
 	TreeIterator<T> begin();
 	TreeIterator<T> end();

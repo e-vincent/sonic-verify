@@ -2,6 +2,7 @@
 #define __NODE_TREE_H__
 
 #include <iostream>
+#include <memory>
 
 //#include "parse/ast/visitableNode.h"
 
@@ -19,7 +20,6 @@ public:
 	friend class TreeIterator<T>;
 	typedef TreeIterator<T> iterator;
 	typedef TreeCIterator<T> const_iterator;
-	//typedef ptrdiff_t difference_type;
 	typedef size_t size_type;
 	typedef T value_type;
 	typedef T* pointer;
