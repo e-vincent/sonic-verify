@@ -10,13 +10,23 @@ TimeMarker::TimeMarker()
 
 	_it = new ast::TreeIterator(*(Builder::tree), (Builder::tree)->root());
 
-	ast::TreeIterator* start = Builder::tree->begin();
-	ast::TreeIterator* end   = Builder::tree->end();
+	ast::TreeIterator start = Builder::tree->begin();
+	ast::TreeIterator end   = Builder::tree->end();
 
-	std::cout << (start == end) << "\n";
-	std::cout << (start != end) << "\n";
+	for (ast::TreeIterator it = start; it != end; ++it)
+	{
+		std::cout << (*it).value << "\n";
+	}
 
-	std::cout << "start break" << "\n";
+	std::cout << "OUT OF LOOP" << "\n";
+
+	// std::cout << (start != end) << "\n";
+
+	// std::cout << (*start).value << "\n";
+
+	// start++;
+
+	// std::cout << (*start).value << "\n";
 
 	// std::cout << Builder::tree->root()->value << "\n";
 	// std::cout << Builder::tree->begin() << "\n";	

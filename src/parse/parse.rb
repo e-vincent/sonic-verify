@@ -4,8 +4,8 @@ require_relative '../../bin/verify'
 path = "src/assets/sp/"
 
 #filename = path + "nested_loop.txt"
-#filename = path + "simple_sequence.txt"
-filename = path + "simple_chord.txt"
+filename = path + "simple_sequence.txt"
+#filename = path + "simple_chord.txt"
 #filename = path + "simple_loop.txt"
 
 file = File.open(filename, "rb")
@@ -36,6 +36,9 @@ data.children.each do |child|
 	while !stack.empty?() do
 		curr = stack.pop()
 		info = curr[0]
+		if info == nil
+			info = "nil"
+		end
 
 		if info.respond_to?(:type)
 			builder.addNode(info.type, curr[1], curr[2])

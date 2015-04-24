@@ -37,7 +37,7 @@ bool TreeIterator::operator!=(const TreeIterator& rhs)
 
 ast::VisitableNode& TreeIterator::operator*()
 {
-	return *_curr;
+	return *this->_curr;
 }
 
 const ast::VisitableNode& TreeIterator::operator*() const

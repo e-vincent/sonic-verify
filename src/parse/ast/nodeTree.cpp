@@ -5,14 +5,14 @@ namespace ast
 
 NodeTree::NodeTree() {}
 
-ast::TreeIterator* NodeTree::begin()
+ast::TreeIterator NodeTree::begin()
 {
-	return new TreeIterator(*this, rootNode);
+	return *(new TreeIterator(*this, rootNode));
 }
 
-ast::TreeIterator* NodeTree::end()
+ast::TreeIterator NodeTree::end()
 {
-	return new TreeIterator(*this, NULL);
+	return *(new TreeIterator(*this, NULL));
 }
 
 ast::VisitableNode* NodeTree::root()
@@ -41,7 +41,7 @@ ast::VisitableNode* NodeTree::findNode(int index)
 		ast::VisitableNode* old = curr;		
 		for (ast::VisitableNode* child : curr->children)
 		{
-			if (child->index <= index)
+			if (child->index <= index && child->index > curr->index)
 			{
 				curr = child;
 			}

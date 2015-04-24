@@ -21,17 +21,12 @@ public:
 	typedef TreeIterator iterator;
 	typedef TreeCIterator const_iterator;
 
-	// typedef size_t size_type;
-	// typedef T value_type;
-	// typedef T* pointer;
-	// typedef T& reference;
-
 	ast::VisitableNode* rootNode;
 
 	NodeTree();
 
-	TreeIterator* begin();
-	TreeIterator* end();
+	TreeIterator begin();
+	TreeIterator end();
 
 	ast::VisitableNode* root();
 	ast::VisitableNode* findNode(int index);
