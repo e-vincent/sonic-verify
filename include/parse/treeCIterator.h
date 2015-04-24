@@ -9,21 +9,33 @@
 namespace ast
 {
 
-template <class T>
-class TreeCIterator : public TreeIterator<T>
+class TreeCIterator : public TreeIterator
 {
 private:
-	ast::NodeTree<std::shared_ptr<T>>& _c_nodeTree;
-	T _c_curr;
+	ast::NodeTree& _c_nodeTree;
+	ast::VisitableNode _c_curr;
 
 public:
-	TreeCIterator<T>();
-	TreeCIterator<T>(ast::NodeTree<std::shared_ptr<T>>& tree);
+	TreeCIterator()
+	{
+		_c_nodeTree	= NULL;
+		_c_curr		= NULL;
+	}
+	
+	TreeCIterator(ast::NodeTree& tree) 
+		: _c_nodeTree(tree), _c_curr(*tree.root()) { }
 
-	TreeCIterator<T> cbegin() const;
-	TreeCIterator<T> cend() const;
+	// TreeCIterator cbegin() const
+	// {
+	// 	return (*_c_nodeTree->rootNode);
+	// }
+	
+	TreeCIterator cend() const
+	{
+		return NULL;
+	}
 
-	TreeCIterator<T> operator++();
+	TreeCIterator operator++() {}
 };
 
 } // namespace ast

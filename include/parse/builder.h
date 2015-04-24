@@ -14,12 +14,12 @@
 class Builder
 {
 public:
-	static ast::NodeTree<std::shared_ptr<ast::VisitableNode>>* tree;
+	static ast::NodeTree* tree;
 
 	Builder();
 	~Builder();
 
-	std::shared_ptr<ast::BodyNode> makeNode(Rice::Symbol token, int index, int parent);
+	ast::BodyNode* makeNode(Rice::Symbol token, int index, int parent);
 	void makeRoot(Rice::Symbol root);
 	void addNode(Rice::Symbol nodeType, int index, int parent);
 	void addValue(std::string val, int index, int parent);

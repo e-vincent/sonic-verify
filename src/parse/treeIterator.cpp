@@ -1,78 +1,48 @@
 #include "parse/treeIterator.h"
-#include "parse/treeCIterator.h"
 
 namespace ast
 {
 
-template <class T>
-TreeIterator<T>::TreeIterator() 
+TreeIterator::TreeIterator(ast::NodeTree& tree, ast::VisitableNode* node) 
+	: _nodeTree(tree), _curr(node)
 {
-	_nodeTree = NULL;
-	_curr 	  = NULL;
+//	_curr = ;
+	//std::cout << _nodeTree.root()->value << "\n";
 }
 
-template <class T>
-TreeIterator<T>::TreeIterator(ast::NodeTree<std::shared_ptr<T>>& tree) 
-		: _nodeTree(tree), _curr(*tree->rootNode) { }
-
-template <class T>
-TreeIterator<T> ast::TreeIterator<T>::begin()
+TreeIterator TreeIterator::operator++()
 {
-	return iterator(*_nodeTree->rootNode);
+	int next = _curr->index + 1;
+	_curr = _nodeTree.findNode(next);
+	return *this;
 }
 
-template <class T>
-TreeIterator<T> TreeIterator<T>::end()
+TreeIterator TreeIterator::operator++(int)
 {
-	return NULL;
+	TreeIterator clone(*this);
+	int next = _curr->index + 1;
+	_curr = _nodeTree.findNode(next);
+	return clone;	
 }
 
-template <class T>
-TreeIterator<T> TreeIterator<T>::operator++()
+bool TreeIterator::operator==(const TreeIterator& rhs)
 {
-
+	return this->_curr == rhs._curr;
 }
 
-template <class T>
-bool TreeIterator<T>::operator==(const TreeIterator<T>& rhs)
+bool TreeIterator::operator!=(const TreeIterator& rhs)
 {
-	return *this == *rhs;
+	return !(*this == rhs);
 }
 
-template <class T>
-bool TreeIterator<T>::operator!=(const TreeIterator<T>& rhs)
+ast::VisitableNode& TreeIterator::operator*()
 {
-	return !(this == rhs);
+	return *_curr;
 }
 
-template <class T>
-T& TreeIterator<T>::operator*()
+const ast::VisitableNode& TreeIterator::operator*() const
 {
-	return _curr;
-}
-
-
-template <class T>
-TreeCIterator<T>::TreeCIterator() 
-{
-	_c_nodeTree	= NULL;
-	_c_curr		= NULL;
-}
-
-template <class T>
-TreeCIterator<T>::TreeCIterator(ast::NodeTree<std::shared_ptr<T>>& tree) 
-		: _c_nodeTree(tree), _c_curr(*tree->rootNode) { }
-
-template <class T>
-TreeCIterator<T> ast::TreeCIterator<T>::cbegin() const
-{
-	return const_iterator(*_c_nodeTree->rootNode);
-}
-
-template <class T>
-TreeCIterator<T> TreeCIterator<T>::cend() const
-{
-	return NULL;
+	return *_curr;
 }
 
 } // namespace ast

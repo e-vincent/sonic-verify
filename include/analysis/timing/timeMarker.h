@@ -2,7 +2,7 @@
 #define __TIME_MARKER_H__
 
 #include <iostream>
-#include <memory>
+//#include <memory>
 
 #include "parse/builder.h"
 #include "parse/treeIterator.h"
@@ -12,7 +12,7 @@
 class TimeMarker
 {
 private:
-	ast::TreeIterator<ast::VisitableNode>* _it;
+	ast::TreeIterator* _it;
 
 public:
 	TimeMarker();

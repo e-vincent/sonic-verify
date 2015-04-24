@@ -23,10 +23,8 @@ data = parser.parse(buffer)
 children = data.children
 
 # pass builder through to avoid static use of tree
-builder = Builder.new
-analyser = TimeMarker.new
-
-stack   = Array.new
+builder  = Builder.new
+stack    = Array.new
 parentIndex = 0
 nodeIndex   = 0
 
@@ -53,6 +51,8 @@ data.children.each do |child|
 	end
 end
 
-
+# this must come after builder has created the tree
+# otherwise it has no information to process and will die
+analyser = TimeMarker.new
 
 file.close

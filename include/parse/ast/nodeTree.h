@@ -2,40 +2,50 @@
 #define __NODE_TREE_H__
 
 #include <iostream>
+#include <iterator>
 #include <memory>
 
-//#include "parse/ast/visitableNode.h"
+#include "parse/treeIterator.h"
+#include "parse/ast/visitableNode.h"
 
 namespace ast
 {
 
 // forward declaration
-template <class T> class TreeIterator;
-template <class T> class TreeCIterator;
+class TreeIterator;
+class TreeCIterator;
 
-template <class T>
 class NodeTree
 {
 public:
-	friend class TreeIterator<T>;
-	typedef TreeIterator<T> iterator;
-	typedef TreeCIterator<T> const_iterator;
-	typedef size_t size_type;
-	typedef T value_type;
-	typedef T* pointer;
-	typedef T& reference;
+	typedef TreeIterator iterator;
+	typedef TreeCIterator const_iterator;
 
-	std::shared_ptr<T> rootNode;
+	// typedef size_t size_type;
+	// typedef T value_type;
+	// typedef T* pointer;
+	// typedef T& reference;
 
-	NodeTree<T>();
+	ast::VisitableNode* rootNode;
 
-	T root();
-	T findNode(int index);
-	
-	void setRoot(T rootNode);
-	void addNode(T node, int parent);
+	NodeTree();
 
+	TreeIterator* begin();
+	TreeIterator* end();
+
+	ast::VisitableNode* root();
+	ast::VisitableNode* findNode(int index);
+
+	void setRoot(ast::VisitableNode* rootNode);
+	void addNode(ast::VisitableNode* node, int parent);
 };
+
+// inline std::ostream& operator<<(std::ostream& stream, const NodeTree&)
+// {
+// 	stream << "Not implemented\n";
+// 	return stream;
+// }
+
 
 } // ast
 

@@ -3,6 +3,7 @@
 
 #include <list>
 #include <iostream>
+#include <memory>
 
 #include "rice/Data_Type.hpp"
 
@@ -19,6 +20,7 @@ protected:
 
 public:
 	std::list<ast::VisitableNode*> children;
+//	std::list<std::shared_ptr<ast::VisitableNode>> children;
 	std::string value;
 	int index;
 	int parent;

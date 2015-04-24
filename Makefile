@@ -36,7 +36,7 @@ LDFLAGS		= -L$(RUBYLIBDIR) -L$(RICELIBDIR) -lrice $(RUBYLIB) -lcrypt -ldl -pthre
 DEFS		= 
 INCFLAGS	= $(addprefix -I,$(INCDIR))
 
-DLLIB		 = $(TARGET).so
+DLLIB		= $(TARGET).so
 
 DIRGUARD	= @mkdir -p $(@D)
 

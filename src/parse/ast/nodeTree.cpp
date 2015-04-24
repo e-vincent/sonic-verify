@@ -3,20 +3,27 @@
 namespace ast
 {
 
-template <class T>
-NodeTree<T>::NodeTree() {}
+NodeTree::NodeTree() {}
 
-template <class T>
-T NodeTree<T>::root()
+ast::TreeIterator* NodeTree::begin()
 {
-	return NodeTree::rootNode;
+	return new TreeIterator(*this, rootNode);
 }
 
-template <class T>
-T NodeTree<T>::findNode(int index)
+ast::TreeIterator* NodeTree::end()
 {
-	T curr = this->rootNode;
-	T result = NULL;
+	return new TreeIterator(*this, NULL);
+}
+
+ast::VisitableNode* NodeTree::root()
+{
+	return rootNode;
+}
+
+ast::VisitableNode* NodeTree::findNode(int index)
+{
+	ast::VisitableNode* curr   = this->rootNode;
+	ast::VisitableNode* result = NULL;
 
 	while (curr != NULL)
 	{
@@ -31,8 +38,8 @@ T NodeTree<T>::findNode(int index)
 			break;
 		}
 
-		T old = curr;		
-		for (T child : curr->children)
+		ast::VisitableNode* old = curr;		
+		for (ast::VisitableNode* child : curr->children)
 		{
 			if (child->index <= index)
 			{
@@ -50,17 +57,21 @@ T NodeTree<T>::findNode(int index)
 	return result;
 }
 
-template <class T>
-void NodeTree<T>::setRoot(T rootNode)
+void NodeTree::setRoot(ast::VisitableNode* rootNode)
 {
 	this->rootNode = rootNode;
 }
 
-template <class T>
-void NodeTree<T>::addNode(T node, int parent)
+void NodeTree::addNode(ast::VisitableNode* node, int parent)
 {
-	T parNode = findNode(parent);
+	ast::VisitableNode* parNode = findNode(parent);
 	parNode->children.push_back(node);
 }
+
+// std::ostream& operator<<(std::ostream& stream, const NodeTree&)
+// {
+// 	stream << "Not implemented\n";
+// 	return stream;
+// }
 
 } // namespace ast

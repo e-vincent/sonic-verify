@@ -1,32 +1,33 @@
 #ifndef __TREE_ITERATOR_H__
 #define __TREE_ITERATOR_H__
 
-#include <iterator>
+//#include <iterator>
 #include <memory>
 
 #include "parse/ast/nodeTree.h"
+#include "parse/ast/visitableNode.h"
 
 namespace ast
 {
 
-template <class T>
+class NodeTree;
+
 class TreeIterator
 {
 private:
-	ast::NodeTree<std::shared_ptr<T>>& _nodeTree;
-	T _curr;
+	ast::NodeTree& _nodeTree;
+	ast::VisitableNode* _curr;
 
 public:
-	TreeIterator<T>();
-	TreeIterator<T>(ast::NodeTree<std::shared_ptr<T>>& tree);
+	TreeIterator(ast::NodeTree& tree, ast::VisitableNode* node);
 
-	TreeIterator<T> begin();
-	TreeIterator<T> end();
+	TreeIterator operator++();
+	TreeIterator operator++(int);
+	bool operator==(const TreeIterator& rhs);
+	bool operator!=(const TreeIterator& rhs);
 
-	TreeIterator<T> operator++();
-	bool operator==(const TreeIterator<T>& rhs);
-	bool operator!=(const TreeIterator<T>& rhs);
-	T& operator*();
+	ast::VisitableNode& operator*();
+	const ast::VisitableNode& operator*() const;
 };
 
 } // namespace ast
