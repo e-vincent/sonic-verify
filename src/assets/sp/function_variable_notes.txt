@@ -1,0 +1,9 @@
+define :frere do |n|
+  play n
+  sleep 0.5
+  play n + 2
+  sleep 0.5
+  play n + 4
+  sleep 0.5
+  play n
+end

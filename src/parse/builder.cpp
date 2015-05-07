@@ -12,33 +12,64 @@ Builder::~Builder()
 	delete Builder::tree;
 }
 
-ast::BodyNode* Builder::makeNode(Rice::Symbol token, 
-	int index, int parent)
+ast::BodyNode* Builder::makeNode(Rice::Symbol token, int index, 
+		int parent, int line, int statement)
 {
-	return new ast::BodyNode(token.str(), index, parent);
-	//return std::shared_ptr<ast::BodyNode>(new ast::BodyNode(token.str(), index, parent));
+	return new ast::BodyNode(token.str(), index, parent, 
+								line, statement);
+}
+
+ast::IntNode* Builder::makeInt(int num, int index, int parent,
+		int line, int statement)
+{
+	return new ast::IntNode(num, index, parent, line, statement);
+}
+
+ast::FloatNode* Builder::makeFloat(float num, int index, int parent,
+		int line, int statement)
+{
+	return new ast::FloatNode(num, index, parent, line, statement);
 }
 
 void Builder::makeRoot(Rice::Symbol root)
 {
 	ast::RootNode* rootNode = new ast::RootNode(root.str());
 	Builder::tree->setRoot(rootNode);
-	//std::cout << Builder::tree->root()->value << "\n";
 }
 
-void Builder::addNode(Rice::Symbol nodeType, int index, int parent)
+void Builder::addNode(Rice::Symbol nodeType, int index, 
+		int parent, int line, int statement)
 {
-	// auto does => std::shared_ptr<ast::BodyNode> node = ...
-	//auto node = makeNode(nodeType.str(), index, parent);
-	
-	ast::BodyNode* node = makeNode(nodeType.str(), index, parent);
+	ast::BodyNode* node = makeNode(nodeType.str(), index, parent, line, statement);
 	Builder::tree->addNode(node, parent);
-	//std::cout << Builder::tree->findNode(index)->value << "\n";
 }
 
-void Builder::addValue(std::string val, int index, int parent)
+void Builder::addValue(std::string val, int index, int parent, 
+		int line, int statement)
 {
-	ast::BodyNode* node = makeNode(val, index, parent);
-	//auto node = makeNode(val, index, parent);
+	ast::BodyNode* node = makeNode(val, index, parent, line, statement);
 	Builder::tree->addNode(node, parent);
+}
+
+void Builder::addNumber(std::string num, int index, 
+		int parent, int line, int statement)
+{
+	float value = std::stof(num.c_str());
+	ast::VisitableNode* node;
+	if (remainder(value, 1) == 0)
+	{
+		node = makeInt((int)value, index, parent, line, statement);
+	} 
+	else
+	{
+		node = makeFloat(value, index, parent, line, statement);
+	}
+
+	Builder::tree->addNode(node, parent);
+}
+
+void Builder::setTreeSize(int treeSize, int lineCount)
+{
+	Builder::tree->setSize(treeSize);
+	Builder::tree->setLineCount(lineCount);
 }

@@ -1,15 +1,15 @@
-#ifndef __BASICVISITOR_H__
-#define __BASICVISITOR_H__
+#ifndef __VTIME_VISITOR_H__
+#define __VTIME_VISITOR_H__
 
 #include "parse/ast/iVisitor.h"
 
 namespace ast
 {
 
-class BasicVisitor : public IVisitor
+class VTimeVisitor : public IVisitor
 {
 public:
-	BasicVisitor();
+	VTimeVisitor();
 
 	virtual void visit(ast::RootNode* rootNode);
 	virtual void visit(ast::BodyNode* bodyNode);
@@ -19,4 +19,4 @@ public:
 
 } // namespace ast
 
-#endif // __BASICVISITOR_H__
+#endif // __VTIME_VISITOR_H__

@@ -1,26 +1,26 @@
-#include "parse/ast/basicVisitor.h"
+#include "parse/ast/vTimeVisitor.h"
 
 namespace ast
 {
 	
-BasicVisitor::BasicVisitor() {}
+VTimeVisitor::VTimeVisitor() { }
 
-void BasicVisitor::visit(ast::RootNode* rootNode)
+void VTimeVisitor::visit(ast::RootNode* rootNode)
 {
 	std::cout << "Visiting Root " << rootNode->value << "\n";
 }
 
-void BasicVisitor::visit(ast::BodyNode* bodyNode)
+void VTimeVisitor::visit(ast::BodyNode* bodyNode)
 {
 	std::cout << "Visiting BodyNode " << bodyNode->value << "\n";		
 }
 
-void BasicVisitor::visit(ast::IntNode* intNode)
+void VTimeVisitor::visit(ast::IntNode* intNode)
 {
 	std::cout << "Visiting IntNode " << intNode->val() << "\n";		
 }
 
-void BasicVisitor::visit(ast::FloatNode* floatNode)
+void VTimeVisitor::visit(ast::FloatNode* floatNode)
 {
 	std::cout << "Visiting IntNode " << floatNode->val() << "\n";		
 }

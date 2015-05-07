@@ -7,6 +7,8 @@
 
 #include "rice/Data_Type.hpp"
 
+//#include "parse/ast/intNode.h"
+
 namespace ast
 {
 
@@ -17,6 +19,8 @@ class VisitableNode
 private:
 
 protected:
+	int statementNum;
+	int lineNum;
 
 public:
 	std::list<ast::VisitableNode*> children;
@@ -25,7 +29,12 @@ public:
 	int index;
 	int parent;
 
+	//operator IntNode() const;
+
 	void accept(IVisitor v);
+
+	virtual int line();
+	virtual int statement();
 };
 
 } // namespace ast

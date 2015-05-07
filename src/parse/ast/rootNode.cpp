@@ -9,7 +9,9 @@ RootNode::RootNode(std::string root)
 {
 	this->value = root;
 	this->index = 0;
-	this->parent = -1;
+	this->parent  = -1;
+	this->lineNum = -1;
+	this->statementNum = -1;
 }
 
 void RootNode::accept(IVisitor v)

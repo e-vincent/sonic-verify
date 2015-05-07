@@ -6,8 +6,12 @@
 
 #include "parse/builder.h"
 #include "parse/treeIterator.h"
+#include "parse/ast/vTimeVisitor.h"
 
 #include "parse/ast/visitableNode.h"
+
+namespace analysis
+{
 
 class TimeMarker
 {
@@ -17,5 +21,7 @@ private:
 public:
 	TimeMarker();
 };
+
+} // namespace anlysis
 
 #endif // __TIME_MARKER_H__

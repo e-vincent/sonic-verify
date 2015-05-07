@@ -1,7 +1,6 @@
 #ifndef __TREE_ITERATOR_H__
 #define __TREE_ITERATOR_H__
 
-//#include <iterator>
 #include <memory>
 
 #include "parse/ast/nodeTree.h"

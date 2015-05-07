@@ -14,7 +14,7 @@ protected:
 
 public:
 	BodyNode();
-	BodyNode(std::string node, int index, int parent);
+	BodyNode(std::string node, int index, int parent, int line, int statement);
 
 	void accept(IVisitor v);
 };

@@ -33,7 +33,7 @@ ast::VisitableNode* NodeTree::findNode(int index)
 		}
 
 		// this is written terribly
-		if (!curr->children.size())
+		if (curr->children.empty() || result != NULL)
 		{
 			break;
 		}
@@ -41,6 +41,48 @@ ast::VisitableNode* NodeTree::findNode(int index)
 		ast::VisitableNode* old = curr;		
 		for (ast::VisitableNode* child : curr->children)
 		{
+			if (child->index <= index)
+			//if (child->index <= index && child->index > curr->index)
+			{
+				curr = child;
+			}
+		}
+
+		// if curr didn't change there were no children to search further
+		// we haven't found node so returning null
+		if (curr == old)
+		{
+			curr = NULL;
+		}
+
+	}
+
+	return result;
+}
+
+ast::VisitableNode* NodeTree::findNext(ast::VisitableNode* node)
+{
+	int index = node->index + 1;
+	ast::VisitableNode* curr = this->rootNode;
+	ast::VisitableNode* result = NULL;
+
+	while (curr != NULL)
+	{
+		if (curr->index == index)
+		{
+			result = curr;
+		}
+
+		// this is written terribly
+		if (curr->children.empty())
+		{
+			break;
+		}
+
+		ast::VisitableNode* old = curr;		
+		for (ast::VisitableNode* child : curr->children)
+		{
+			//if (child->index <= index)
 			if (child->index <= index && child->index > curr->index)
 			{
 				curr = child;
@@ -48,6 +90,7 @@ ast::VisitableNode* NodeTree::findNode(int index)
 		}
 
 		// if curr didn't change there were no children to search further
+		// we haven't found node so returning null
 		if (curr == old)
 		{
 			curr = NULL;
@@ -68,10 +111,24 @@ void NodeTree::addNode(ast::VisitableNode* node, int parent)
 	parNode->children.push_back(node);
 }
 
-// std::ostream& operator<<(std::ostream& stream, const NodeTree&)
-// {
-// 	stream << "Not implemented\n";
-// 	return stream;
-// }
+void NodeTree::setSize(int size)
+{
+	this->treeSize = size;
+}
+
+int NodeTree::size()
+{
+	return this->treeSize;
+}
+
+void NodeTree::setLineCount(int count)
+{
+	this->lines = count;
+}
+
+int NodeTree::lineCount()
+{
+	return this->lines;
+}
 
 } // namespace ast

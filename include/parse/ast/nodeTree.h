@@ -13,13 +13,15 @@ namespace ast
 
 // forward declaration
 class TreeIterator;
-class TreeCIterator;
 
 class NodeTree
 {
+private:
+	int treeSize;
+	int lines;
+
 public:
 	typedef TreeIterator iterator;
-	typedef TreeCIterator const_iterator;
 
 	ast::VisitableNode* rootNode;
 
@@ -30,9 +32,15 @@ public:
 
 	ast::VisitableNode* root();
 	ast::VisitableNode* findNode(int index);
+	ast::VisitableNode* findNext(ast::VisitableNode* node);
 
 	void setRoot(ast::VisitableNode* rootNode);
 	void addNode(ast::VisitableNode* node, int parent);
+
+	void setSize(int size);
+	int size();
+	void setLineCount(int count);
+	int lineCount();
 };
 
 // inline std::ostream& operator<<(std::ostream& stream, const NodeTree&)

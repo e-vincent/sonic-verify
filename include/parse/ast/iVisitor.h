@@ -5,6 +5,8 @@
 
 #include "parse/ast/rootNode.h"
 #include "parse/ast/bodyNode.h"
+#include "parse/ast/intNode.h"
+#include "parse/ast/floatNode.h"
 
 namespace ast
 {
@@ -16,6 +18,8 @@ public:
 
 	virtual void visit(ast::RootNode* rootNode) = 0;
 	virtual void visit(ast::BodyNode* bodyNode) = 0;
+	virtual void visit(ast::IntNode* intNode) = 0;
+	virtual void visit(ast::FloatNode* floatNode) = 0;
 };
 
 } // namespace ast
