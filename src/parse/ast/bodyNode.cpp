@@ -1,5 +1,5 @@
 #include "parse/ast/bodyNode.h"
-#include "parse/ast/iVisitor.h"
+#include "parse/ast/vTimeVisitor.h"
 
 namespace ast
 {
@@ -14,9 +14,9 @@ BodyNode::BodyNode(std::string symbol, int index, int parent, int line, int stat
 	this->statementNum = statement;
 }
 
-void BodyNode::accept(IVisitor v)
+void BodyNode::accept(VTimeVisitor* v)
 {
-	v.visit(this);
+	v->visit(this);
 }
 
 } // namespace ast

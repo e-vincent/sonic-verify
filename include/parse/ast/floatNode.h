@@ -18,7 +18,7 @@ public:
 	FloatNode(float num, int index, int parent, int line, int statement);
 
 	float val();
-	void accept(IVisitor v);
+	void accept(ast::VTimeVisitor* v);
 };
 
 } // namespace ast

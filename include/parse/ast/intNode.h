@@ -18,7 +18,7 @@ public:
 	IntNode(int num, int index, int parent, int line, int statement);
 
 	int val();
-	void accept(IVisitor v);
+	void accept(ast::VTimeVisitor* v);
 };
 
 } // namespace ast

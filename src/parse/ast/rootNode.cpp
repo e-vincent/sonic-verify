@@ -1,5 +1,5 @@
 #include "parse/ast/rootNode.h"
-#include "parse/ast/iVisitor.h"
+#include "parse/ast/vTimeVisitor.h"
 
 namespace ast
 {
@@ -14,9 +14,9 @@ RootNode::RootNode(std::string root)
 	this->statementNum = -1;
 }
 
-void RootNode::accept(IVisitor v)
+void RootNode::accept(ast::VTimeVisitor* v)
 {
-	v.visit(this);
+	v->visit(this);
 }
 
 } // namespace ast

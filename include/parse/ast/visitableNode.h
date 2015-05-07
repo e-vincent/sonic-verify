@@ -7,13 +7,10 @@
 
 #include "rice/Data_Type.hpp"
 
-//#include "parse/ast/intNode.h"
-
 namespace ast
 {
 
-class IVisitor;
-
+class VTimeVisitor;
 class VisitableNode
 {
 private:
@@ -24,14 +21,11 @@ protected:
 
 public:
 	std::list<ast::VisitableNode*> children;
-//	std::list<std::shared_ptr<ast::VisitableNode>> children;
 	std::string value;
 	int index;
 	int parent;
 
-	//operator IntNode() const;
-
-	void accept(IVisitor v);
+	virtual void accept(ast::VTimeVisitor*) = 0;
 
 	virtual int line();
 	virtual int statement();

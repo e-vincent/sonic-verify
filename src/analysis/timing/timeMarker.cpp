@@ -25,7 +25,9 @@ TimeMarker::TimeMarker()
 		std::cout << (*it).value;
 		std::cout << "\n";
 
-		visitor->visit(*it);
+		(&(*it))->accept(visitor);
+		//visitor->visit(&(*it));
+		
 	// Go forth and adapt an IterateVisitor
 	// which will do the int detecting for you
 	// detect sleep sends as a flag to count time

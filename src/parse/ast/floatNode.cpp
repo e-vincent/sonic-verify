@@ -1,5 +1,5 @@
 #include "parse/ast/floatNode.h"
-#include "parse/ast/iVisitor.h"
+#include "parse/ast/vTimeVisitor.h"
 
 namespace ast
 {
@@ -20,9 +20,9 @@ float FloatNode::val()
 	return this->num;
 }
 
-void FloatNode::accept(IVisitor v)
+void FloatNode::accept(VTimeVisitor* v)
 {
-	v.visit(this);
+	v->visit(this);
 }
 
 } // namespace ast

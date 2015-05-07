@@ -1,5 +1,5 @@
 #include "parse/ast/intNode.h"
-#include "parse/ast/iVisitor.h"
+#include "parse/ast/vTimeVisitor.h"
 
 namespace ast
 {
@@ -20,9 +20,9 @@ int IntNode::val()
 	return this->num;
 }
 
-void IntNode::accept(IVisitor v)
+void IntNode::accept(VTimeVisitor* v)
 {
-	v.visit(this);
+	v->visit(this);
 }
 
 } // namespace ast

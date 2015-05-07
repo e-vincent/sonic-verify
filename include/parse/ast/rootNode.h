@@ -16,7 +16,7 @@ public:
 	RootNode();
 	RootNode(std::string root);
 
-	void accept(IVisitor v);
+	void accept(ast::VTimeVisitor* v);
 };
 
 } // namespace ast
