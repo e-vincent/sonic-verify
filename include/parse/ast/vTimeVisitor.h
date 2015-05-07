@@ -3,11 +3,16 @@
 
 #include "parse/ast/iVisitor.h"
 
+#include "analysis/pTrace.h"
+
 namespace ast
 {
 
 class VTimeVisitor : public IVisitor
 {
+private:
+	bool detectSleep;
+
 public:
 	VTimeVisitor();
 

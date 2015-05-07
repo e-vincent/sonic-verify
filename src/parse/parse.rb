@@ -3,9 +3,9 @@ require_relative '../../bin/verify'
 
 path = "src/assets/sp/"
 
-filename = path + "function_variable_sleep.txt"
+#filename = path + "function_variable_sleep.txt"
 #filename = path + "nested_loop.txt"
-#filename = path + "simple_chord.txt"
+filename = path + "simple_sequence.txt"
 
 file = File.open(filename, "rb")
 contents = file.read
@@ -40,12 +40,6 @@ data.children.each do |child|
 		curr = stack.pop()
 		info = curr[0]
 		curr[1] = nodeIndex
-		
-		
-
-		puts "Current node #{info}"
-		puts "           index #{curr[1]} with parent #{curr[2]}"
-		puts "Current nodeIndex #{nodeIndex}"
 
 		if info.respond_to?(:location) and info.location.expression != nil	
 			if info.location.expression.line > line
@@ -74,18 +68,17 @@ data.children.each do |child|
 		if info.respond_to?(:children)
 			if !intFlag
 				info.children.reverse.each do |child|
-					puts "giving index #{nodeIndex}"
 					stack.push([child, -1, curr[1]])
 				end
 			end
 		end
 
-		puts "=== STACK ==="
-		stack.each_with_index do |item, index|
-			puts "stack_mem: #{index}"
-			puts "#{item[0]}"
-		end
-		puts ""
+		# puts "=== STACK ==="
+		# stack.each_with_index do |item, index|
+		# 	puts "stack_mem: #{index}"
+		# 	puts "#{item[0]}"
+		# end
+		# puts ""
 	end
 end
 

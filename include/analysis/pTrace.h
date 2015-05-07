@@ -6,11 +6,18 @@ namespace analysis
 
 class PTrace
 {
+private:
+	static float vtCounter;
+
 public:
-	int* stats;
+	static int* stats;
 
 	PTrace();
 	~PTrace();
+
+	static void test();
+	static void setVT(float vt);
+	static float vT();
 };
 
 } // namespace analysis
