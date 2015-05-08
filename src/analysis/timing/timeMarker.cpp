@@ -1,5 +1,4 @@
 #include "analysis/timing/timeMarker.h"
-#include "analysis/pTrace.h"
 
 namespace analysis
 {
@@ -23,14 +22,11 @@ TimeMarker::TimeMarker()
 		(&(*it))->accept(visitor);
 	}
 
-		// Go forth and adapt an IterateVisitor
-	// which will do the int detecting for you
-	// detect sleep sends as a flag to count time
-	// check statements are recording properly
-	// and then time at given statement can be recorded
-
-	// maybe stick line number in there somehow
-	// prog trace of objects for all the best information
+	std::cout << "End VT: " << analysis::PTrace::totalVT() << "\n";
+	for (int i = 0; i < analysis::PTrace::traceSize(); ++i)
+	{
+		std::cout << "Index " << i << " has VT " << PTrace::stats[i]->conVT << "\n";
+	}
 
 	std::cout << "OUT OF LOOP" << "\n";
 }

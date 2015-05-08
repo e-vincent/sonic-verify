@@ -5,33 +5,60 @@
 namespace analysis
 {
 
-float PTrace::vtCounter = 0;
-int* PTrace::stats = NULL;
+// persistant off by one error as statements index from 1
+std::vector<analysis::TData*> PTrace::stats{ new TData() };
 
 PTrace::PTrace()
 {
-	stats = new int[Builder::tree->size()];
+	int counter = Builder::tree->size();
+	while (counter != 0)
+	{
+		PTrace::stats.push_back(new TData());
+		--counter;
+	}
+
+	for (auto s : PTrace::stats)
+	{
+		std::printf("%p\n", s);
+	}
+
 	std::cout << "Made Trace" << "\n";
 }
 
 PTrace::~PTrace()
 {
-	delete[] stats;
+	for (TData* data : PTrace::stats)
+	{
+		delete data;
+	}
 }
 
-void PTrace::test()
+void PTrace::setVT(float vt, int index)
 {
-	std::cout << "\n" << "Success Test" << "\n";
+	std::cout << "Setting trace index " << index << " to " << vt << "\n";
+	PTrace::stats[index]->conVT = vt;
+	PTrace::stats[index]->cumVT = PTrace::stats[index - 1]->cumVT + vt;
 }
 
-void PTrace::setVT(float vt)
+float PTrace::vtAt(int index)
 {
-	PTrace::vtCounter += vt;
+	return PTrace::stats[index]->conVT;
 }
 
-float PTrace::vT()
+float PTrace::cumVTAt(int index)
 {
-	return PTrace::vtCounter;
+	std::cout << "Looking for index " << index << "\n";
+	return PTrace::stats[index]->cumVT;
+}
+
+float PTrace::totalVT()
+{
+	return PTrace::stats[traceSize() - 1]->cumVT;
+}
+
+int PTrace::traceSize()
+{
+	return PTrace::stats.size();
 }
 
 } // namespace analysis

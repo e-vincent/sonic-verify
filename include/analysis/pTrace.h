@@ -1,23 +1,29 @@
 #ifndef __PTRACE_H__
 #define __PTRACE_H__
 
+#include <vector>
+
+#include "analysis/tData.h"
+
 namespace analysis
 {
 
 class PTrace
 {
 private:
-	static float vtCounter;
 
 public:
-	static int* stats;
+	//static std::vector<int*> stats;
+	static std::vector<analysis::TData*> stats;
 
 	PTrace();
 	~PTrace();
 
-	static void test();
-	static void setVT(float vt);
-	static float vT();
+	static void setVT(float vt, int index);
+	static float vtAt(int index);
+	static float cumVTAt(int index);
+	static float totalVT();
+	static int traceSize();
 };
 
 } // namespace analysis
