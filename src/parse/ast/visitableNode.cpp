@@ -13,4 +13,9 @@ int VisitableNode::statement()
 	return this->statementNum;
 }
 
+void VisitableNode::accept(BasicVisitor*, std::string)
+{
+	// stub
+}
+
 } // namespace ast

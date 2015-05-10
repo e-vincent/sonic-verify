@@ -20,32 +20,60 @@ void VTimeVisitor::visit(ast::BodyNode* bodyNode)
 	{
 		std::cout << "flip bool" << "\n";
 		this->detectSleep = true;
-	}		
+	}
+
+	// carry forward the cumulative VT in the event 
+	// we pass through begin/block nodes
+	analysis::PTrace::createTrace(bodyNode->statement());
 }
 
 void VTimeVisitor::visit(ast::IntNode* intNode)
 {
 	std::cout << "Visiting IntNode " << intNode->val() << "\n";
-	std::cout << "CURR STATEMENT: " << intNode->statement() << "\n";
 	float conVT;
 
 	if (this->detectSleep)
 	{
 		conVT = (float) intNode->val();
 		this->detectSleep = false;
+		std::cout << "reset bool" << "\n";
 	}		
 	else
 	{
 		conVT = 0.0;
 	}
 
-	analysis::PTrace::setVT(conVT, intNode->statement());
-	std::cout << "VT at: " << analysis::PTrace::cumVTAt(intNode->statement()) << "\n";
+	analysis::PTrace::createTrace(conVT, intNode->statement());
 }
 
 void VTimeVisitor::visit(ast::FloatNode* floatNode)
 {
-	std::cout << "Visiting IntNode " << floatNode->val() << "\n";		
+	std::cout << "Visiting FloatNode " << floatNode->val() << "\n";
+	float conVT;
+
+	if (this->detectSleep)
+	{
+		conVT = floatNode->val();
+		this->detectSleep = false;
+		std::cout << "reset bool" << "\n";
+	}		
+	else
+	{
+		conVT = 0.0;
+	}
+
+	std::cout << "contributing " << conVT << "\n";
+	analysis::PTrace::createTrace(conVT, floatNode->statement());
+}
+
+void VTimeVisitor::visit(ast::SymNode* symNode)
+{
+	std::cout << "Visiting SymNode " << symNode->value << "\n";
+}
+
+void VTimeVisitor::visit(ast::SendNode* sendNode)
+{
+	std::cout << "Visiting SendNode " << sendNode->value << "\n";
 }
 
 } // namespace ast

@@ -1,0 +1,5 @@
+play 60
+sleep rrand(0.5, 1)
+play 62
+sleep rrand(1, 1.5)
+play 64

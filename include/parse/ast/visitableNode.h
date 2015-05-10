@@ -10,6 +10,7 @@
 namespace ast
 {
 
+class BasicVisitor;
 class VTimeVisitor;
 class VisitableNode
 {
@@ -26,6 +27,7 @@ public:
 	int parent;
 
 	virtual void accept(ast::VTimeVisitor*) = 0;
+	virtual void accept(ast::BasicVisitor*, std::string);
 
 	virtual int line();
 	virtual int statement();

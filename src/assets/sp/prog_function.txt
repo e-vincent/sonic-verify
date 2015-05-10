@@ -1,0 +1,11 @@
+live_loop :host do
+  play 60
+  play 64
+  sleep 0.5
+  bells
+end
+
+define :bells do
+  sample :perc_bell
+  sleep 1
+end

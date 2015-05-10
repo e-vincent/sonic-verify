@@ -7,13 +7,15 @@ namespace analysis
 class TData
 {
 private:
+	bool funcCall;
+	bool funcFound;
 
 public:
 	TData();
 
+	int loopDepth;
 	float cumVT; // cumulative
 	float conVT; // contribution
-
 };
 
 } // namespace analysis

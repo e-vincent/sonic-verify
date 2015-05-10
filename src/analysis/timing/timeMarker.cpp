@@ -25,7 +25,10 @@ TimeMarker::TimeMarker()
 	std::cout << "End VT: " << analysis::PTrace::totalVT() << "\n";
 	for (int i = 0; i < analysis::PTrace::traceSize(); ++i)
 	{
-		std::cout << "Index " << i << " has VT " << PTrace::stats[i]->conVT << "\n";
+		std::cout << "Index " << i 
+				<< " has VT " << PTrace::stats[i]->conVT
+				<< ", Current total: " << PTrace::stats[i]->cumVT 
+				<< "\n";
 	}
 
 	std::cout << "OUT OF LOOP" << "\n";

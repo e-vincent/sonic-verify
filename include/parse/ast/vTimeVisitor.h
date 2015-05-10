@@ -20,6 +20,8 @@ public:
 	virtual void visit(ast::BodyNode* bodyNode);
 	virtual void visit(ast::IntNode* intNode);
 	virtual void visit(ast::FloatNode* floatNode);
+	virtual void visit(ast::SymNode* symNode);
+	virtual void visit(ast::SendNode* sendNode);
 };
 
 } // namespace ast

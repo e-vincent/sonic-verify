@@ -7,19 +7,16 @@ namespace analysis
 
 // persistant off by one error as statements index from 1
 std::vector<analysis::TData*> PTrace::stats{ new TData() };
+std::vector<std::string> PTrace::definedFuncs;
+int PTrace::lastSet = 0;
 
 PTrace::PTrace()
 {
 	int counter = Builder::tree->size();
 	while (counter != 0)
 	{
-		PTrace::stats.push_back(new TData());
+		stats.push_back(new TData());
 		--counter;
-	}
-
-	for (auto s : PTrace::stats)
-	{
-		std::printf("%p\n", s);
 	}
 
 	std::cout << "Made Trace" << "\n";
@@ -27,7 +24,7 @@ PTrace::PTrace()
 
 PTrace::~PTrace()
 {
-	for (TData* data : PTrace::stats)
+	for (TData* data : stats)
 	{
 		delete data;
 	}
@@ -35,30 +32,55 @@ PTrace::~PTrace()
 
 void PTrace::setVT(float vt, int index)
 {
+	lastSet = index;
 	std::cout << "Setting trace index " << index << " to " << vt << "\n";
-	PTrace::stats[index]->conVT = vt;
-	PTrace::stats[index]->cumVT = PTrace::stats[index - 1]->cumVT + vt;
+	stats[index]->conVT = vt;
+	stats[index]->cumVT = stats[index - 1]->cumVT + vt;
+}
+
+void PTrace::updateVT(int index)
+{
+	if (index > lastSet)
+	{
+		stats[index]->cumVT = stats[index - 1]->cumVT;
+	}
+}
+
+void PTrace::createTrace(float conVT, int statement)
+{
+	setVT(conVT, statement);
+}
+
+void PTrace::createTrace(std::string func, int statement)
+{
+	std::cout << " create trace " << func
+			<< " for statement " << statement;
+}
+
+void PTrace::createTrace(int statement)
+{
+	updateVT(statement);
 }
 
 float PTrace::vtAt(int index)
 {
-	return PTrace::stats[index]->conVT;
+	return stats[index]->conVT;
 }
 
 float PTrace::cumVTAt(int index)
 {
 	std::cout << "Looking for index " << index << "\n";
-	return PTrace::stats[index]->cumVT;
+	return stats[index]->cumVT;
 }
 
 float PTrace::totalVT()
 {
-	return PTrace::stats[traceSize() - 1]->cumVT;
+	return stats[traceSize() - 1]->cumVT;
 }
 
 int PTrace::traceSize()
 {
-	return PTrace::stats.size();
+	return stats.size();
 }
 
 } // namespace analysis
