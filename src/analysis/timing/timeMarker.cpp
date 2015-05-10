@@ -28,6 +28,7 @@ TimeMarker::TimeMarker()
 		std::cout << "Index " << i 
 				<< " has VT " << PTrace::stats[i]->conVT
 				<< ", Current total: " << PTrace::stats[i]->cumVT 
+				<< " IN FUNC:: " << PTrace::stats[i]->isInFunc()
 				<< "\n";
 	}
 

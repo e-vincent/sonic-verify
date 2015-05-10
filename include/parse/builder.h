@@ -31,17 +31,17 @@ public:
 	Builder();
 	~Builder();
 
-	ast::BodyNode* makeNode(Rice::Symbol token, int index, int parent, int line, int statement);
-	ast::IntNode* makeInt(int num, int index, int parent, int line, int statement);
-	ast::FloatNode* makeFloat(float num, int index, int parent, int line, int statement);
-	ast::SymNode* makeSymbol(std::string sym, int index, int parent, int line, int statement);
-	ast::SendNode* makeSend(int index, int parent, int line, int statement);
+	ast::BodyNode* makeNode(Rice::Symbol token, int index, int parent, int line, int statement, int blkDepth);
+	ast::IntNode* makeInt(int num, int index, int parent, int line, int statement, int blkDepth);
+	ast::FloatNode* makeFloat(float num, int index, int parent, int line, int statement, int blkDepth);
+	ast::SymNode* makeSymbol(std::string sym, int index, int parent, int line, int statement, int blkDepth);
+	ast::SendNode* makeSend(int index, int parent, int line, int statement, int blkDepth);
 
 	void makeRoot(Rice::Symbol root);
-	void addNode(Rice::Symbol nodeType, int index, int parent, int line, int statement);
-	void addValue(std::string val, int index, int parent, int line, int statement);
-	void addNumber(std::string num, int index, int parent, int line, int statement);
-	void addSymbol(std::string sym, int index, int parent, int line, int statement);
+	void addNode(Rice::Symbol nodeType, int index, int parent, int line, int statement, int blkDepth);
+	void addValue(std::string val, int index, int parent, int line, int statement, int blkDepth);
+	void addNumber(std::string num, int index, int parent, int line, int statement, int blkDepth);
+	void addSymbol(std::string sym, int index, int parent, int line, int statement, int blkDepth);
 
 	void setTreeSize(int treeSize, int lineCount);
 };

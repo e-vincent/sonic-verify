@@ -4,15 +4,11 @@
 namespace ast
 {
 
-IntNode::IntNode() { }
-IntNode::IntNode(int num, int index, int parent, int line, int statement)
+IntNode::IntNode(int num, int index, int parent, int line, int statement, int blkDepth)
+: ast::VisitableNode(index, parent, line, statement, blkDepth)
 {
 	this->num	= num;
 	this->value = "int";
-	this->index = index;
-	this->parent  = parent;
-	this->lineNum = line;
-	this->statementNum = statement;
 }
 
 int IntNode::val()

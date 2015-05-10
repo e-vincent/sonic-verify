@@ -14,8 +14,7 @@ private:
 protected:
 
 public:
-	FloatNode();
-	FloatNode(float num, int index, int parent, int line, int statement);
+	FloatNode(float num, int index, int parent, int line, int statement, int blkDepth);
 
 	float val();
 	void accept(ast::VTimeVisitor* v);

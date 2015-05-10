@@ -14,8 +14,7 @@ private:
 protected:
 
 public:
-	IntNode();
-	IntNode(int num, int index, int parent, int line, int statement);
+	IntNode(int num, int index, int parent, int line, int statement, int blkDepth);
 
 	int val();
 	void accept(ast::VTimeVisitor* v);

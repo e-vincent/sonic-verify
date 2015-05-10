@@ -4,7 +4,6 @@
 namespace ast
 {
 
-RootNode::RootNode() { }
 RootNode::RootNode(std::string root)
 {
 	this->value = root;

@@ -19,6 +19,7 @@ private:
 protected:
 	int statementNum;
 	int lineNum;
+	int blkDepth;
 
 public:
 	std::list<ast::VisitableNode*> children;
@@ -26,11 +27,15 @@ public:
 	int index;
 	int parent;
 
+	VisitableNode();
+	VisitableNode(int index, int parent, int line, int statement, int blkDepth);
+
 	virtual void accept(ast::VTimeVisitor*) = 0;
 	virtual void accept(ast::BasicVisitor*, std::string);
 
 	virtual int line();
 	virtual int statement();
+	virtual int blockDepth();
 };
 
 } // namespace ast

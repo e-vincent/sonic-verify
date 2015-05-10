@@ -9,6 +9,7 @@ namespace analysis
 std::vector<analysis::TData*> PTrace::stats{ new TData() };
 std::vector<std::string> PTrace::definedFuncs;
 int PTrace::lastSet = 0;
+bool PTrace::inFunc = false;
 
 PTrace::PTrace()
 {
@@ -35,31 +36,52 @@ void PTrace::setVT(float vt, int index)
 	lastSet = index;
 	std::cout << "Setting trace index " << index << " to " << vt << "\n";
 	stats[index]->conVT = vt;
-	stats[index]->cumVT = stats[index - 1]->cumVT + vt;
+	if (index != 0)
+	{
+		stats[index]->cumVT = stats[index - 1]->cumVT + vt;
+	}
 }
 
 void PTrace::updateVT(int index)
 {
-	if (index > lastSet)
-	{
-		stats[index]->cumVT = stats[index - 1]->cumVT;
-	}
+	std::cout << "UpdateVT " << index << "\n";
+	// if (index > lastSet)
+	// {
+	// 	stats[index]->cumVT = stats[index - 1]->cumVT;
+	// }
 }
 
 void PTrace::createTrace(float conVT, int statement)
 {
+	stats[statement]->setInFunc(isInFunc());
 	setVT(conVT, statement);
 }
 
 void PTrace::createTrace(std::string func, int statement)
 {
+	stats[statement]->setInFunc(isInFunc());
 	std::cout << " create trace " << func
 			<< " for statement " << statement;
 }
 
 void PTrace::createTrace(int statement)
 {
+	stats[statement]->setInFunc(isInFunc());
 	updateVT(statement);
+}
+
+void PTrace::createTrace(int statement, bool funcCalled)
+{
+	stats[statement]->setInFunc(isInFunc());
+	stats[statement]->setFuncCall(funcCalled);
+	stats[statement]->setFuncFound(!funcCalled);
+	// -1 will signal the program to re-calculate numbers on second run
+	setVT(-1, statement);
+}
+
+void PTrace::setInFunc(bool b)
+{
+	inFunc = b;
 }
 
 float PTrace::vtAt(int index)
@@ -81,6 +103,11 @@ float PTrace::totalVT()
 int PTrace::traceSize()
 {
 	return stats.size();
+}
+
+bool PTrace::isInFunc()
+{
+	return inFunc;
 }
 
 } // namespace analysis

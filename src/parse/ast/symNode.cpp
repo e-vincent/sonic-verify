@@ -4,15 +4,11 @@
 namespace ast
 {
 
-//SymNode::SymNode();
-SymNode::SymNode(std::string symbol, int index, int parent, int line, int statement)
+SymNode::SymNode(std::string symbol, int index, int parent, int line, int statement, int blkDepth)
+: ast::VisitableNode(index, parent, line, statement, blkDepth)
 {
 	this->value   = "sym";
 	this->symbol  = symbol;
-	this->index   = index;
-	this->parent  = parent;
-	this->lineNum = line;
-	this->statementNum = statement;
 }
 
 void SymNode::accept(VTimeVisitor* v)

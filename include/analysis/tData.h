@@ -7,15 +7,21 @@ namespace analysis
 class TData
 {
 private:
-	bool funcCall;
-	bool funcFound;
+	bool funcCall; // this line is a function call
+	bool funcFound; // the function called for has been defined
+	bool inFunc;
 
 public:
 	TData();
 
-	int loopDepth;
 	float cumVT; // cumulative
 	float conVT; // contribution
+
+	void setFuncCall(bool b);
+	void setFuncFound(bool b);
+	void setInFunc(bool b);
+
+	bool isInFunc();
 };
 
 } // namespace analysis

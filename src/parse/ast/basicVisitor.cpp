@@ -32,7 +32,7 @@ void BasicVisitor::visit(ast::SymNode* symNode)
 
 void BasicVisitor::visit(ast::SendNode* sendNode)
 {
-	std::cout << "Visiting SendNode " << sendNode->value << "\n";
+	std::cout << "Visiting SendNode " << sendNode->value << " " << sendNode->index << "\n";
 }
 
 } // namespace ast

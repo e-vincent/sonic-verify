@@ -5,14 +5,10 @@
 namespace ast
 {
 
-SendNode::SendNode() { }
-SendNode::SendNode(int index, int parent, int line, int statement)
+SendNode::SendNode(int index, int parent, int line, int statement, int blkDepth)
+: ast::VisitableNode(index, parent, line, statement, blkDepth)
 {
 	this->value = "send";
-	this->index = index;
-	this->parent  = parent;
-	this->lineNum = line;
-	this->statementNum = statement;
 }
 
 void SendNode::accept(VTimeVisitor* v)
@@ -24,6 +20,7 @@ void SendNode::accept(BasicVisitor* v, std::string sym)
 {
 	v->visit(this);
 	setFuncName(sym);
+	setType("function");
 }
 
 void SendNode::setType(std::string s)

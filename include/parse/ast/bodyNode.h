@@ -13,10 +13,10 @@ private:
 protected:
 
 public:
-	BodyNode();
-	BodyNode(std::string node, int index, int parent, int line, int statement);
+	BodyNode(std::string node, int index, int parent, int line, int statement, int blkDepth);
 
 	void accept(ast::VTimeVisitor* v);
+	bool isFuncCall();
 };
 
 } // namespace ast

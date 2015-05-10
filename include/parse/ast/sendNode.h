@@ -15,8 +15,7 @@ private:
 protected:
 
 public:
-	SendNode();
-	SendNode(int index, int parent, int line, int statement);
+	SendNode(int index, int parent, int line, int statement, int blkDepth);
 
 	void accept(ast::VTimeVisitor* v);
 	void accept(ast::BasicVisitor* v, std::string sym);

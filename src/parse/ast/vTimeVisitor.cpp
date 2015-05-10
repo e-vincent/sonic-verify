@@ -22,9 +22,18 @@ void VTimeVisitor::visit(ast::BodyNode* bodyNode)
 		this->detectSleep = true;
 	}
 
-	// carry forward the cumulative VT in the event 
-	// we pass through begin/block nodes
-	analysis::PTrace::createTrace(bodyNode->statement());
+	if (bodyNode->isFuncCall())
+	{
+		std::cout << "Setting function call VT\n";
+		analysis::PTrace::createTrace(bodyNode->statement(), bodyNode->isFuncCall());
+	}
+	else
+	{
+		// carry forward the cumulative VT in the event 
+		// we pass through begin/block nodes
+		analysis::PTrace::createTrace(bodyNode->statement());
+		std::cout << "State: " << bodyNode->statement() << "\n";
+	}
 }
 
 void VTimeVisitor::visit(ast::IntNode* intNode)
@@ -73,7 +82,16 @@ void VTimeVisitor::visit(ast::SymNode* symNode)
 
 void VTimeVisitor::visit(ast::SendNode* sendNode)
 {
-	std::cout << "Visiting SendNode " << sendNode->value << "\n";
+	std::cout << "Visiting SendNode " << sendNode->value << " " << sendNode->index << "\n";
+	std::cout << "    type " << sendNode->type() << "\n";
+	std::cout << "    func " << sendNode->func() << "\n";
+
+	if (sendNode->type() == "function")
+	{
+		(analysis::PTrace::stats[sendNode->statement()])->setInFunc(true);
+		(analysis::PTrace::stats[sendNode->statement()])->cumVT = 0; // start cumulation fresh with new func
+		analysis::PTrace::setInFunc(true);
+	}
 }
 
 } // namespace ast

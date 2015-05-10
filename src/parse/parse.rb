@@ -27,6 +27,7 @@ children = data.children
 # pass builder through to avoid static use of tree
 builder  = Builder.new
 stack    = Array.new
+blkStack = Array.new
 parentIndex = 0
 nodeIndex   = 0
 statementNo = 0
@@ -45,6 +46,7 @@ data.children.each do |child|
 		info = curr[0]
 		curr[1] = nodeIndex
 
+puts info
 		if info.respond_to?(:location) and info.location.expression != nil	
 			if info.location.expression.line > line
 				line = info.location.expression.line
@@ -52,7 +54,21 @@ data.children.each do |child|
 
 			if "send".eql?(info.type.to_s())
 				statementNo += 1
-			end		
+			end	
+			
+			# if the current node has the same parent as the top block
+			# pop it because we are outside of the last block tree
+			# puts "Current stack size: #{blkStack.size()}"
+			# puts "Looking at blkStack top: #{blkStack[blkStack.size() - 1]}"
+			# puts "Given parent: #{curr[2]}"
+			if curr[2] == blkStack[blkStack.size() - 1]
+				blkStack.pop()
+			end
+			# handling detection of block level
+			# used later to track where in the trace index internal function VT is stored
+			if "block".eql?(info.type.to_s())
+				blkStack.push(curr[2])
+			end
 		end
 
 		if info.respond_to?(:type)
@@ -60,19 +76,19 @@ data.children.each do |child|
 			symFlag = "sym".eql?(info.type.to_s())
 			if intFlag
 				int = info.children[0]
-				builder.addNumber(int.to_s(), curr[1], curr[2], line, statementNo)
+				builder.addNumber(int.to_s(), curr[1], curr[2], line, statementNo, blkStack.size())
 			elsif symFlag
 				sym = info.children[0]
-				builder.addSymbol(sym.to_s(), curr[1], curr[2], line, statementNo)
+				builder.addSymbol(sym.to_s(), curr[1], curr[2], line, statementNo, blkStack.size())
 			else
 				intFlag = false
 				symFlag = false
-				builder.addNode(info.type, curr[1], curr[2], line, statementNo)
+				builder.addNode(info.type, curr[1], curr[2], line, statementNo, blkStack.size())
 			end
 		else
 			intFlag = false
 			symFlag = false
-			builder.addValue(info.to_s(), curr[1], curr[2], line, statementNo)
+			builder.addValue(info.to_s(), curr[1], curr[2], line, statementNo, blkStack.size())
 		end
 
 		if info.respond_to?(:children)

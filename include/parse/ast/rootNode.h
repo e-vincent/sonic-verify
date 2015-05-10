@@ -13,7 +13,6 @@ private:
 protected:
 
 public:
-	RootNode();
 	RootNode(std::string root);
 
 	void accept(ast::VTimeVisitor* v);
