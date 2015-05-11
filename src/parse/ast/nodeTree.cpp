@@ -108,7 +108,8 @@ void NodeTree::setRoot(ast::VisitableNode* rootNode)
 
 void NodeTree::addNode(ast::VisitableNode* node, int parent)
 {
-//	std::cout << node->value << "\n";
+	std::cout << node->value 
+			<< " " << node->index << " parent " << parent << "\n";
 	ast::VisitableNode* parNode = findNode(parent);
 	parNode->children.push_back(node);
 }

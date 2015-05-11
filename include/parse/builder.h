@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <math.h>
+#include <map>
 
 #include "main.h"
 
@@ -23,6 +24,7 @@ class Builder
 private:
 	int lastSend;
 	bool define;
+	static std::map<int, bool> exits;
 
 public:
 	static ast::NodeTree* tree;
@@ -44,6 +46,9 @@ public:
 	void addSymbol(std::string sym, int index, int parent, int line, int statement, int blkDepth);
 
 	void setTreeSize(int treeSize, int lineCount);
+	void exitFuncs(int statement);
+	
+	static std::map<int, bool> getExitMap();
 };
 
 #endif // __BUILDER_H__

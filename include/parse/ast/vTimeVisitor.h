@@ -12,6 +12,7 @@ class VTimeVisitor : public IVisitor
 {
 private:
 	bool detectSleep;
+	bool defineCall;
 
 public:
 	VTimeVisitor();

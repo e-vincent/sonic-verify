@@ -6,6 +6,7 @@
 #include <map>
 
 #include "analysis/tData.h"
+#include "parse/builder.h"
 
 namespace analysis
 {
@@ -19,18 +20,20 @@ private:
 
 public:
 	static std::vector<analysis::TData*> stats;
+	static std::map<std::string, int> defFuncs;
 	static std::vector<std::string> definedFuncs;
 
 	PTrace();
 	~PTrace();
 
 	static void setVT(float vt, int index);
-	static void updateVT(int index);
 
-	static void createTrace(float conVT, int statement);
-	static void createTrace(std::string func, int statement);
-	static void createTrace(int statement);
-	static void createTrace(int statement, bool funcCalled);
+	static void createTrace(float conVT, int statement);		// TData with new VT
+	static void createTrace(std::string func, int statement);	// TData, func defined
+	static void createTrace(int statement);						// TData, carry previous VT
+	static void createTrace(int statement, bool funcCalled, std::string func);	// TData, func called
+
+	static void checkFunctionStatus(int statement);
 	static void setInFunc(bool b);
 
 	static float vtAt(int index);
@@ -38,6 +41,9 @@ public:
 	static float totalVT();
 	static int traceSize();
 	static bool isInFunc();
+	static float getFunctionVT(std::string func);
+
+	static void updateTraceWithFuncVTs();
 };
 
 } // namespace analysis

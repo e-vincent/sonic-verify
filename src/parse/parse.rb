@@ -3,10 +3,10 @@ require_relative '../../bin/verify'
 
 path = "src/assets/sp/"
 
-#filename = path + "function_simple.txt"
+filename = path + "function_sequential.txt"
 #filename = path + "sequence_loop.txt"
-#filename = path + "simple_chord.txt"
-filename = path + "prog_function.txt"
+#filename = path + "simple_loop.txt"
+#filename = path + "prog_function.txt"
 
 file = File.open(filename, "rb")
 contents = file.read
@@ -63,6 +63,7 @@ puts info
 			# puts "Given parent: #{curr[2]}"
 			if curr[2] == blkStack[blkStack.size() - 1]
 				blkStack.pop()
+				builder.exitFuncs(statementNo)
 			end
 			# handling detection of block level
 			# used later to track where in the trace index internal function VT is stored

@@ -1,0 +1,11 @@
+define :first do
+	play 60;
+end
+
+first
+second
+play 60;
+
+define :second do
+	sleep 1
+end

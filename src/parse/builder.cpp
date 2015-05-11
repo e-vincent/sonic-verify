@@ -1,6 +1,7 @@
 #include "parse/builder.h"
 
 ast::NodeTree* Builder::tree = NULL;
+std::map<int, bool> Builder::exits;
 
 Builder::Builder()
 {
@@ -75,8 +76,6 @@ void Builder::addNode(Rice::Symbol nodeType, int index,
 void Builder::addValue(std::string val, int index, int parent, 
 		int line, int statement, int blkDepth)
 {
-	std::cout << val;
-	std::cout << "\ndefine is " << (val == "define") << "\n";
 	ast::BodyNode* node = makeNode(val, index, parent, line, statement, blkDepth);
 	Builder::tree->addNode(node, parent);
 	define = (val == "define");
@@ -109,7 +108,6 @@ void Builder::addSymbol(std::string sym, int index,
 	// update last send if function name is being defined
 	if (define)
 	{
-		std::cout << "\nMADE IT\n";
 		ast::VisitableNode* send = Builder::tree->findNode(lastSend);
 		send->accept(visitor, sym);
 		define = false;
@@ -120,4 +118,14 @@ void Builder::setTreeSize(int treeSize, int lineCount)
 {
 	Builder::tree->setSize(treeSize);
 	Builder::tree->setLineCount(lineCount);
+}
+
+void Builder::exitFuncs(int statement)
+{
+	exits[statement] = false;
+}
+
+std::map<int, bool> Builder::getExitMap()
+{
+	return exits;
 }

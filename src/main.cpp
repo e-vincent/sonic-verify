@@ -12,7 +12,8 @@ void Init_verify()
 		.define_method("addValue", &Builder::addValue)
 		.define_method("addNumber", &Builder::addNumber)
 		.define_method("addSymbol", &Builder::addSymbol)
-		.define_method("setTreeSize", &Builder::setTreeSize);
+		.define_method("setTreeSize", &Builder::setTreeSize)
+		.define_method("exitFuncs", &Builder::exitFuncs);
 
 	Rice::Data_Type<analysis::TimeMarker> rb_cTimeMarker =
 		Rice::define_class<analysis::TimeMarker>("TimeMarker")

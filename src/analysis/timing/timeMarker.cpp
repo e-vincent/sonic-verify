@@ -17,13 +17,15 @@ TimeMarker::TimeMarker()
 
 	ast::TreeIterator start = Builder::tree->begin();
 	ast::TreeIterator end   = Builder::tree->end();
+	// first pass - setup VTs
 	for (ast::TreeIterator it = start; it != end; ++it)
 	{
 		(&(*it))->accept(visitor);
 	}
 
 	std::cout << "End VT: " << analysis::PTrace::totalVT() << "\n";
-	for (int i = 0; i < analysis::PTrace::traceSize(); ++i)
+	std::cout << " ===  First Pass Results ===\n";
+	for (int i = 0; i < PTrace::traceSize(); ++i)
 	{
 		std::cout << "Index " << i 
 				<< " has VT " << PTrace::stats[i]->conVT
@@ -31,8 +33,21 @@ TimeMarker::TimeMarker()
 				<< " IN FUNC:: " << PTrace::stats[i]->isInFunc()
 				<< "\n";
 	}
+	std::cout << " === =================== ===\n";
 
-	std::cout << "OUT OF LOOP" << "\n";
+	// second pass - collect function VT
+	PTrace::updateTraceWithFuncVTs();
+
+	std::cout << " === Second Pass Results ===\n";
+	for (int i = 0; i < PTrace::traceSize(); ++i)
+	{
+		std::cout << "Index " << i 
+				<< " has VT " << PTrace::stats[i]->conVT
+				<< ", Current total: " << PTrace::stats[i]->cumVT 
+				<< " IN FUNC:: " << PTrace::stats[i]->isInFunc()
+				<< "\n";
+	}
+	std::cout << " === =================== ===\n";
 }
 
 } // namespace analysis

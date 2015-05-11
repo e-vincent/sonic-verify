@@ -14,7 +14,6 @@ private:
 protected:
 
 public:
-//	SymNode();
 	SymNode(std::string symbol, int index, int parent, int line, int statement, int blkDepth);
 
 	void accept(ast::VTimeVisitor* v);

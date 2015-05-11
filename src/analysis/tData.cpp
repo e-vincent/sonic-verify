@@ -8,18 +8,13 @@ TData::TData()
 	cumVT = 0.0;
 	conVT = 0.0;
 	funcCall  = false;
-	funcFound = false;
 	inFunc	  = false;
 }
 
-void TData::setFuncCall(bool b)
+void TData::setFuncCall(bool b, std::string function)
 {
 	funcCall = b;
-}
-
-void TData::setFuncFound(bool b)
-{
-	funcFound = b;
+	func = function;
 }
 
 void TData::setInFunc(bool b)
@@ -30,6 +25,11 @@ void TData::setInFunc(bool b)
 bool TData::isInFunc()
 {
 	return inFunc;
+}
+
+std::string TData::getFunc()
+{
+	return func;
 }
 
 } // namespace analysis

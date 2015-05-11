@@ -1,14 +1,16 @@
 #ifndef __TDATA_H__
 #define __TDATA_H__
 
+#include <string>
+
 namespace analysis
 {
 
 class TData
 {
 private:
-	bool funcCall; // this line is a function call
-	bool funcFound; // the function called for has been defined
+	bool funcCall; 		// this line is a function call
+	std::string func; 	// function called
 	bool inFunc;
 
 public:
@@ -17,11 +19,11 @@ public:
 	float cumVT; // cumulative
 	float conVT; // contribution
 
-	void setFuncCall(bool b);
-	void setFuncFound(bool b);
+	void setFuncCall(bool b, std::string function);
 	void setInFunc(bool b);
 
 	bool isInFunc();
+	std::string getFunc();
 };
 
 } // namespace analysis

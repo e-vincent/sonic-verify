@@ -6,6 +6,7 @@ namespace ast
 VTimeVisitor::VTimeVisitor()
 {
 	this->detectSleep = false;
+	this->defineCall  = false;
 }
 
 void VTimeVisitor::visit(ast::RootNode* rootNode)
@@ -18,21 +19,22 @@ void VTimeVisitor::visit(ast::BodyNode* bodyNode)
 	std::cout << "Visiting BodyNode " << bodyNode->value << "\n";
 	if ("sleep" == bodyNode->value)
 	{
-		std::cout << "flip bool" << "\n";
 		this->detectSleep = true;
+	}
+	else if ("define" == bodyNode->value)
+	{
+		this->defineCall  = true;
 	}
 
 	if (bodyNode->isFuncCall())
 	{
-		std::cout << "Setting function call VT\n";
-		analysis::PTrace::createTrace(bodyNode->statement(), bodyNode->isFuncCall());
+		analysis::PTrace::createTrace(bodyNode->statement(), bodyNode->isFuncCall(), bodyNode->value);
 	}
 	else
 	{
 		// carry forward the cumulative VT in the event 
 		// we pass through begin/block nodes
 		analysis::PTrace::createTrace(bodyNode->statement());
-		std::cout << "State: " << bodyNode->statement() << "\n";
 	}
 }
 
@@ -45,7 +47,6 @@ void VTimeVisitor::visit(ast::IntNode* intNode)
 	{
 		conVT = (float) intNode->val();
 		this->detectSleep = false;
-		std::cout << "reset bool" << "\n";
 	}		
 	else
 	{
@@ -64,20 +65,23 @@ void VTimeVisitor::visit(ast::FloatNode* floatNode)
 	{
 		conVT = floatNode->val();
 		this->detectSleep = false;
-		std::cout << "reset bool" << "\n";
 	}		
 	else
 	{
 		conVT = 0.0;
 	}
 
-	std::cout << "contributing " << conVT << "\n";
 	analysis::PTrace::createTrace(conVT, floatNode->statement());
 }
 
 void VTimeVisitor::visit(ast::SymNode* symNode)
 {
 	std::cout << "Visiting SymNode " << symNode->value << "\n";
+	if (defineCall)
+	{
+		analysis::PTrace::createTrace(symNode->sym(), symNode->statement());
+		defineCall = false;
+	}
 }
 
 void VTimeVisitor::visit(ast::SendNode* sendNode)
