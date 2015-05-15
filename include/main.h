@@ -3,6 +3,7 @@
 
 #include "parse/builder.h"
 #include "analysis/timing/timeMarker.h"
+#include "analysis/session/planner.h"
 
 extern "C"
 void Init_verify();

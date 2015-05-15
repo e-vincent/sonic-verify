@@ -1,0 +1,53 @@
+in_thread do
+  loop do
+    cue :A
+    play 60
+    sleep 1
+  end
+end
+
+in_thread do
+  loop do
+    cue :B
+    play 63
+    sleep 0.5
+  end
+end
+
+live_loop :liiiive do
+  cue :things
+  cue :moar
+  sleep 1
+  cue :things
+end
+
+in_thread do
+  loop do
+    cue :B
+    play 63
+    sleep 0.5
+  end
+end
+
+in_thread do
+  loop do
+    cue :B
+    cue :C
+    cue :D
+    play 63
+    sleep 0.5
+  end
+end
+
+in_thread do
+  loop do
+    if (true) then
+      cue :E
+      sleep 0.5
+    else
+      cue :F
+    end
+    play 63
+    sleep 0.5
+  end
+end

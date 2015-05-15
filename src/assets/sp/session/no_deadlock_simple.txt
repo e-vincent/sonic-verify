@@ -1,0 +1,17 @@
+in_thread do
+  loop do
+    cue :B
+    sync :A
+    sleep 1
+    play 63
+  end
+end
+
+in_thread do
+  loop do
+    cue :A
+    sync :B
+    play 60
+    sleep 0.5
+  end
+end

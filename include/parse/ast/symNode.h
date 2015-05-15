@@ -2,6 +2,7 @@
 #define __SYM_NODE_H__
 
 #include "parse/ast/visitableNode.h"
+#include "analysis/session/typeVisitor.h"
 
 namespace ast
 {
@@ -17,6 +18,7 @@ public:
 	SymNode(std::string symbol, int index, int parent, int line, int statement, int blkDepth);
 
 	void accept(ast::VTimeVisitor* v);
+	std::string acceptType();
 
 	std::string sym();
 };

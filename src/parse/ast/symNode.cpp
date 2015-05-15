@@ -16,6 +16,11 @@ void SymNode::accept(VTimeVisitor* v)
 	v->visit(this);
 }
 
+std::string SymNode::acceptType()
+{
+	return sym();
+}
+
 std::string SymNode::sym()
 {
 	return this->symbol;

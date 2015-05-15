@@ -8,7 +8,7 @@
 namespace ast
 {
 
-class VTimeVisitor : public IVisitor
+class VTimeVisitor : public ast::IVisitor
 {
 private:
 	bool detectSleep;

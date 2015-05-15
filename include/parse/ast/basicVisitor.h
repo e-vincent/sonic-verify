@@ -1,5 +1,5 @@
-#ifndef __BASICVISITOR_H__
-#define __BASICVISITOR_H__
+#ifndef __BASIC_VISITOR_H__
+#define __BASIC_VISITOR_H__
 
 #include "parse/ast/iVisitor.h"
 
@@ -21,4 +21,4 @@ public:
 
 } // namespace ast
 
-#endif // __BASICVISITOR_H__
+#endif // __BASIC_VISITOR_H__

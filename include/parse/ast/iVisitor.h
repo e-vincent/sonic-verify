@@ -1,5 +1,5 @@
-#ifndef __IVISITOR_H__
-#define __IVISITOR_H__
+#ifndef __AST_IVISITOR_H__
+#define __AST_IVISITOR_H__
 
 #include <iostream>
 
@@ -28,4 +28,4 @@ public:
 
 } // namespace ast
 
-#endif // __IVISITOR_H__
+#endif // __AST_IVISITOR_H__

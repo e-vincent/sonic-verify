@@ -3,6 +3,7 @@
 namespace analysis
 {
 
+// move things out of constructor!
 TimeMarker::TimeMarker()
 {
 	// given how the constructor works, null check should really be done here

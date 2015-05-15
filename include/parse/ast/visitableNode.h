@@ -7,6 +7,8 @@
 
 #include "rice/Data_Type.hpp"
 
+#include "analysis/session/typeVisitor.h"
+
 namespace ast
 {
 
@@ -32,6 +34,7 @@ public:
 
 	virtual void accept(ast::VTimeVisitor*) = 0;
 	virtual void accept(ast::BasicVisitor*, std::string);
+	virtual std::string acceptType();
 
 	virtual int line();
 	virtual int statement();

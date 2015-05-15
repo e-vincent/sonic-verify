@@ -18,4 +18,9 @@ void Init_verify()
 	Rice::Data_Type<analysis::TimeMarker> rb_cTimeMarker =
 		Rice::define_class<analysis::TimeMarker>("TimeMarker")
 		.define_constructor(Rice::Constructor<analysis::TimeMarker>());
+
+	Rice::Data_Type<analysis::Planner> rb_cPlanner =
+		Rice::define_class<analysis::Planner>("Planner")
+		.define_constructor(Rice::Constructor<analysis::Planner>())
+		.define_method("setUp", &analysis::Planner::setUp);
 }

@@ -1,0 +1,7 @@
+in_thread do
+  loop do
+    cue :A
+    play 60
+    sleep 1
+  end
+end

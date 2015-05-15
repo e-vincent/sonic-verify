@@ -1,14 +1,19 @@
 require 'parser/current'
 require_relative '../../bin/verify'
 
-path = "src/assets/sp/"
+#path = "src/assets/sp/timing/"
+path = "src/assets/sp/session/"
 
-filename = path + "function_sequential.txt"
+filename = path + "cue_many.txt"
+#filename = path + "deadlock_simple.txt"
+#filename = path + "no_deadlock_simple.txt"
+
+#filename = path + "function_sequential.txt"
 #filename = path + "sequence_loop.txt"
 #filename = path + "simple_loop.txt"
 #filename = path + "prog_function.txt"
 
-file = File.open(filename, "rb")
+file 	 = File.open(filename, "rb")
 contents = file.read
 
 parser = Parser::CurrentRuby.new
@@ -18,9 +23,9 @@ end
 
 # parse will throw an error on syntax error
 # will need a useful syntax guard
-buffer = Parser::Source::Buffer.new(filename)
+buffer   = Parser::Source::Buffer.new(filename)
 buffer.source = contents
-data = parser.parse(buffer)
+data     = parser.parse(buffer)
 
 children = data.children
 
@@ -28,25 +33,29 @@ children = data.children
 builder  = Builder.new
 stack    = Array.new
 blkStack = Array.new
+
 parentIndex = 0
 nodeIndex   = 0
 statementNo = 0
 beginPos 	= 0
+line		= 0
 intFlag		= false
 symFlag		= false
-line		= 0
 
 builder.makeRoot(data.type)
+
+# for building test suit
+# move this into a seperate includable ruby file
+# test parser can use the builder but adapt which makefile it loads with
 
 data.children.each do |child|
 	stack.push([child, nodeIndex, parentIndex])
 	while !stack.empty?() do
 		nodeIndex += 1
-		curr = stack.pop()
-		info = curr[0]
+		curr    = stack.pop()
+		info    = curr[0]
 		curr[1] = nodeIndex
 
-puts info
 		if info.respond_to?(:location) and info.location.expression != nil	
 			if info.location.expression.line > line
 				line = info.location.expression.line
@@ -58,9 +67,6 @@ puts info
 			
 			# if the current node has the same parent as the top block
 			# pop it because we are outside of the last block tree
-			# puts "Current stack size: #{blkStack.size()}"
-			# puts "Looking at blkStack top: #{blkStack[blkStack.size() - 1]}"
-			# puts "Given parent: #{curr[2]}"
 			if curr[2] == blkStack[blkStack.size() - 1]
 				blkStack.pop()
 				builder.exitFuncs(statementNo)
@@ -73,6 +79,8 @@ puts info
 		end
 
 		if info.respond_to?(:type)
+			# ints/floats/symbols consume next token so set a flag to 
+			# skip adding child to stack of nodes still to visit
 			intFlag = "int".eql?(info.type.to_s()) || "float".eql?(info.type.to_s())
 			symFlag = "sym".eql?(info.type.to_s())
 			if intFlag
@@ -99,23 +107,18 @@ puts info
 				end
 			end
 		end
-
-		# puts "=== STACK ==="
-		# stack.each_with_index do |item, index|
-		# 	puts "stack_mem: #{index}"
-		# 	puts "#{item[0]}"
-		# end
-		# puts ""
 	end
 end
-
-puts "Statements #{statementNo}"
-puts "Lines #{line}"
 
 builder.setTreeSize(statementNo, line)
 
 # this must come after builder has created the tree
 # otherwise it has no information to process and will die
 analyser = TimeMarker.new
+
+# setup planner
+# call methods to build from nodeTree
+planner = Planner.new
+planner.setUp()
 
 file.close
