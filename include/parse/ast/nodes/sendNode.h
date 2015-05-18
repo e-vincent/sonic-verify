@@ -1,7 +1,7 @@
 #ifndef __SEND_NODE_H__
 #define __SEND_NODE_H__
 
-#include "parse/ast/visitableNode.h"
+#include "parse/ast/nodes/visitableNode.h"
 
 namespace ast
 {

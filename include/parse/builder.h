@@ -11,13 +11,8 @@
 #include "parse/ast/basicVisitor.h"
 
 #include "parse/ast/nodeTree.h"
-#include "parse/ast/visitableNode.h"
-#include "parse/ast/rootNode.h"
-#include "parse/ast/bodyNode.h"
-#include "parse/ast/intNode.h"
-#include "parse/ast/floatNode.h"
-#include "parse/ast/symNode.h"
-#include "parse/ast/sendNode.h"
+#include "parse/ast/nodes/nodes.h"
+
 
 class Builder
 {

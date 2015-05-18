@@ -3,12 +3,7 @@
 
 #include <iostream>
 
-#include "parse/ast/rootNode.h"
-#include "parse/ast/bodyNode.h"
-#include "parse/ast/intNode.h"
-#include "parse/ast/floatNode.h"
-#include "parse/ast/symNode.h"
-#include "parse/ast/sendNode.h"
+#include "parse/ast/nodes/nodes.h"
 
 namespace ast
 {

@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "parse/treeIterator.h"
-#include "parse/ast/visitableNode.h"
+#include "parse/ast/nodes/visitableNode.h"
 
 namespace ast
 {

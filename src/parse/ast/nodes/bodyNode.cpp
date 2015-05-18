@@ -1,4 +1,4 @@
-#include "parse/ast/bodyNode.h"
+#include "parse/ast/nodes/bodyNode.h"
 #include "parse/ast/vTimeVisitor.h"
 
 namespace ast

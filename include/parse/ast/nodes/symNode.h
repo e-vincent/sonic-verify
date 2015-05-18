@@ -1,7 +1,7 @@
 #ifndef __SYM_NODE_H__
 #define __SYM_NODE_H__
 
-#include "parse/ast/visitableNode.h"
+#include "parse/ast/nodes/visitableNode.h"
 #include "analysis/session/typeVisitor.h"
 
 namespace ast

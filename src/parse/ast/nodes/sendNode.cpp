@@ -1,4 +1,4 @@
-#include "parse/ast/sendNode.h"
+#include "parse/ast/nodes/sendNode.h"
 #include "parse/ast/vTimeVisitor.h"
 #include "parse/ast/basicVisitor.h"
 

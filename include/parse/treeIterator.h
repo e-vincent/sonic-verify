@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "parse/ast/nodeTree.h"
-#include "parse/ast/visitableNode.h"
+#include "parse/ast/nodes/visitableNode.h"
 
 namespace ast
 {

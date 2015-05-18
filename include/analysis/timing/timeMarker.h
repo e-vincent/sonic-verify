@@ -7,7 +7,7 @@
 #include "parse/treeIterator.h"
 #include "parse/ast/vTimeVisitor.h"
 
-#include "parse/ast/visitableNode.h"
+#include "parse/ast/nodes/visitableNode.h"
 
 #include "analysis/pTrace.h"
 

@@ -1,5 +1,5 @@
 require 'parser/current'
-require_relative '../../bin/verify'
+require_relative 'bin/verify'
 
 #path = "src/assets/sp/timing/"
 path = "src/assets/sp/session/"
