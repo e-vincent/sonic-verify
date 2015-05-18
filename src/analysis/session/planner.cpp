@@ -119,7 +119,17 @@ void Planner::makeGraph(ast::NodeTree* tree)
 
 	analysis::GraphNode* node = graph[0][0].node;
 	std::cout << "node " << node->symbol << "\n";
+
+	boost::property_map<Graph, vertex_index>::type g_v_index
+		= get(vertex_index, graph);
+
+	for (boost::tie(g_it, g_it_end) = vertices(graph); g_it != g_it_end; ++g_it)
+	{
+		std::cout << g_v_index[*g_it] << "\n";
+	}
+	
 	//std::cout << "top graph size " << graph.size() << "\n";
+
 //	analysis::Planner::sg_vertex_info subG = graph[0];
 	// std::pair<sg_vertex_iter, sg_vertex_iter> vp;
 	// std::pair<g_vertex_iter, g_vertex_iter> it;
