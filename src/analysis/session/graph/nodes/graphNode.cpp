@@ -1,5 +1,5 @@
-#include "analysis/session/graphNode.h"
-#include "analysis/session/typeVisitor.h"
+#include "analysis/session/graph/nodes/graphNode.h"
+#include "analysis/session/graph/typeVisitor.h"
 
 namespace analysis
 {
@@ -11,11 +11,6 @@ GraphNode::GraphNode(int index, int line, std::string symbol, int blk)
 	this->line 	 = line;
 	this->symbol = symbol;
 	this->blk 	 = blk;
-}
-
-void GraphNode::accept(TypeVisitor* v)
-{
-	v->visit(this);
 }
 
 } // namespace analysis

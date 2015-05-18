@@ -1,7 +1,7 @@
 #ifndef __TYPE_VISITOR_H__
 #define __TYPE_VISITOR_H__
 
-#include "analysis/session/iVisitor.h"
+#include "analysis/session/graph/iVisitor.h"
 
 namespace analysis
 {

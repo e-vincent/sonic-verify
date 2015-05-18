@@ -1,17 +1,18 @@
 require 'parser/current'
 require_relative 'bin/verify'
 
-#path = "src/assets/sp/timing/"
-path = "src/assets/sp/session/"
+path = "src/assets/sp/"
 
-filename = path + "cue_many.txt"
-#filename = path + "deadlock_simple.txt"
-#filename = path + "no_deadlock_simple.txt"
+ ## Session ##
+filename = path + "session/cue_many.txt"
+#filename = path + "session/deadlock_simple.txt"
+#filename = path + "session/no_deadlock_simple.txt"
 
-#filename = path + "function_sequential.txt"
-#filename = path + "sequence_loop.txt"
-#filename = path + "simple_loop.txt"
-#filename = path + "prog_function.txt"
+ ## Timing ##
+#filename = path + "timing/function_sequential.txt"
+#filename = path + "timing/sequence_loop.txt"
+#filename = path + "timing/simple_loop.txt"
+#filename = path + "timing/prog_function.txt"
 
 file 	 = File.open(filename, "rb")
 contents = file.read
@@ -22,7 +23,7 @@ parser.diagnostics.consumer = lambda do |diag|
 end
 
 # parse will throw an error on syntax error
-# will need a useful syntax guard
+# will need a useful syntax guard?
 buffer   = Parser::Source::Buffer.new(filename)
 buffer.source = contents
 data     = parser.parse(buffer)

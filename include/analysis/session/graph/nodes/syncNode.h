@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "analysis/session/graphNode.h"
+#include "analysis/session/graph/nodes/graphNode.h"
 
 namespace analysis
 {

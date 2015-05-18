@@ -1,4 +1,4 @@
-#include "analysis/session/typeVisitor.h"
+#include "analysis/session/graph/typeVisitor.h"
 
 namespace analysis
 {

@@ -2,7 +2,7 @@
 #define __SYM_NODE_H__
 
 #include "parse/ast/nodes/visitableNode.h"
-#include "analysis/session/typeVisitor.h"
+#include "analysis/session/graph/typeVisitor.h"
 
 namespace ast
 {

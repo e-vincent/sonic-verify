@@ -7,7 +7,7 @@
 
 #include "rice/Data_Type.hpp"
 
-#include "analysis/session/typeVisitor.h"
+#include "analysis/session/graph/typeVisitor.h"
 
 namespace ast
 {

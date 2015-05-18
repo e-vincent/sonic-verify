@@ -11,9 +11,7 @@
 
 #include "main.h"
 
-#include "analysis/session/graphNode.h"
-#include "analysis/session/cueNode.h"
-#include "analysis/session/syncNode.h"
+#include "analysis/session/graph/nodes/nodes.h"
 #include "parse/ast/nodeTree.h"
 #include "parse/treeIterator.h"
 

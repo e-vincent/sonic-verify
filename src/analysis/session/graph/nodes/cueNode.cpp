@@ -1,5 +1,5 @@
-#include "analysis/session/cueNode.h"
-#include "analysis/session/typeVisitor.h"
+#include "analysis/session/graph/nodes/cueNode.h"
+#include "analysis/session/graph/typeVisitor.h"
 
 namespace analysis
 {

@@ -18,12 +18,9 @@ public:
 	int line;
 	int blk;
 	std::string symbol;
-	std::list<std::pair<int, int>> arcs; // two arcs types??
 
 	GraphNode();
 	GraphNode(int index, int line, std::string symbol, int blk);
-
-	virtual void accept(analysis::TypeVisitor*);
 };
 
 } // namespace analysis

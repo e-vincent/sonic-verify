@@ -1,5 +1,5 @@
-#include "analysis/session/syncNode.h"
-#include "analysis/session/typeVisitor.h"
+#include "analysis/session/graph/nodes/syncNode.h"
+#include "analysis/session/graph/typeVisitor.h"
 
 namespace analysis
 {
