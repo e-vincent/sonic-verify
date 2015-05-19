@@ -18,6 +18,11 @@ void VisitableNode::accept(BasicVisitor*, std::string)
 	// stub
 }
 
+void VisitableNode::accept(BasicVisitor*, int, int)
+{
+	// stub
+}
+
 int VisitableNode::line()
 {
 	return this->lineNum;

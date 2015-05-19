@@ -17,7 +17,7 @@ protected:
 public:
 	SendNode(int index, int parent, int line, int statement, int blkDepth);
 
-	void accept(ast::VTimeVisitor* v);
+	virtual void accept(ast::VTimeVisitor* v);
 	void accept(ast::BasicVisitor* v, std::string sym);
 	void setType(std::string s);
 	void setFuncName(std::string s);

@@ -32,6 +32,7 @@ public:
 
 	virtual void accept(ast::VTimeVisitor*) = 0;
 	virtual void accept(ast::BasicVisitor*, std::string);
+	virtual void accept(ast::BasicVisitor*, int, int);
 
 	virtual int line();
 	virtual int statement();

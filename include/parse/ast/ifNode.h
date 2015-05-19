@@ -10,6 +10,8 @@ class IfNode : public ast::VisitableNode
 {
 private:
 	int conditionRootIndex;
+	int trueBlkIndex;
+	int falseBlkIndex;
 	float trueVT;
 	float falseVT;
 
@@ -18,10 +20,15 @@ public:
 
 	void setTrueVT(float vt);
 	void setFalseVT(float vt);
+	void setBlkIndexes(int index, int childCount);
+
 	float finalVT();
 	int getConditionRootIndex();
+	int getTrueIndex();
+	int getFalseIndex();
 
 	virtual void accept(VTimeVisitor* v);
+	virtual void accept(BasicVisitor* v, int index, int childCount);
 };
 
 } // namespace ast

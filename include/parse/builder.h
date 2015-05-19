@@ -5,6 +5,7 @@
 #include <memory>
 #include <math.h>
 #include <map>
+#include <stack>
 
 #include "main.h"
 
@@ -23,6 +24,8 @@
 class Builder
 {
 private:
+	std::stack<int> ifIndexes;
+	int ifChildCount;
 	int lastSend;
 	bool define;
 	static std::map<int, bool> exits;
@@ -50,6 +53,7 @@ public:
 
 	void setTreeSize(int treeSize, int lineCount);
 	void exitFuncs(int statement);
+	void checkIfState(int index, int parent);
 	
 	static std::map<int, bool> getExitMap();
 };
