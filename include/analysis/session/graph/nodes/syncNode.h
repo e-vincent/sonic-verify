@@ -11,7 +11,7 @@ namespace analysis
 class SyncNode : public GraphNode
 {
 public:
-	SyncNode(int index, int line, std::string symbol, int blk);
+	SyncNode(int index, int line, std::string symbol);
 
 	virtual void accept(TypeVisitor* v);
 };

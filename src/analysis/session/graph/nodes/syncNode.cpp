@@ -4,8 +4,8 @@
 namespace analysis
 {
 
-SyncNode::SyncNode(int index, int line, std::string symbol, int blk)
-: GraphNode(index, line, symbol, blk) { }
+SyncNode::SyncNode(int index, int line, std::string symbol)
+: GraphNode(index, line, symbol) { }
 
 void SyncNode::accept(TypeVisitor* v)
 {

@@ -11,7 +11,7 @@ namespace analysis
 class CueNode : public GraphNode
 {
 public:
-	CueNode(int index, int line, std::string symbol, int blk);
+	CueNode(int index, int line, std::string symbol);
 
 	virtual void accept(TypeVisitor* v);
 };

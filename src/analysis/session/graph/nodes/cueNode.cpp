@@ -4,8 +4,8 @@
 namespace analysis
 {
 
-CueNode::CueNode(int index, int line, std::string symbol, int blk)
-: GraphNode(index, line, symbol, blk) { }
+CueNode::CueNode(int index, int line, std::string symbol)
+: GraphNode(index, line, symbol) { }
 
 void CueNode::accept(TypeVisitor* v)
 {
