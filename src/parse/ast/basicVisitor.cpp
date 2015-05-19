@@ -35,4 +35,9 @@ void BasicVisitor::visit(ast::SendNode* sendNode)
 	std::cout << "Visiting SendNode " << sendNode->value << " " << sendNode->index << "\n";
 }
 
+void BasicVisitor::visit(ast::IfNode* ifNode)
+{
+	std::cout << "Visiting IfNode " << ifNode->index << "\n";
+}
+
 } // namespace ast

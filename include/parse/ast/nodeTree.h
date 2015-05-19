@@ -26,6 +26,7 @@ public:
 	ast::VisitableNode* rootNode;
 
 	NodeTree();
+	NodeTree(ast::VisitableNode* root);
 
 	TreeIterator begin();
 	TreeIterator end();

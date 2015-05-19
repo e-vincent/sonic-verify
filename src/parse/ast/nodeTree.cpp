@@ -4,6 +4,10 @@ namespace ast
 {
 
 NodeTree::NodeTree() {}
+NodeTree::NodeTree(ast::VisitableNode* root)
+{
+	rootNode = root;
+}
 
 ast::TreeIterator NodeTree::begin()
 {

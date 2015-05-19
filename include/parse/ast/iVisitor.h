@@ -9,6 +9,7 @@
 #include "parse/ast/floatNode.h"
 #include "parse/ast/symNode.h"
 #include "parse/ast/sendNode.h"
+#include "parse/ast/ifNode.h"
 
 namespace ast
 {
@@ -24,6 +25,7 @@ public:
 	virtual void visit(ast::FloatNode* floatNode) = 0;
 	virtual void visit(ast::SymNode* symNode) = 0;
 	virtual void visit(ast::SendNode* sendNode) = 0;
+	virtual void visit(ast::IfNode* ifNode) = 0;
 };
 
 } // namespace ast

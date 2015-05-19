@@ -1,0 +1,10 @@
+loop do
+	play 60
+	if true then
+	  sleep 0.5
+	else
+	  play 50
+	  sleep 1
+	end
+	play 70
+end

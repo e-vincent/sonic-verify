@@ -17,6 +17,7 @@ public:
 	virtual void visit(ast::FloatNode* floatNode);
 	virtual void visit(ast::SymNode* symNode);
 	virtual void visit(ast::SendNode* sendNode);
+	virtual void visit(ast::IfNode* ifNode);
 };
 
 } // namespace ast

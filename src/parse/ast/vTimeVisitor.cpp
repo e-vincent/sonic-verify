@@ -98,4 +98,11 @@ void VTimeVisitor::visit(ast::SendNode* sendNode)
 	}
 }
 
+void VTimeVisitor::visit(ast::IfNode* ifNode)
+{
+	std::cout << "Visiting IfNode " << ifNode->index << " " << ifNode->statement() << "\n";
+
+	analysis::PTrace::createTrace(-2, ifNode->statement());
+}
+
 } // namespace ast

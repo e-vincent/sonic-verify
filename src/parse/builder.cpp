@@ -49,6 +49,11 @@ ast::SendNode* Builder::makeSend(int index, int parent, int line, int statement,
 	return new ast::SendNode(index, parent, line, statement, blkDepth);
 }
 
+ast::IfNode* Builder::makeIf(int index, int parent, int line, int statement, int blkDepth)
+{
+	return new ast::IfNode(index, parent, line, statement, blkDepth);
+}
+
 void Builder::makeRoot(Rice::Symbol root)
 {
 	ast::RootNode* rootNode = new ast::RootNode(root.str());
@@ -112,6 +117,12 @@ void Builder::addSymbol(std::string sym, int index,
 		send->accept(visitor, sym);
 		define = false;
 	}
+}
+
+void Builder::addIf(int index, int parent, int line, int statement, int blkDepth)
+{
+	ast::IfNode* node = makeIf(index, parent, line, statement, blkDepth);
+	Builder::tree->addNode(node, parent);
 }
 
 void Builder::setTreeSize(int treeSize, int lineCount)
