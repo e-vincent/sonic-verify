@@ -1,6 +1,6 @@
 #include "analysis/session/graph/subGraph.h"
 
-namespace analysis
+namespace graph
 {
 
 SubGraph::SubGraph() 
@@ -9,7 +9,7 @@ SubGraph::SubGraph()
 	lastIndex  = -1;
 }
 
-void SubGraph::addNode(analysis::GraphNode* node)
+void SubGraph::addNode(graph::GraphNode* node)
 {
 	nodes.push_front(node);
 }
@@ -35,9 +35,9 @@ void SubGraph::setLast(int index)
 	}
 }
 
-analysis::GraphNode* SubGraph::get(int index)
+graph::GraphNode* SubGraph::get(int index)
 {
-	analysis::GraphNode* node = NULL;
+	graph::GraphNode* node = NULL;
 
 	for (auto item : nodes)
 	{
@@ -50,7 +50,7 @@ analysis::GraphNode* SubGraph::get(int index)
 	return node;
 }
 
-std::list<analysis::GraphNode*> SubGraph::nodeList()
+std::list<graph::GraphNode*> SubGraph::nodeList()
 {
 	return nodes;
 }
@@ -70,4 +70,20 @@ std::string SubGraph::sType()
 	return "unknown";
 }
 
-} // namespace analysis
+void SubGraph::printType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs)
+{
+	for (auto node : nodes)
+	{
+		std::cout << "Node Type: " << node->toSType() << "\n";
+		for (auto it = arcs.begin(); it != arcs.end(); ++it)
+		{
+			if (it->first.second == node->symbol)
+			{
+				std::cout << "Found a symbol?= " << it->first.second 
+					<< " " << node->symbol << "\n";
+			}
+		}
+	}
+}
+
+} // namespace graph

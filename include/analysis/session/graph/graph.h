@@ -5,25 +5,33 @@
 #include <string>
 #include <map>
 #include <list>
+#include <vector>
 
+#include "analysis/session/graph/nodes/nodes.h"
 #include "analysis/session/graph/subGraph.h"
 
-namespace analysis
+namespace graph
 {
 
 class Graph
 {
 private:
-	std::list<analysis::SubGraph*> blocks;
-	std::map<int, int> arcs;
+	std::vector<std::pair<arcData, std::string>> syncStore;
+	std::list<graph::SubGraph*> blocks;
+	std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs; 	// one to many map
 
 public:
 	Graph();
 	~Graph();
 
-	void addBlock(SubGraph* sub);
-	void addArc(int from, int to);
+	void printArcs();
+	void addBlock(graph::SubGraph* sub);
+	
+	void startArc(graph::CueNode* cue, int block);
+	void addToArc(graph::SyncNode* sync, int block);
 
+	void printTypes();
+	void printSubType(int block);
 	int blockCount();
 };
 

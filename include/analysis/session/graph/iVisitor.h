@@ -13,8 +13,8 @@ class IVisitor
 public:
 	virtual ~IVisitor() {}
 
-	virtual void visit(analysis::CueNode* cueNode) = 0;
-	virtual void visit(analysis::SyncNode* syncNode) = 0;
+	virtual void visit(graph::CueNode* cueNode) = 0;
+	virtual void visit(graph::SyncNode* syncNode) = 0;
 };
 
 } // namespace ast

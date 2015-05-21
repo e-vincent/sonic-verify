@@ -20,20 +20,21 @@ class Planner
 {
 private:
 	int currIndex;
+	int subCount;
 
 public:
-	analysis::Graph* graph;
+	graph::Graph* graph;
 
 	Planner();
 	~Planner();
 
 	void setUp();
 
-	analysis::CueNode* makeCue(int line, std::string symbol);
-	analysis::SyncNode* makeSync(int line, std::string symbol);
+	graph::CueNode* makeCue(int line, std::string symbol);
+	graph::SyncNode* makeSync(int line, std::string symbol);
 
 	void makeGraph(ast::NodeTree* tree);
-	void makeSubGraph(std::stack<analysis::GraphNode*>& symbols);
+	void makeSubGraph(std::stack<graph::GraphNode*>& symbols);
 
 	int getIndex();
 	void updateIndex();

@@ -3,16 +3,16 @@
 namespace analysis
 {
 
-void TypeVisitor::visit(analysis::CueNode* cueNode)
+void TypeVisitor::visit(graph::CueNode* cueNode)
 {
 	std::cout << "Visiting Cue " << cueNode->symbol << "\n";
-	std::string type = cueNode->symbol;
-	type.append("!");
+	cueNode->setSType("!");
 }
 
-void TypeVisitor::visit(analysis::SyncNode* syncNode)
+void TypeVisitor::visit(graph::SyncNode* syncNode)
 {
 	std::cout << "Visiting Sync " << syncNode->symbol << "\n";
+	syncNode->setSType("?");
 }
 
 } // namespace analysis

@@ -9,6 +9,8 @@ namespace analysis
 std::vector<analysis::TData*> PTrace::stats{ new TData() };
 std::map<std::string, int> PTrace::defFuncs;
 std::vector<std::string> PTrace::definedFuncs;
+std::vector<std::string> sessionTypes;
+
 int PTrace::lastSet = 0;
 bool PTrace::inFunc = false;
 

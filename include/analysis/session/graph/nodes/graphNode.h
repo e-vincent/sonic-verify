@@ -6,9 +6,11 @@
 #include <string>
 
 namespace analysis
+{class TypeVisitor;} // namespace analysis
+
+namespace graph
 {
 
-class TypeVisitor;
 class GraphNode
 {
 private:
@@ -25,6 +27,8 @@ public:
 	virtual void setSType(std::string type);
 	virtual void appendSType(std::string str);
 	virtual std::string toSType();
+
+	virtual void accept(analysis::TypeVisitor*);
 };
 
 } // namespace analysis

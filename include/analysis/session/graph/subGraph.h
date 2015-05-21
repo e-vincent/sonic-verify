@@ -5,36 +5,58 @@
 #include <string>
 #include <list>
 #include <map>
+#include <vector>
 
 #include "analysis/session/graph/nodes/graphNode.h"
 
-namespace analysis
+namespace graph
 {
+
+struct arcData
+{
+	int line;
+	int index;
+	std::string block;
+
+	bool operator==(const arcData &o) const {
+        return (line == o.line) && (index == o.index) 
+        	&& (block == o.block);
+    }
+
+    bool operator<(const arcData &o) const {
+        return (line < o.line)
+        	|| ((line == o.line) && (index < o.index));
+    }
+};
 
 class SubGraph
 {
 private:
 	int firstIndex;
 	int lastIndex;
-	std::list<analysis::GraphNode*> nodes;
+	std::list<graph::GraphNode*> nodes;
 	std::map<int, int> arcs;
+	std::string processType;
 
 public:
+	std::string name;
+
 	SubGraph();
 
-	void addNode(analysis::GraphNode* node);
+	void addNode(graph::GraphNode* node);
 	void addArc(int from, int to);
 	void setFirst(int index);
 	void setLast(int index);
 
-	analysis::GraphNode* get(int index);
-	std::list<analysis::GraphNode*> nodeList();
+	graph::GraphNode* get(int index);
+	std::list<graph::GraphNode*> nodeList();
 	std::map<int, int> arcList();
 	bool inrange(int index);
 
 	std::string sType();
+	void printType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs);
 };
 
-} // namespace analysis
+} // namespace graph
 
 #endif // __SUBGRAPH_H__

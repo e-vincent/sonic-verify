@@ -5,7 +5,7 @@
 
 #include "analysis/session/graph/nodes/graphNode.h"
 
-namespace analysis
+namespace graph
 {
 
 class CueNode : public GraphNode
@@ -13,9 +13,9 @@ class CueNode : public GraphNode
 public:
 	CueNode(int index, int line, std::string symbol);
 
-	virtual void accept(TypeVisitor* v);
+	virtual void accept(analysis::TypeVisitor* v);
 };
 
-} // namespace analysis
+} // namespace graph
 
 #endif // __CUE_NODE_H__

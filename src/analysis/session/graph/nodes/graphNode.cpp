@@ -1,7 +1,7 @@
 #include "analysis/session/graph/nodes/graphNode.h"
 #include "analysis/session/graph/typeVisitor.h"
 
-namespace analysis
+namespace graph
 {
 
 GraphNode::GraphNode() { }
@@ -27,4 +27,9 @@ std::string GraphNode::toSType()
 	return stype;
 }
 
-} // namespace analysis
+void GraphNode::accept(analysis::TypeVisitor*)
+{
+	// stub?	
+}
+
+} // namespace graph

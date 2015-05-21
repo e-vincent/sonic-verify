@@ -15,13 +15,13 @@ class PTrace
 {
 private:
 	static int lastSet;
-	//static std::map<int, bool> defines;
 	static bool inFunc;
 
 public:
 	static std::vector<analysis::TData*> stats;
 	static std::map<std::string, int> defFuncs;
 	static std::vector<std::string> definedFuncs;
+	static std::vector<std::string> sessionTypes;
 
 	PTrace();
 	~PTrace();
