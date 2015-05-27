@@ -67,23 +67,32 @@ bool SubGraph::inrange(int index)
 
 std::string SubGraph::sType()
 {
-	return "unknown";
+	return processType;
 }
 
 void SubGraph::printType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs)
 {
+	analysis::TypeVisitor* visitor = new analysis::TypeVisitor();
+	std::cout << name << "\n";
 	for (auto node : nodes)
 	{
+		node->accept(visitor);
 		std::cout << "Node Type: " << node->toSType() << "\n";
 		for (auto it = arcs.begin(); it != arcs.end(); ++it)
 		{
 			if (it->first.second == node->symbol)
 			{
-				std::cout << "Found a symbol?= " << it->first.second 
-					<< " " << node->symbol << "\n";
+				std::cout << "Symbol in block " << it->first.first.block << "\n";
+				std::vector<std::pair<arcData, std::string>> vec = it->second;
+				for (auto p : vec)
+				{
+					std::cout << "Links with " << p.first.block << "\n";
+				}
 			}
 		}
 	}
+
+	delete visitor;
 }
 
 } // namespace graph

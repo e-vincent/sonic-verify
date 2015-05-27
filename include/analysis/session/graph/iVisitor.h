@@ -11,6 +11,8 @@ namespace analysis
 class IVisitor
 {
 public:
+
+	IVisitor() = default;
 	virtual ~IVisitor() {}
 
 	virtual void visit(graph::CueNode* cueNode) = 0;

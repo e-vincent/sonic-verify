@@ -12,13 +12,17 @@ void Graph::printArcs()
 {
 	for (auto it = arcs.begin(); it != arcs.end(); ++it)
 	{
-		std::cout << "Cue " << it->first.first.index << " " << it->first.second
+		std::cout << "Cue " << it->first.first.index << " "
+			<< "Block:" << it->first.first.block
+			<< " " << it->first.second
 			<< "\n   |_> points at " << "\n";
 
 		std::vector<std::pair<arcData, std::string>> vec = it->second;
 		for (auto p : vec)
 		{
-			std::cout << "       -> " << p.first.index << " " << p.second << "\n";
+			std::cout << "       -> " << p.first.block << ": "
+				<< p.first.index 
+				<< " " << p.second << "\n";
 		}
 	}
 
@@ -100,6 +104,7 @@ void Graph::printTypes()
 {
 	for (auto sub : blocks)
 	{
+		std::cout << "looped\n";
 		sub->printType(arcs);
 	}
 }

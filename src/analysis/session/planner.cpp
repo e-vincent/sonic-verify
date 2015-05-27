@@ -23,6 +23,7 @@ void Planner::setUp()
 	// printing test
 	std::cout << "\n\n === Arc Results === \n";
 	graph->printArcs();
+	graph->printTypes();
 }
 
 graph::CueNode* Planner::makeCue(int line, std::string symbol)
@@ -53,9 +54,9 @@ void Planner::makeGraph(ast::NodeTree* tree)
 		ast::VisitableNode* curr = &(*it);
 		if (curr->value == "block")
 		{
-			std::cout << "New Block" << "\n";
 			if (!symbols.empty())
 			{
+				std::cout << "New Block" << "\n";
 				makeSubGraph(symbols);
 			}
 			++currBlk;
@@ -87,6 +88,8 @@ void Planner::makeGraph(ast::NodeTree* tree)
 		}
 	}
 
+	// catch last block
+	makeSubGraph(symbols);
 }
 
 void Planner::makeSubGraph(std::stack<graph::GraphNode*>& symbols)

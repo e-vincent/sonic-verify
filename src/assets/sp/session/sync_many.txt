@@ -1,0 +1,53 @@
+in_thread do
+  loop do
+    sync :A
+    play 60
+    sleep 1
+  end
+end
+
+in_thread do
+  loop do
+    sync :B
+    play 63
+    sleep 0.5
+  end
+end
+
+live_loop :liiiive do
+  sync :things
+  sync :moar
+  sleep 1
+  sync :things
+end
+
+in_thread do
+  loop do
+    sync :B
+    play 63
+    sleep 0.5
+  end
+end
+
+in_thread do
+  loop do
+    sync :B
+    sync :C
+    sync :D
+    play 63
+    sleep 0.5
+  end
+end
+
+in_thread do
+  loop do
+    if (true) then
+      sync :E
+      sleep 0.5
+    else
+      sync :F
+    end
+    play 63
+    sleep 0.5
+  end
+end

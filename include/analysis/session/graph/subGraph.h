@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "analysis/session/graph/nodes/graphNode.h"
+#include "analysis/session/graph/typeVisitor.h"
 
 namespace graph
 {

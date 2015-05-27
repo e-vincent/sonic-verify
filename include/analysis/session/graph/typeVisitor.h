@@ -11,11 +11,12 @@ class TypeVisitor : public analysis::IVisitor
 public:
 	TypeVisitor();
 
-	virtual void visit(graph::GraphNode* graphNode);
-	virtual void visit(graph::CueNode* cueNode);
-	virtual void visit(graph::SyncNode* syncNode);
+	~TypeVisitor() {}
+
+	virtual void visit(graph::CueNode* cueNode) override;
+	virtual void visit(graph::SyncNode* syncNode) override;
 };
 
-} // analysis
+} // namespace analysis
 
 #endif // __TYPE_VISITOR_H__

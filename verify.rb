@@ -4,8 +4,8 @@ require_relative 'bin/verify'
 path = "src/assets/sp/"
 
  ## Session ##
-filename = path + "session/sync_many.txt"
-#filename = path + "session/deadlock_simple.txt"
+#filename = path + "session/sync_many.txt"
+filename = path + "session/deadlock_simple.txt"
 #filename = path + "session/no_deadlock_simple.txt"
 
  ## Timing ##
