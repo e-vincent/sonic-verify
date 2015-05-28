@@ -1,0 +1,14 @@
+live_loop :ding do  # P0
+  cue :A			## P0P1!
+  sleep 0.5
+end
+
+live_loop :dang do  # P1
+  sync :A			## (P0P1||P2P1)?
+  sleep 1
+end
+
+live_loop :dong do  # P2
+  cue :A			## P2P1!
+  sleep 0.5
+end

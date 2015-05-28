@@ -27,9 +27,4 @@ std::string GraphNode::toSType()
 	return stype;
 }
 
-void GraphNode::accept(analysis::TypeVisitor*)
-{
-	// stub?	
-}
-
 } // namespace graph

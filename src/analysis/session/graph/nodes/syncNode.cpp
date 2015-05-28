@@ -12,4 +12,9 @@ void SyncNode::accept(analysis::TypeVisitor* v)
 	v->visit(this);
 }
 
+void SyncNode::accept(analysis::TypeVisitor* v, std::string& type, std::vector<std::pair<std::string, std::string>> interactions)
+{
+	v->visit(this, type, interactions);
+}
+
 } // namespace graph

@@ -73,24 +73,64 @@ std::string SubGraph::sType()
 void SubGraph::printType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs)
 {
 	analysis::TypeVisitor* visitor = new analysis::TypeVisitor();
-	std::cout << name << "\n";
+	// std::cout << name << "\n";
+
+	std::string type;
+
 	for (auto node : nodes)
 	{
 		node->accept(visitor);
 		std::cout << "Node Type: " << node->toSType() << "\n";
+		bool syncType = (node->toSType() == "?");
+		std::vector<std::pair<std::string, std::string>> interactions;
 		for (auto it = arcs.begin(); it != arcs.end(); ++it)
 		{
-			if (it->first.second == node->symbol)
+			std::vector<std::pair<arcData, std::string>> vec = it->second;
+			for (auto p : vec)
 			{
-				std::cout << "Symbol in block " << it->first.first.block << "\n";
-				std::vector<std::pair<arcData, std::string>> vec = it->second;
-				for (auto p : vec)
+				if ((syncType
+						&& (it->first.second == node->symbol)) ||
+					((name == it->first.first.block)
+						&& (it->first.second == node->symbol)))
 				{
-					std::cout << "Links with " << p.first.block << "\n";
+					interactions.push_back(std::make_pair(it->first.first.block, p.first.block));
 				}
 			}
+
+			// if ()
+			// {
+				
+			// }
+
+			// if ()
+			// {
+
+			// 	// std::cout << "Symbol in block " << it->first.first.block << "\n";
+			// 	std::vector<std::pair<arcData, std::string>> vec = it->second;
+			// 	for (auto p : vec)
+			// 	{
+			// 		interactions.push_back(std::make_pair(it->first.first.block, p.first.block));
+			// 		// std::cout << "Links with " << p.first.block << "\n";
+			// 		// node->accept(visitor, 
+			// 		// 		this->processType, 
+			// 		// 		it->first.first.block,
+			// 		// 		p.first.block);
+
+			// 		// std::cout << "Current SubProcessType " << this->processType << "\n";
+			// 	}
+			// }
+		}
+
+		node->accept(visitor, processType, interactions);
+		std::cout << "interactions\n";
+		for (auto action : interactions)
+		{
+			std::cout << action.first << " " << action.second << "\n";
 		}
 	}
+
+	std::cout << "SubGraph " << name 
+		<< "\n has processType " << processType << "\n";
 
 	delete visitor;
 }

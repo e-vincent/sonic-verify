@@ -104,7 +104,6 @@ void Graph::printTypes()
 {
 	for (auto sub : blocks)
 	{
-		std::cout << "looped\n";
 		sub->printType(arcs);
 	}
 }

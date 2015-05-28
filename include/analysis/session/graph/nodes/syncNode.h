@@ -14,6 +14,7 @@ public:
 	SyncNode(int index, int line, std::string symbol);
 
 	virtual void accept(analysis::TypeVisitor* v);
+	virtual void accept(analysis::TypeVisitor* v, std::string& type, std::vector<std::pair<std::string, std::string>> interactions);
 };
 
 } // namespace graph
