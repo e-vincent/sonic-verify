@@ -8,5 +8,6 @@
 #include "parse/ast/nodes/floatNode.h"
 #include "parse/ast/nodes/symNode.h"
 #include "parse/ast/nodes/sendNode.h"
+#include "parse/ast/nodes/ifNode.h"
 
 #endif // __AST_NODES_H__
