@@ -13,9 +13,9 @@ RootNode::RootNode(std::string root)
 	this->statementNum = -1;
 }
 
-void RootNode::accept(ast::VTimeVisitor* v)
+void RootNode::accept(analysis::PTrace* trace, ast::VTimeVisitor* v)
 {
-	v->visit(this);
+	v->visit(trace, this);
 }
 
 } // namespace ast

@@ -21,6 +21,9 @@
 #include "parse/ast/sendNode.h"
 #include "parse/ast/ifNode.h"
 
+namespace ast
+{ class NodeTree; }
+
 class Builder
 {
 private:

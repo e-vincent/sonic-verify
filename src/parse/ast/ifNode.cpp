@@ -7,7 +7,7 @@ namespace ast
 IfNode::IfNode(int index, int parent, int line, int statement, int blkDepth)
 : ast::VisitableNode(index, parent, line, statement, blkDepth)
 {
-	conditionRootIndex = index + 1;
+		conditionRootIndex = index + 1;
 }
 
 void IfNode::setTrueVT(float vt)
@@ -65,9 +65,14 @@ int IfNode::getFalseIndex()
 	return falseBlkIndex;
 }
 
-void IfNode::accept(VTimeVisitor* v)
+void IfNode::accept(analysis::PTrace* trace, VTimeVisitor* v)
 {
-	v->visit(this);
+	v->visit(trace, this);
+}
+
+void IfNode::accept(VTimeVisitor* v, indexes& fill)
+{
+	v->visit(this, fill);
 }
 
 void IfNode::accept(BasicVisitor* v, int index, int childCount)

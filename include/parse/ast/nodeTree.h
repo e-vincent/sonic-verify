@@ -7,6 +7,10 @@
 
 #include "parse/treeIterator.h"
 #include "parse/ast/visitableNode.h"
+#include "analysis/pTrace.h"
+
+namespace analysis
+{ class PTrace; }
 
 namespace ast
 {
@@ -17,6 +21,7 @@ class TreeIterator;
 class NodeTree
 {
 private:
+	analysis::PTrace* treeTrace;
 	int treeSize;
 	int lines;
 
@@ -26,7 +31,10 @@ public:
 	ast::VisitableNode* rootNode;
 
 	NodeTree();
-	NodeTree(ast::VisitableNode* root);
+	NodeTree(ast::VisitableNode* root, int parentSize);
+	~NodeTree();
+
+	void setUpTrace();
 
 	TreeIterator begin();
 	TreeIterator end();
@@ -37,6 +45,8 @@ public:
 
 	void setRoot(ast::VisitableNode* rootNode);
 	void addNode(ast::VisitableNode* node, int parent);
+
+	analysis::PTrace* trace();
 
 	void setSize(int size);
 	int size();

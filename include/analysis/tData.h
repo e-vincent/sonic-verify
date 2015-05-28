@@ -12,6 +12,7 @@ private:
 	bool funcCall; 		// this line is a function call
 	std::string func; 	// function called
 	bool inFunc;
+	int ifIndex;
 
 public:
 	TData();
@@ -21,9 +22,11 @@ public:
 
 	void setFuncCall(bool b, std::string function);
 	void setInFunc(bool b);
+	void setIfIndex(int index);
 
 	bool isInFunc();
 	std::string getFunc();
+	int getIfIndex();
 };
 
 } // namespace analysis

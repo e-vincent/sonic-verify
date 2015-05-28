@@ -13,6 +13,11 @@ VisitableNode::VisitableNode(int index, int parent, int line, int statement, int
 	this->blkDepth = blkDepth;
 }
 
+void VisitableNode::accept(VTimeVisitor*, indexes&)
+{
+	// stub
+}
+
 void VisitableNode::accept(BasicVisitor*, std::string)
 {
 	// stub

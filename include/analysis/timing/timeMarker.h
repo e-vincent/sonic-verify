@@ -11,6 +11,15 @@
 
 #include "analysis/pTrace.h"
 
+namespace ast
+{
+
+class TreeIterator; 
+class NodeTree;
+class VTimeVisitor;
+
+} // namespace ast
+
 namespace analysis
 {
 
@@ -21,6 +30,9 @@ private:
 
 public:
 	TimeMarker();
+
+	void resolveIfs(analysis::PTrace* trace, ast::VTimeVisitor* visitor);
+	void traceFirstPass(ast::NodeTree* tree, ast::VTimeVisitor* visitor, bool inIf);
 };
 
 } // namespace anlysis

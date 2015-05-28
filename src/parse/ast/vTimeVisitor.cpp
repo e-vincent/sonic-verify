@@ -9,14 +9,9 @@ VTimeVisitor::VTimeVisitor()
 	this->defineCall  = false;
 }
 
-void VTimeVisitor::visit(ast::RootNode* rootNode)
+void VTimeVisitor::visit(analysis::PTrace* trace, ast::BodyNode* bodyNode)
 {
-	std::cout << "Visiting Root " << rootNode->value << "\n";
-}
-
-void VTimeVisitor::visit(ast::BodyNode* bodyNode)
-{
-	std::cout << "Visiting BodyNode " << bodyNode->value << "\n";
+	// std::cout << "Visiting BodyNode " << bodyNode->value << "\n";
 	if ("sleep" == bodyNode->value)
 	{
 		this->detectSleep = true;
@@ -28,19 +23,19 @@ void VTimeVisitor::visit(ast::BodyNode* bodyNode)
 
 	if (bodyNode->isFuncCall())
 	{
-		analysis::PTrace::createTrace(bodyNode->statement(), bodyNode->isFuncCall(), bodyNode->value);
+		trace->createTrace(bodyNode->statement(), bodyNode->isFuncCall(), bodyNode->value);
 	}
 	else
 	{
 		// carry forward the cumulative VT in the event 
 		// we pass through begin/block nodes
-		analysis::PTrace::createTrace(bodyNode->statement());
+		trace->createTrace(bodyNode->statement());
 	}
 }
 
-void VTimeVisitor::visit(ast::IntNode* intNode)
+void VTimeVisitor::visit(analysis::PTrace* trace, ast::IntNode* intNode)
 {
-	std::cout << "Visiting IntNode " << intNode->val() << "\n";
+	// std::cout << "Visiting IntNode " << intNode->val() << "\n";
 	float conVT;
 
 	if (this->detectSleep)
@@ -53,12 +48,12 @@ void VTimeVisitor::visit(ast::IntNode* intNode)
 		conVT = 0.0;
 	}
 
-	analysis::PTrace::createTrace(conVT, intNode->statement());
+	trace->createTrace(conVT, intNode->statement());
 }
 
-void VTimeVisitor::visit(ast::FloatNode* floatNode)
+void VTimeVisitor::visit(analysis::PTrace* trace, ast::FloatNode* floatNode)
 {
-	std::cout << "Visiting FloatNode " << floatNode->val() << "\n";
+	// std::cout << "Visiting FloatNode " << floatNode->val() << "\n";
 	float conVT;
 
 	if (this->detectSleep)
@@ -71,38 +66,49 @@ void VTimeVisitor::visit(ast::FloatNode* floatNode)
 		conVT = 0.0;
 	}
 
-	analysis::PTrace::createTrace(conVT, floatNode->statement());
+	trace->createTrace(conVT, floatNode->statement());
 }
 
-void VTimeVisitor::visit(ast::SymNode* symNode)
+void VTimeVisitor::visit(analysis::PTrace* trace, ast::SymNode* symNode)
 {
-	std::cout << "Visiting SymNode " << symNode->value << "\n";
+	// std::cout << "Visiting SymNode " << symNode->value << "\n";
 	if (defineCall)
 	{
-		analysis::PTrace::createTrace(symNode->sym(), symNode->statement());
+		trace->createTrace(symNode->sym(), symNode->statement());
 		defineCall = false;
 	}
 }
 
-void VTimeVisitor::visit(ast::SendNode* sendNode)
+void VTimeVisitor::visit(analysis::PTrace* trace, ast::SendNode* sendNode)
 {
-	std::cout << "Visiting SendNode " << sendNode->value << " " << sendNode->index << "\n";
-	std::cout << "    type " << sendNode->type() << "\n";
-	std::cout << "    func " << sendNode->func() << "\n";
+	// std::cout << "Visiting SendNode " << sendNode->value << " " << sendNode->index << "\n";
+	// std::cout << "    type " << sendNode->type() << "\n";
+	// std::cout << "    func " << sendNode->func() << "\n";
 
 	if (sendNode->type() == "function")
 	{
-		(analysis::PTrace::stats[sendNode->statement()])->setInFunc(true);
-		(analysis::PTrace::stats[sendNode->statement()])->cumVT = 0; // start cumulation fresh with new func
-		analysis::PTrace::setInFunc(true);
+		(trace->stats[sendNode->statement()])->setInFunc(true);
+		(trace->stats[sendNode->statement()])->cumVT = 0; // start cumulation fresh with new func
+		trace->setInFunc(true);
 	}
 }
 
-void VTimeVisitor::visit(ast::IfNode* ifNode)
+void VTimeVisitor::visit(analysis::PTrace* trace, ast::IfNode* ifNode)
 {
-	std::cout << "Visiting IfNode " << ifNode->index << " " << ifNode->statement() << "\n";
+	// std::cout << "Visiting IfNode " << ifNode->index << " " << ifNode->statement() << "\n";
+	// std::cout << "Left Index " << ifNode->getTrueIndex() 
+	// 	<< " \nRight Index " << ifNode->getFalseIndex() << "\n";
 
-	analysis::PTrace::createTrace(-2, ifNode->statement());
+	trace->createTrace(-2, ifNode->statement());
+	trace->stats[ifNode->statement()]->setIfIndex(ifNode->index);
+}
+
+void VTimeVisitor::visit(ast::IfNode* ifNode, indexes& fill)
+{
+	// std::cout << ifNode->getTrueIndex() << " " << ifNode->getFalseIndex() << "\n"; 
+	fill.trueIndex  = ifNode->getTrueIndex();
+	fill.falseIndex = ifNode->getFalseIndex();
+	// std::cout << "Fill1 " << fill.trueIndex << " " << fill.falseIndex << "\n";
 }
 
 } // namespace ast

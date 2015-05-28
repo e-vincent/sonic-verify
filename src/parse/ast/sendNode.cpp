@@ -11,9 +11,9 @@ SendNode::SendNode(int index, int parent, int line, int statement, int blkDepth)
 	this->value = "send";
 }
 
-void SendNode::accept(VTimeVisitor* v)
+void SendNode::accept(analysis::PTrace* trace, VTimeVisitor* v)
 {
-	v->visit(this);
+	v->visit(trace, this);
 }
 
 void SendNode::accept(BasicVisitor* v, std::string sym)

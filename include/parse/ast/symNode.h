@@ -16,7 +16,7 @@ protected:
 public:
 	SymNode(std::string symbol, int index, int parent, int line, int statement, int blkDepth);
 
-	void accept(ast::VTimeVisitor* v);
+	void accept(analysis::PTrace* trace, ast::VTimeVisitor* v);
 
 	std::string sym();
 };

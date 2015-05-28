@@ -27,7 +27,8 @@ public:
 	int getTrueIndex();
 	int getFalseIndex();
 
-	virtual void accept(VTimeVisitor* v);
+	virtual void accept(analysis::PTrace* trace, VTimeVisitor* v);
+	virtual void accept(VTimeVisitor* v, indexes& fill);
 	virtual void accept(BasicVisitor* v, int index, int childCount);
 };
 

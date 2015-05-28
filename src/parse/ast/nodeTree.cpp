@@ -3,10 +3,25 @@
 namespace ast
 {
 
-NodeTree::NodeTree() {}
-NodeTree::NodeTree(ast::VisitableNode* root)
+NodeTree::NodeTree() { }
+NodeTree::NodeTree(ast::VisitableNode* root, int parentSize)
 {
 	rootNode = root;
+
+	// correct tree sizes
+	this->setSize(parentSize); // statement indexing?
+
+	treeTrace = new analysis::PTrace(this);
+}
+
+NodeTree::~NodeTree()
+{
+	delete treeTrace;
+}
+
+void NodeTree::setUpTrace()
+{
+	treeTrace = new analysis::PTrace();
 }
 
 ast::TreeIterator NodeTree::begin()
@@ -116,6 +131,11 @@ void NodeTree::addNode(ast::VisitableNode* node, int parent)
 			<< " " << node->index << " parent " << parent << "\n";
 	ast::VisitableNode* parNode = findNode(parent);
 	parNode->children.push_back(node);
+}
+
+analysis::PTrace* NodeTree::trace()
+{
+	return treeTrace;
 }
 
 void NodeTree::setSize(int size)

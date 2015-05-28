@@ -7,6 +7,12 @@
 
 #include "analysis/tData.h"
 #include "parse/builder.h"
+#include "parse/ast/nodeTree.h"
+#include "parse/ast/vTimeVisitor.h"
+#include "parse/ast/structs.h"
+
+namespace ast
+{ class NodeTree; }
 
 namespace analysis
 {
@@ -14,36 +20,40 @@ namespace analysis
 class PTrace
 {
 private:
-	static int lastSet;
-	//static std::map<int, bool> defines;
-	static bool inFunc;
+	int lastSet;
+	bool inFunc;
+	int lastStatement; // detecting end of partial traces
 
 public:
-	static std::vector<analysis::TData*> stats;
-	static std::map<std::string, int> defFuncs;
-	static std::vector<std::string> definedFuncs;
+	std::vector<analysis::TData*> stats;
+	std::map<std::string, int> defFuncs;
+	std::vector<std::string> definedFuncs;
 
-	PTrace();
+	PTrace();					 // base tree construction
+	PTrace(ast::NodeTree* tree); // tree specific construction
 	~PTrace();
 
-	static void setVT(float vt, int index);
+	void setVT(float vt, int index);
 
-	static void createTrace(float conVT, int statement);		// TData with new VT
-	static void createTrace(std::string func, int statement);	// TData, func defined
-	static void createTrace(int statement);						// TData, carry previous VT
-	static void createTrace(int statement, bool funcCalled, std::string func);	// TData, func called
+	void createTrace(float conVT, int statement);		// TData with new VT
+	void createTrace(std::string func, int statement);	// TData, func defined
+	void createTrace(int statement);					// TData, carry previous VT
+	void createTrace(int statement, bool funcCalled, std::string func);	// TData, func called
 
-	static void checkFunctionStatus(int statement);
-	static void setInFunc(bool b);
+	void checkFunctionStatus(int statement);
+	void setInFunc(bool b);
 
-	static float vtAt(int index);
-	static float cumVTAt(int index);
-	static float totalVT();
-	static int traceSize();
-	static bool isInFunc();
-	static float getFunctionVT(std::string func);
+	float vtAt(int index);
+	float cumVTAt(int index);
+	float totalVT();
+	int traceSize();
+	bool isInFunc();
+	void setLast(int statement);
+	int getLast();
+	float getFunctionVT(std::string func);
 
-	static void updateTraceWithFuncVTs();
+	void resolveIfs(ast::VTimeVisitor* visitor);
+	void traceSecondPass();
 };
 
 } // namespace analysis

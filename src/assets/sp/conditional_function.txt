@@ -1,0 +1,10 @@
+define :bells do
+  sample :perc_bell
+  sleep 1
+end
+
+if true then
+	bells
+else
+	sleep 0.5
+end

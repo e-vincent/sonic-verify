@@ -16,9 +16,9 @@ float FloatNode::val()
 	return this->num;
 }
 
-void FloatNode::accept(VTimeVisitor* v)
+void FloatNode::accept(analysis::PTrace* trace, VTimeVisitor* v)
 {
-	v->visit(this);
+	v->visit(trace, this);
 }
 
 } // namespace ast

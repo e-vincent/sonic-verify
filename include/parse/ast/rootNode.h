@@ -15,7 +15,7 @@ protected:
 public:
 	RootNode(std::string root);
 
-	void accept(ast::VTimeVisitor* v);
+	void accept(analysis::PTrace* trace, ast::VTimeVisitor* v);
 };
 
 } // namespace ast
