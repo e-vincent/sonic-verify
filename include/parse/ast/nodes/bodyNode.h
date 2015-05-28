@@ -15,7 +15,7 @@ protected:
 public:
 	BodyNode(std::string node, int index, int parent, int line, int statement, int blkDepth);
 
-	void accept(ast::VTimeVisitor* v);
+	void accept(analysis::PTrace* trace, ast::VTimeVisitor* v);
 	bool isFuncCall();
 };
 

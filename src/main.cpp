@@ -12,6 +12,7 @@ void Init_verify()
 		.define_method("addValue", &Builder::addValue)
 		.define_method("addNumber", &Builder::addNumber)
 		.define_method("addSymbol", &Builder::addSymbol)
+		.define_method("addIf", &Builder::addIf)
 		.define_method("setTreeSize", &Builder::setTreeSize)
 		.define_method("exitFuncs", &Builder::exitFuncs);
 

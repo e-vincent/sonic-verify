@@ -10,9 +10,9 @@ BodyNode::BodyNode(std::string symbol, int index, int parent, int line, int stat
 	this->value = symbol;
 }
 
-void BodyNode::accept(VTimeVisitor* v)
+void BodyNode::accept(analysis::PTrace* trace, VTimeVisitor* v)
 {
-	v->visit(this);
+	v->visit(trace, this);
 }
 
 bool BodyNode::isFuncCall()

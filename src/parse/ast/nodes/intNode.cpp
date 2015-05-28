@@ -16,9 +16,9 @@ int IntNode::val()
 	return this->num;
 }
 
-void IntNode::accept(VTimeVisitor* v)
+void IntNode::accept(analysis::PTrace* trace, VTimeVisitor* v)
 {
-	v->visit(this);
+	v->visit(trace, this);
 }
 
 } // namespace ast

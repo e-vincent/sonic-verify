@@ -42,6 +42,8 @@ beginPos 	= 0
 line		= 0
 intFlag		= false
 symFlag		= false
+ifFlag		= false
+line		= 0
 
 builder.makeRoot(data.type)
 
@@ -62,7 +64,7 @@ data.children.each do |child|
 				line = info.location.expression.line
 			end
 
-			if "send".eql?(info.type.to_s())
+			if ("send".eql?(info.type.to_s())) || ("if".eql?(info.type.to_s()))
 				statementNo += 1
 			end	
 			
@@ -84,27 +86,33 @@ data.children.each do |child|
 			# skip adding child to stack of nodes still to visit
 			intFlag = "int".eql?(info.type.to_s()) || "float".eql?(info.type.to_s())
 			symFlag = "sym".eql?(info.type.to_s())
+			ifFlag  = "if".eql?(info.type.to_s())
 			if intFlag
 				int = info.children[0]
 				builder.addNumber(int.to_s(), curr[1], curr[2], line, statementNo, blkStack.size())
 			elsif symFlag
 				sym = info.children[0]
 				builder.addSymbol(sym.to_s(), curr[1], curr[2], line, statementNo, blkStack.size())
+			elsif ifFlag
+				cond = info.children[0] # throwing it for the moment => will want a mini tree later?
+				builder.addIf(curr[1], curr[2], line, statementNo, blkStack.size())
 			else
-				intFlag = false
-				symFlag = false
 				builder.addNode(info.type, curr[1], curr[2], line, statementNo, blkStack.size())
 			end
 		else
-			intFlag = false
-			symFlag = false
 			builder.addValue(info.to_s(), curr[1], curr[2], line, statementNo, blkStack.size())
 		end
 
 		if info.respond_to?(:children)
 			if !intFlag && !symFlag
-				info.children.reverse.each do |child|
-					stack.push([child, -1, curr[1]])
+				info.children.reverse.each_with_index do |child, index|
+					if ifFlag && (index == info.children.size - 1)
+						ifFlag = false
+						# want to avoid first child but add the rest
+						# since we're reverse iterating, this means avoid last loop
+					else
+						stack.push([child, -1, curr[1]])
+					end
 				end
 			end
 		end

@@ -19,6 +19,7 @@ public:
 	virtual void visit(ast::FloatNode* floatNode) = 0;
 	virtual void visit(ast::SymNode* symNode) = 0;
 	virtual void visit(ast::SendNode* sendNode) = 0;
+	virtual void visit(ast::IfNode* ifNode) = 0;
 };
 
 } // namespace ast

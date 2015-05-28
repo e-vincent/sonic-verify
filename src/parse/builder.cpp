@@ -7,6 +7,7 @@ Builder::Builder()
 {
 	Builder::tree = new ast::NodeTree();
 	visitor = new ast::BasicVisitor();
+	ifChildCount = 0;
 }
 
 Builder::~Builder()
@@ -49,6 +50,12 @@ ast::SendNode* Builder::makeSend(int index, int parent, int line, int statement,
 	return new ast::SendNode(index, parent, line, statement, blkDepth);
 }
 
+ast::IfNode* Builder::makeIf(int index, int parent, int line, int statement, int blkDepth)
+{
+	ifIndexes.push(index);
+	return new ast::IfNode(index, parent, line, statement, blkDepth);
+}
+
 void Builder::makeRoot(Rice::Symbol root)
 {
 	ast::RootNode* rootNode = new ast::RootNode(root.str());
@@ -58,6 +65,11 @@ void Builder::makeRoot(Rice::Symbol root)
 void Builder::addNode(Rice::Symbol nodeType, int index, 
 		int parent, int line, int statement, int blkDepth)
 {
+	if (!ifIndexes.empty())
+	{
+		checkIfState(index, parent);
+	}
+	
 	ast::VisitableNode* node;
 	if (nodeType.str().compare("send") == 0)
 	{
@@ -114,6 +126,12 @@ void Builder::addSymbol(std::string sym, int index,
 	}
 }
 
+void Builder::addIf(int index, int parent, int line, int statement, int blkDepth)
+{
+	ast::IfNode* node = makeIf(index, parent, line, statement, blkDepth);
+	Builder::tree->addNode(node, parent);
+}
+
 void Builder::setTreeSize(int treeSize, int lineCount)
 {
 	Builder::tree->setSize(treeSize);
@@ -123,6 +141,22 @@ void Builder::setTreeSize(int treeSize, int lineCount)
 void Builder::exitFuncs(int statement)
 {
 	exits[statement] = false;
+}
+
+void Builder::checkIfState(int index, int parent)
+{
+	if (parent == ifIndexes.top())
+	{
+		++ifChildCount;
+		ast::VisitableNode* ifNode = Builder::tree->findNode(parent);
+		ifNode->accept(visitor, index, ifChildCount);
+
+		if (ifChildCount == 2)
+		{
+			ifChildCount = 0;
+			ifIndexes.pop();
+		}
+	}
 }
 
 std::map<int, bool> Builder::getExitMap()

@@ -9,14 +9,15 @@ namespace ast
 class BasicVisitor : public IVisitor
 {
 public:
-	BasicVisitor();
+	BasicVisitor() {};
 
-	virtual void visit(ast::RootNode* rootNode);
-	virtual void visit(ast::BodyNode* bodyNode);
-	virtual void visit(ast::IntNode* intNode);
-	virtual void visit(ast::FloatNode* floatNode);
-	virtual void visit(ast::SymNode* symNode);
-	virtual void visit(ast::SendNode* sendNode);
+	virtual void visit(ast::RootNode*) {};
+	virtual void visit(ast::BodyNode*) {};
+	virtual void visit(ast::IntNode*) {};
+	virtual void visit(ast::FloatNode*) {};
+	virtual void visit(ast::SymNode*) {};
+	virtual void visit(ast::SendNode*) {};
+	virtual void visit(ast::IfNode*) {};
 };
 
 } // namespace ast
