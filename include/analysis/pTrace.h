@@ -33,6 +33,7 @@ public:
 	PTrace(ast::NodeTree* tree); // tree specific construction
 	~PTrace();
 
+	void initStats(int counter);
 	void setVT(float vt, int index);
 
 	void createTrace(float conVT, int statement);		// TData with new VT

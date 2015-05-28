@@ -18,7 +18,6 @@ TimeMarker::TimeMarker()
 	traceFirstPass(Builder::tree, visitor, false);
 
 	analysis::PTrace* trace = (Builder::tree)->trace();
-	std::cout << "End VT: " << trace->totalVT() << "\n";
 	std::cout << " ===  First Pass Results ===\n";
 	for (int i = 0; i < trace->traceSize(); ++i)
 	{
@@ -62,55 +61,35 @@ void TimeMarker::resolveIfs(analysis::PTrace* trace, ast::VTimeVisitor* visitor)
 	{
 		if (trace->stats[i]->conVT == -2)
 		{
-			int index = trace->stats[i]->getIfIndex();
+			int index    = trace->stats[i]->getIfIndex();
+			int baseSize = (Builder::tree)->size();
 			indexes fill;
+			
 			ast::VisitableNode* node = Builder::tree->findNode(index);
 			node->accept(visitor, fill);
-			int baseSize = (Builder::tree)->size();
 
-			ast::VisitableNode* trueNode  = Builder::tree->findNode(fill.trueIndex);
-			ast::VisitableNode* falseNode = Builder::tree->findNode(fill.falseIndex);
-			ast::NodeTree* trueTree  = new ast::NodeTree(trueNode, baseSize);
-			ast::NodeTree* falseTree = new ast::NodeTree(falseNode, baseSize);
-
-			analysis::PTrace* trueTrace  = trueTree->trace();
-			analysis::PTrace* falseTrace = falseTree->trace();
+			ast::VisitableNode* trueNode 
+				= Builder::tree->findNode(fill.trueIndex);
+			ast::VisitableNode* falseNode
+				= Builder::tree->findNode(fill.falseIndex);
+			ast::NodeTree* trueTree
+				= new ast::NodeTree(trueNode, baseSize);
+			ast::NodeTree* falseTree 
+				= new ast::NodeTree(falseNode, baseSize);
+			analysis::PTrace* trueTrace 
+				= trueTree->trace();
+			analysis::PTrace* falseTrace 
+				= falseTree->trace();
 
 			traceFirstPass(trueTree, visitor, true);
 			traceFirstPass(falseTree, visitor, true);
 
-			std::cout << "True\n";
 			trueTrace->traceSecondPass();
-			std::cout << "False\n";
 			falseTrace->traceSecondPass();
 
 			int trueVT  = trueTrace->stats[trueTrace->getLast()]->cumVT;
 			int falseVT = falseTrace->stats[falseTrace->getLast()]->cumVT;
 
-
-std::cout << " ===  True Pass Results ===\n";
-	for (int i = 0; i < trueTrace->traceSize(); ++i)
-	{
-		std::cout << "Index " << i 
-				<< " has VT " << trueTrace->stats[i]->conVT
-				<< ", Current total: " << trueTrace->stats[i]->cumVT 
-				<< " IN FUNC:: " << trueTrace->stats[i]->isInFunc()
-				<< "\n";
-	}
-	std::cout << " === =================== ===\n";
-
-	std::cout << " ===  False Pass Results ===\n";
-	for (int i = 0; i < falseTrace->traceSize(); ++i)
-	{
-		std::cout << "Index " << i 
-				<< " has VT " << falseTrace->stats[i]->conVT
-				<< ", Current total: " << falseTrace->stats[i]->cumVT 
-				<< " IN FUNC:: " << falseTrace->stats[i]->isInFunc()
-				<< "\n";
-	}
-	std::cout << " === =================== ===\n";
-
-std::cout << "true " << trueVT << " false " << falseVT << "\n";
 			if (trueVT > falseVT)
 			{
 				trace->stats[i]->conVT = trueVT;
@@ -131,8 +110,6 @@ std::cout << "true " << trueVT << " false " << falseVT << "\n";
 			delete falseTree;
 		}
 	}
-
-	std::cout << "fourth slot " << trace->stats[4]->conVT << "\n";
 }
 
 void TimeMarker::traceFirstPass(ast::NodeTree* tree, ast::VTimeVisitor* visitor,
@@ -144,7 +121,8 @@ void TimeMarker::traceFirstPass(ast::NodeTree* tree, ast::VTimeVisitor* visitor,
 
 	ast::TreeIterator start = tree->begin();
 	ast::TreeIterator end   = tree->end();
-	// first pass - setup VTs
+	
+	// mark initial VTs
 	for (ast::TreeIterator it = start; it != end; ++it)
 	{
 		trace->setLast((&(*it))->statement());

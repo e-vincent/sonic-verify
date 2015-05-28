@@ -22,13 +22,7 @@ PTrace::PTrace()
 	lastStatement = -1;
 
 	// persistant off by one error as statements index from 1
-	int counter = Builder::tree->size() + 1;
-	while (counter != 0)
-	{
-		stats.push_back(new TData());
-		--counter;
-	}
-
+	initStats(Builder::tree->size() + 1);
 	std::cout << "======== Made Base Trace" << "\n";
 }
 
@@ -39,8 +33,11 @@ PTrace::PTrace(ast::NodeTree* tree)
 	inFunc  = 0;
 	lastStatement = -1;
 
-	int counter = tree->size() + 1;
-	std::cout << "Given tree size: " << counter << "\n";
+	initStats(tree->size() + 1);
+}
+
+void PTrace::initStats(int counter)
+{
 	while (counter != 0)
 	{
 		stats.push_back(new TData());
@@ -59,7 +56,6 @@ PTrace::~PTrace()
 void PTrace::setVT(float vt, int index)
 {
 	lastSet = index;
-	std::cout << "Setting trace index " << index << " to " << vt << "\n";
 	stats[index]->conVT = vt;
 	if (index != 0)
 	{
@@ -70,7 +66,6 @@ void PTrace::setVT(float vt, int index)
 // TData with new VT
 void PTrace::createTrace(float conVT, int statement)
 {
-	std::cout << "checkFunction from newVT Trace\n";
 	checkFunctionStatus(statement);
 	setVT(conVT, statement);
 }
@@ -78,10 +73,7 @@ void PTrace::createTrace(float conVT, int statement)
 // TData, func defined
 void PTrace::createTrace(std::string func, int statement)
 {
-	std::cout << "checkFunction from funcDefined Trace\n";
 	checkFunctionStatus(statement);
-
-	std::cout << " <= Can Define " << func << " " << statement << "here\n";
 	defFuncs.insert(std::pair<std::string, int> (func, statement));
 }
 
@@ -112,7 +104,6 @@ void PTrace::checkFunctionStatus(int statement)
 		if (it->first == statement)
 		{
 			stats[statement]->setInFunc(exists[statement]);
-			std::cout << "setting " << statement << " to " << exists[statement] << "\n";
 			setInFunc(exists[statement]);
 		}
 	}
@@ -190,17 +181,6 @@ void PTrace::traceSecondPass()
 
 	for (int i = 1; i < traceSize(); ++i)
 	{
-		std::cout << " === InFor Pass Results ===\n";
-		for (int i = 0; i < traceSize(); ++i)
-		{
-			std::cout << "Index " << i 
-					<< " has VT " << stats[i]->conVT
-					<< ", Current total: " << stats[i]->cumVT 
-					<< " IN FUNC:: " << stats[i]->isInFunc()
-					<< "\n";
-		}
-		std::cout << " === =================== ===\n";
-
 		// if this is dead code, set it
 		deadCode = (stats[i]->conVT == -3);
 
@@ -211,14 +191,10 @@ void PTrace::traceSecondPass()
 			prevChange = false;
 		}
 
-		// updateIndex = (stats[i]->conVT == -1);
-		
 		if (prevChange)
 		{
 			stats[i]->cumVT = lastCumVT + stats[i]->conVT;
 			lastCumVT = stats[i]->cumVT;
-			// stats[i]->conVT = stats[i - 1]->conVT;
-			// stats[i]->cumVT = stats[i - 1]->cumVT;
 		}
 
 		// is this index a method call?
@@ -238,15 +214,9 @@ void PTrace::traceSecondPass()
 			auto defFuncs = (Builder::tree)->trace()->defFuncs;
 			for (auto it = defFuncs.begin(); it != defFuncs.end(); ++it)
 			{
-				std::cout << it->first << " " << stats[i]->getFunc() << "\n";
 				if (it->first == stats[i]->getFunc())
 				{
-					// float vtime = getFunctionVT(it->first);
-					// stats[i]->conVT = stats[i]->conVT + vtime;
-					// stats[i]->cumVT += vtime;
-					// prevChange = true;
 					float vtime = getFunctionVT(it->first);
-					std::cout << vtime << "\n";
 					stats[i]->conVT = stats[i]->conVT + vtime;
 					stats[i]->cumVT += vtime;
 					lastCumVT = stats[i]->cumVT;
@@ -255,10 +225,6 @@ void PTrace::traceSecondPass()
 			}
 		}
 
-		std::cout << "Index " << i
-				<< " deadcode: " << deadCode
-				<< " previous was dead? " << (stats[i - 1]->conVT == -3) << "\n";
-				std::cout << "Last CumVT " << lastCumVT << "\n";
 		// if this line is not dead code, if the previous line is, update some value
 		if (!deadCode && (stats[i - 1]->conVT == -3))
 		{

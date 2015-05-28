@@ -3,10 +3,10 @@ require_relative '../../bin/verify'
 
 path = "src/assets/sp/"
 
-#filename = path + "conditional_in_loop.txt"
+filename = path + "conditional_in_loop.txt"
 #filename = path + "sequence_loop.txt"
 #filename = path + "simple_loop.txt"
-filename = path + "prog_function.txt"
+#filename = path + "prog_function.txt"
 
 file = File.open(filename, "rb")
 contents = file.read
