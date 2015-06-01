@@ -47,16 +47,23 @@ void Graph::startArc(graph::CueNode* cue, int block)
 	newData.block.append("P").append(std::to_string(block));
 	std::pair<arcData, std::string> from(newData, cue->symbol);
 	
+	std::vector<int> offsets;
 	int offset = 0;
+
 	// any valid syncs in storage?
 	for (auto p : syncStore)
 	{
 		if (p.second == cue->symbol)
 		{
 			to.push_back(p);
-			syncStore.erase(syncStore.begin() + offset);
+			offsets.push_back(offset); // store offsets to erase after loop
 		}
 		++offset;
+	}
+
+	for (int offset : offsets)
+	{
+		syncStore.erase(syncStore.begin() + offset);
 	}
 
 	// has this symbol occured on another line?
@@ -100,11 +107,47 @@ void Graph::addToArc(graph::SyncNode* sync, int block)
 	}
 }
 
+int Graph::size()
+{
+	return nodeCount;
+}
+
+void Graph::setNodeCount(int count)
+{
+	nodeCount = count;
+}
+
 void Graph::printTypes()
 {
 	for (auto sub : blocks)
 	{
 		sub->printType(arcs);
+	}
+}
+
+void Graph::printGlobal()
+{
+	std::cout << "Node Count: " << size() << "\n";
+	for (auto sub : blocks)
+	{
+		sub->setConsumableSType();
+	}
+
+	for (auto sub : blocks)
+	{
+		if (sub->consumableSType() != NULL)
+		{
+			sub->setConsumableSType(strtok(sub->consumableSType(), "."));			
+		}
+
+		std::cout << sub->consumableSType() << "\n";
+
+		if (sub->consumableSType() != NULL)
+		{
+			sub->setConsumableSType(strtok(NULL, "."));			
+		}
+
+		std::cout << sub->consumableSType() << "\n";
 	}
 }
 

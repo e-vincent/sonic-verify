@@ -2,7 +2,8 @@
 #define __GRAPH_H__
 
 #include <iostream>
-#include <string>
+#include <string.h>
+#include <stdio.h>
 #include <map>
 #include <list>
 #include <vector>
@@ -19,6 +20,7 @@ private:
 	std::vector<std::pair<arcData, std::string>> syncStore;
 	std::list<graph::SubGraph*> blocks;
 	std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs; 	// one to many map
+	int nodeCount;
 
 public:
 	Graph();
@@ -30,7 +32,11 @@ public:
 	void startArc(graph::CueNode* cue, int block);
 	void addToArc(graph::SyncNode* sync, int block);
 
+	int size();
+	void setNodeCount(int count);
+
 	void printTypes();
+	void printGlobal();
 	void printSubType(int block);
 	int blockCount();
 };

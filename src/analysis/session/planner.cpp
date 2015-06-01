@@ -6,9 +6,8 @@ namespace analysis
 Planner::Planner()
 {
 	currIndex = 0;
-	subCount = 0;
+	subCount  = 0;
 	graph = new graph::Graph();
-	std::cout << "New Party Planner\n";
 }
 
 Planner::~Planner()
@@ -24,18 +23,16 @@ void Planner::setUp()
 	std::cout << "\n\n === Arc Results === \n";
 	graph->printArcs();
 	graph->printTypes();
+	graph->printGlobal();
 }
 
 graph::CueNode* Planner::makeCue(int line, std::string symbol)
 {
-	std::cout << "MAKE CUE\n";
-	std::cout << line << " " << symbol << " " << "\n";
 	return new graph::CueNode(getIndex(), line, symbol);
 }
 
 graph::SyncNode* Planner::makeSync(int line, std::string symbol)
 {
-	std::cout << "MAKE SYNC\n";
 	return new graph::SyncNode(getIndex(), line, symbol);
 }
 
@@ -56,7 +53,6 @@ void Planner::makeGraph(ast::NodeTree* tree)
 		{
 			if (!symbols.empty())
 			{
-				std::cout << "New Block" << "\n";
 				makeSubGraph(symbols);
 			}
 			++currBlk;
@@ -66,17 +62,15 @@ void Planner::makeGraph(ast::NodeTree* tree)
 		if (curr->value == "cue")
 		{
 			ast::VisitableNode* next = &(*(++it));
-			graph::CueNode* cueNode = makeCue(curr->line(), next->acceptType());
-			std::cout << "Found C/S Line " << curr->line() << "\n";
+			graph::CueNode* cueNode  = makeCue(curr->line(), next->acceptType());
 			graph->startArc(cueNode, subCount);
 			node = cueNode;
 		} 
 		
 		if (curr->value == "sync")
 		{
-			ast::VisitableNode* next = &(*(++it));
+			ast::VisitableNode* next  = &(*(++it));
 			graph::SyncNode* syncNode = makeSync(curr->line(), next->acceptType());
-			std::cout << "Found C/S Line " << curr->line() << "\n"; 
 			graph->addToArc(syncNode, subCount);
 			node = syncNode;
 		}
@@ -90,6 +84,7 @@ void Planner::makeGraph(ast::NodeTree* tree)
 
 	// catch last block
 	makeSubGraph(symbols);
+	graph->setNodeCount(getIndex());
 }
 
 void Planner::makeSubGraph(std::stack<graph::GraphNode*>& symbols)

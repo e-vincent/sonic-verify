@@ -70,6 +70,21 @@ std::string SubGraph::sType()
 	return processType;
 }
 
+char* SubGraph::consumableSType()
+{
+	return consumableType;
+}
+
+void SubGraph::setConsumableSType()
+{
+	consumableType = &processType[0];
+}
+
+void SubGraph::setConsumableSType(char* type)
+{
+	consumableType = type;
+}
+
 void SubGraph::printType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs)
 {
 	analysis::TypeVisitor* visitor = new analysis::TypeVisitor();
@@ -78,9 +93,8 @@ void SubGraph::printType(std::map<std::pair<arcData, std::string>, std::vector<s
 	std::string type;
 
 	for (auto node : nodes)
-	{
+	{		
 		node->accept(visitor);
-		std::cout << "Node Type: " << node->toSType() << "\n";
 		bool syncType = (node->toSType() == "?");
 		std::vector<std::pair<std::string, std::string>> interactions;
 		for (auto it = arcs.begin(); it != arcs.end(); ++it)
@@ -88,45 +102,21 @@ void SubGraph::printType(std::map<std::pair<arcData, std::string>, std::vector<s
 			std::vector<std::pair<arcData, std::string>> vec = it->second;
 			for (auto p : vec)
 			{
-				if ((syncType
+				if (((name == it->first.first.block)
 						&& (it->first.second == node->symbol)) ||
-					((name == it->first.first.block)
-						&& (it->first.second == node->symbol)))
+					(syncType && (it->first.second == node->symbol)
+						&& (p.first.index == node->index)))
 				{
 					interactions.push_back(std::make_pair(it->first.first.block, p.first.block));
 				}
 			}
-
-			// if ()
-			// {
-				
-			// }
-
-			// if ()
-			// {
-
-			// 	// std::cout << "Symbol in block " << it->first.first.block << "\n";
-			// 	std::vector<std::pair<arcData, std::string>> vec = it->second;
-			// 	for (auto p : vec)
-			// 	{
-			// 		interactions.push_back(std::make_pair(it->first.first.block, p.first.block));
-			// 		// std::cout << "Links with " << p.first.block << "\n";
-			// 		// node->accept(visitor, 
-			// 		// 		this->processType, 
-			// 		// 		it->first.first.block,
-			// 		// 		p.first.block);
-
-			// 		// std::cout << "Current SubProcessType " << this->processType << "\n";
-			// 	}
-			// }
 		}
 
 		node->accept(visitor, processType, interactions);
-		std::cout << "interactions\n";
-		for (auto action : interactions)
-		{
-			std::cout << action.first << " " << action.second << "\n";
-		}
+		// for (auto action : interactions)
+		// {
+		// 	std::cout << action.first << " " << action.second << "\n";
+		// }
 	}
 
 	std::cout << "SubGraph " << name 

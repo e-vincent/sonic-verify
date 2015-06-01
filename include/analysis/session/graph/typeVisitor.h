@@ -19,6 +19,8 @@ public:
 	virtual void visit(graph::SyncNode* syncNode);
 	virtual void visit(graph::CueNode* cueNode, std::string& type, std::vector<std::pair<std::string, std::string>> interactions);
 	virtual void visit(graph::SyncNode* syncNode, std::string& type, std::vector<std::pair<std::string, std::string>> interactions);
+
+	void typer(graph::GraphNode* node, std::string& type, std::string typeSymbol, std::vector<std::pair<std::string, std::string>> interactions);
 };
 
 } // namespace analysis

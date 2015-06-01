@@ -4,8 +4,6 @@
 #include <iostream>
 #include <stack>
 
-#include "rice/Array.hpp"
-
 #include "main.h"
 
 #include "analysis/session/graph/nodes/nodes.h"

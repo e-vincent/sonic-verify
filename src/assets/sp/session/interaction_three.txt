@@ -1,0 +1,17 @@
+live_loop :one do
+  sync :x
+  cue :y
+  sleep 0.5
+end
+
+live_loop :two do
+  cue :x
+  sync :z
+  sleep 0.5
+end
+
+live_loop :three do
+  sync :y
+  cue :z
+  sleep 0.5
+end
