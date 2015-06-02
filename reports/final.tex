@@ -723,29 +723,31 @@ apply to Sonic Pi's Ruby-like syntax.
 
 Session Types consist of the following key ideas:
 
-A basic structural concept known as \emph{sessions}. These are designated via 
-\emph{channels}. The collection of session interactions is what constitutes a 
-program; those interactions are performed via the channels. As well as the 
-session, other concurrent programming contructs are provided: parallel 
-composition, name hiding, conditional and recursion. The combination of 
-recursion and sessions allow for the expression of an unbounded thread of 
-interaction as a single abstraction unit.
+\begin{itemize}[noitemsep]
+	\item A basic structural concept known as \emph{sessions}. These are designated 
+	via \emph{channels}. The collection of session interactions is what constitutes a 
+	program; those interactions are performed via the channels. As well as the 
+	session, other concurrent programming contructs are provided: parallel 
+	composition, name hiding, conditional and recursion. The combination of 
+	recursion and sessions allow for the expression of an unbounded thread of 
+	interaction as a single abstraction unit.
 
-Three basic communication primitives that all other structures will be built 
-from: \emph{value passing} - standard synchronised message-passing, \emph{
-label branching} - purified method invocation, devoid of value passing - and 
-\emph{delgation} - the passing of a channel to another process. Alongside 
-sessions, these allow for complex communication structures to be defined and 
-described with clarity.
+	\item Three basic communication primitives that all other structures will be 
+	built from: \emph{value passing} - standard synchronised message-passing, 
+	\emph{label branching} - purified method invocation, devoid of value passing - and 
+	\emph{delgation} - the passing of a channel to another process. Alongside 
+	sessions, these allow for complex communication structures to be defined and 
+	described with clarity.
 
 % flesh out detail and remark that the theory is not outlined here as
 % there is no focus on the implementation of this in this project
 % it would be good to extend the project to include a formal typing system
-Finally there is a basic type discipline for the communication primitives. 
-Without this there would be no way to guarantee the typability of a program, 
-ensuring that two communicating processes always have compatible patterns of 
-communication. It is the incompatibility of interaction patterns that is one 
-of the main reasons for bugs in commmunication-based programming.
+	\item Finally there is a basic type discipline for the communication primitives. 
+	Without this there would be no way to guarantee the typability of a program, 
+	ensuring that two communicating processes always have compatible patterns of 
+	communication. It is the incompatibility of interaction patterns that is one 
+	of the main reasons for bugs in commmunication-based programming.
+\end{itemize}
 
 % Relate Session Types to project
 
@@ -764,7 +766,7 @@ The base sets of the syntax used to describe session types are as follows:
 	\item[] \emph{process variables}: ranged over by \emph{X, Y... u, u'...}
 \end{itemize}
 
-\emph{processes}, ranged over by \texttt{P, Q...}, are given by the following 
+\emph{Processes}, ranged over by \texttt{P, Q...}, are given by the following 
 grammar:
 \\
 
@@ -1007,16 +1009,17 @@ receivers are not the same:
                       (P | Q) | R $\equiv$ P | (Q | R)
                  ($v$r)P | Q $\equiv$ ($v$r)(P | Q)  if r $\notin$ fn(Q)
          ($v$r)($v$r')P $\equiv$ ($v$r')($v$r)P, ($v$a) 0 $\equiv$ 0, ($v$s)(s:$\emptyset$) $\equiv$ 0
-                        where r ::= a | s
+                             where r ::= a | s
 
                        def D in 0 $\equiv$ 0
-      def D in ($v$r)P $\equiv$ ($v$r)def D in P         if r $\notin$ fn(D)
-   (def D in P) | Q $\equiv$ def D in (P | Q)      if dpv(D) $\cap$ fpv(Q) = $\emptyset$
+      def D in ($v$r)P $\equiv$ ($v$r)def D in P       if r $\notin$ fn(D)
+   (def D in P) | Q $\equiv$ def D in (P | Q)    if dpv(D) $\cap$ fpv(Q) = $\emptyset$
 
-           def D in (def D' in P) $\equiv$ def D' in (def D in P)
- if (dpv(D) $\bigcup$ fpv(D)) $\cap$ dpv(D') = dpv(D) $\cap$ (dpv(D') $\bigcup$ fpv(D')) = $\emptyset$
+          def D in (def D' in P) $\equiv$ def D' in (def D in P)
+if (dpv(D) $\cup$ fpv(D)) $\cap$ dpv(D') = dpv(D) $\cap$ (dpv(D') $\cup$ fpv(D')) = $\emptyset$
 
-s:h$\cdotp$(q,p,$\xi$)$\cdotp$(q',p',$\xi$')$\cdotp$h' $\equiv$ s:h$\cdotp$(q',p',$\xi$')$\cdotp$(q,p,$\xi$)$\cdotp$h'  if p $\neq$ p' or q $\neq$ q'
+s:h$\cdotp$(q,p,$\xi$)$\cdotp$(q',p',$\xi$')$\cdotp$h' $\equiv$ s:h$\cdotp$(q',p',$\xi$')$\cdotp$(q,p,$\xi$)$\cdotp$h'
+                                         if p $\neq$ p' or q $\neq$ q'
 \end{lstlisting}
 
 Next we present the rules for reducing processes where $\rightarrow^*$ and 
