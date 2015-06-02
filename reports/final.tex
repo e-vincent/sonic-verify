@@ -5,6 +5,8 @@
 \usepackage{listings, caption, graphicx}
 \usepackage{multicol, titlesec}
 \usepackage{fancyvrb}
+\usepackage{enumitem}
+\usepackage{amsmath}
 
 \titleformat
 	{\paragraph}
@@ -52,6 +54,10 @@
 \author{Eleanor Vincent}
 \date{\today}
 \maketitle
+\newpage
+
+\tableofcontents
+\newpage
 
 \section{Introduction}
 
@@ -125,7 +131,7 @@ patterns of the program; this will enable the tool to identify difficult bugs
 such as deadlocks and thrashing behaviour. This is possibly the first application
 of this concept to the live programming paradigm of which Sonic Pi is a part.
 
-%% Initial Project Outline %%%%%%%%%%%%%%%%
+% % Initial Project Outline %%%%%%%%%%%%%%%%
 % This project's aim is to formalise the concurrency and timing aspects of the 
 % language and develop a program analysis tool that can be used to identify 
 % program bugs such as deadlock and thrashing behaviour. The formalism and 
@@ -137,15 +143,15 @@ of this concept to the live programming paradigm of which Sonic Pi is a part.
 \subsection{Report Structure}
 The remainder of this report is broken down as follows:
 
-\begin{itemize}
-	\item Background: We detail the histories of Sonic Pi, Live Programming 
-	and Session Types as fields of research and conclude with work relating to
-	these subjects.
+% \begin{itemize}
+% 	\item Background: We detail the histories of Sonic Pi, Live Programming 
+% 	and Session Types as fields of research and conclude with work relating to
+% 	these subjects.
 
-	\item Going Forward: The bulk of this section details the expected 
-	timeline of the project and ideas for how to evaluate progress during and 
-	at the conclusion of the project.
-\end{itemize}
+% 	\item Going Forward: The bulk of this section details the expected 
+% 	timeline of the project and ideas for how to evaluate progress during and 
+% 	at the conclusion of the project.
+% \end{itemize}
 \newpage
 
 \section{Background}
@@ -732,6 +738,9 @@ label branching} - purified method invocation, devoid of value passing - and
 sessions, these allow for complex communication structures to be defined and 
 described with clarity.
 
+% flesh out detail and remark that the theory is not outlined here as
+% there is no focus on the implementation of this in this project
+% it would be good to extend the project to include a formal typing system
 Finally there is a basic type discipline for the communication primitives. 
 Without this there would be no way to guarantee the typability of a program, 
 ensuring that two communicating processes always have compatible patterns of 
@@ -740,18 +749,19 @@ of the main reasons for bugs in commmunication-based programming.
 
 % Relate Session Types to project
 
-\subsubsection{Syntax Summary}
+\subsubsection{Binary Session Types}
+\paragraph{Syntax Summary}
 
-The syntax used to describe session types are as follows:
+The base sets of the syntax used to describe session types are as follows:
 
-\begin{itemize}
-	\item \emph{names}: ranged over by \emph{a,b...}
-	\item \emph{channels}: ranged over by \emph{k, k'...}
-	\item \emph{variables}: ranged over by \emph{x, y...}
-	\item \emph{constants}: ranged over by \emph{c, c'...}
-	\item \emph{expressions}: ranged over by \emph{e, e'...}
-	\item \emph{labels}: ranged over by \emph{l,l'...}
-	\item \emph{process variables}: ranged over by \emph{X, Y... u, u'...}
+\begin{itemize}[noitemsep]
+	\item[] \emph{names}: ranged over by \emph{a,b...}
+	\item[] \emph{channels}: ranged over by \emph{k, k'...}
+	\item[] \emph{variables}: ranged over by \emph{x, y...}
+	\item[] \emph{constants}: ranged over by \emph{c, c'...}
+	\item[] \emph{expressions}: ranged over by \emph{e, e'...}
+	\item[] \emph{labels}: ranged over by \emph{l,l'...}
+	\item[] \emph{process variables}: ranged over by \emph{X, Y... u, u'...}
 \end{itemize}
 
 \emph{processes}, ranged over by \texttt{P, Q...}, are given by the following 
@@ -775,14 +785,60 @@ grammar:
         | X[$\tilde{e}\tilde{k}$]                        process variables
 \end{lstlisting}
 \begin{lstlisting}
-        declaration for recursion
-    D ::= X$_1$($\tilde{x}_1\tilde{k}_1$) = P1 and ... and X$_n$($\tilde{x}_n\tilde{k}_n$) = P$_n$ 
+    D ::= X$_1$($\tilde{x}_1\tilde{k}_1$) = P1 and ...           declaration for recursion
+                and X$_n$($\tilde{x}_n\tilde{k}_n$) = P$_n$ 
 \end{lstlisting}
 
 ``$|$'' is the weakest association; the others listed have the same association. 
 Parenthesis denote binders which bind the corresponding free occurrences. We use standard simulataneous substitution, written $ $. The sets of free names/channels/variables/process variables of, for example program \texttt{P}, are written as \texttt{fn(P), fc(P), fv(P) and fpv(P)} respectively. Processes without free variables or free channels are called programs.
 
-\subsubsection{Basic Concepts}
+\paragraph{Operational Semantics}
+The consise definition of the operational semantics of session types requires the 
+definition of the concept \emph{structural congruence}, $\equiv$ \cite{BB92, M92},
+as the smallest congruence relation on processes. The following equations are
+presented as examples:
+\\
+
+\begin{lstlisting}
+                         P $\equiv$ Q if P $\equiv_\alpha$ Q
+                          P | inact $\equiv$ P, 
+                          P | Q $\equiv$ Q | P, 
+                    (P | Q) | R $\equiv$ P | (Q | R)
+                       ($vu$)inact $\equiv$ inact, 
+                ($vuu$)P $\equiv$ ($vu$)P, ($vuu'$)P $\equiv$ ($vu'u$)P, 
+              ($vu$)P | Q $\equiv$ ($vu$)(P | Q) if $u \notin$ fu(Q), 
+           ($vu$)def D in P $\equiv$ def D in ($vu$)P if $u \notin$ fu(D)
+   (def D in P) | Q $\equiv$ def D in (P | Q) if fpv(D) $\cap$ fpv(Q) = $\emptyset$
+    def D in (def D' in P) $\equiv$ def D and D' in P 
+                                       if fpv(D) $\cap$ fpv(D') = $\emptyset$
+\end{lstlisting} 
+
+The operation semantics are then represented using the \emph{reduction relation}, 
+$\rightarrow$. It is assumed the \emph{evaluation relation}, $\downarrow$, 
+is given and $\rightarrow^*$ represents the reflexive, transistive closure of 
+$\rightarrow$. Reduction is the smallest relation on processes and is demonstrated 
+by the following equations:
+\\
+
+\begin{lstlisting}
+ [Link]  (accept a(k) in P1) | (request a(k) in P2) 
+            $\rightarrow$ ($v$k)(P1 | P2)
+  [Com]  (k![$\tilde{e}$]; P1) | (k?($\tilde{x}$) in P2) 
+            $\rightarrow$ P1 | P2[$\tilde{c}/\tilde{x}$]                   ($\tilde{e} \downarrow \tilde{c}$)
+[Label]  (k $\triangleleft$ $\ell_i$; P) | (k $\triangleright$ {$\ell_1$:P$_1$[] ... []$\ell_n$:P$_n$}) 
+            $\rightarrow$ P | Pi                      (1 $\leq$ i $\leq$ n)
+ [Pass]  (throw k[k$_0$]; P$_1$) | (catch k(k$_0$) in P$_2$) 
+            $\rightarrow$ P1 | P2
+  [If1]  if e then P1 else P2 $\rightarrow$ P1        (e $\downarrow$ true)
+  [If2]  if e then P1 else P2 $\rightarrow$ P2        (e $\downarrow$ false)
+  [Def]  def D in (X[$\tilde{e}\tilde{k}$] | Q) 
+            $\rightarrow$ def D in (P[$\tilde{c}/\tilde{x}$] | Q)          ($\tilde{e} \downarrow \tilde{c}$, $\tilde{X}$ ($\tilde{x}\tilde{k}$) = P $\subset$ D)
+ [Scop]  P $\rightarrow$ P' $\Rightarrow$ ($v$u)P $\rightarrow$ ($v$u)P0
+  [Par]  P $\rightarrow$ P' $\Rightarrow$ P | Q $\rightarrow$ P' | Q
+  [Str]  P $\equiv$ P' and P' $\rightarrow$ Q' and Q' $\equiv$ Q $\Rightarrow$ P $\rightarrow$ Q
+\end{lstlisting}
+
+\paragraph{Basic Concepts}
 
 The central idea to presenting structure is the \emph{session}. A \emph{session} 
 is a set of reciprocal interactions between two parties and serves as a unit of 
@@ -861,52 +917,140 @@ organised by session:
 Operation Semantics of session types. Recursion could be achieved through 
 replication but multiple is preferable for well-structured programs.
 
-\subsubsection{Operational Semantics}
-The consise definition of the operational semantics of session types requires the 
-definition of the concept \emph{structural congruence}, $\equiv$ \cite{BB92, M92},
-as the smallest congruence relation on processes. The following equations are
-presented as examples:
+\subsubsection{Multi-Party Session Types}
+Multi-Party Asynchronous Session Types are a class of behavourial types
+specifically targeted at describing protocols in distribute systems
+based on asynchrounous communication\cite{CCPY15}. As described previously,
+communication interactions are intended to occur within the scope of many
+private channels following strict protocols which we have labelled as
+\emph{sessions}. In it's simplest form this takes place between just two
+peers, hence our previous focus on ``binary'' session types (also known as
+``dyadic''). In practice, a session can involve a variable number of peers
+and so we extend the concept of session types and communication protocol
+descriptions to involve the idea of \emph{multi-party} session types.
+
+Multi-party session types have extended binary session types in a manner
+that retains the intuitive natures of the syntax of the interactions. In
+binary session types this came from the inherant notion of ``duality'' in
+the interactions; a notion that is no longer effective in multi-party 
+sessions as the whole conversation between processes cannnot be constructed
+from a single behaviour. To handle this, multi-party session types
+introduces the concept of a global type; an abstraction of the global
+scenario, whereby we can construct the local types of each process and
+again ensure the composability of the interactions\cite{HYC08}. 
+
+First we will outline the formal syntax and operational semantics of 
+multi-party session types. After this we will detail the concepts behind 
+multi-party session types by way of examples.
+
+\paragraph{Extended Syntax}
+The base sets for multi-party session types are as found in the binary
+definition with one addition:
+
+\begin{itemize}[noitemsep]
+	\item[] \emph{participant number}: ranged over by \emph{p, q...}
+\end{itemize}
+
+We also define \emph{channel with role}, $s[p]$, as a runtime requirement
+(detailed fully after the refined process grammar).
+
+\emph{Process} syntax, such as session request/acceptance, value 
+send/receive, and channel delegation/reception, has been updated to reflect
+the multi-party nature of this communication. As in \cite{CCPY15}, the 
+calculus described here uses communication actions that specify exactly
+one receiver (rather than a non-empty set of receivers) and recursive
+definitions with exactly one data parametre and one channel parametre. Presenting
+the syntax in this manner simplifies the presentation of the material as
+allowing multiple receivers is largely a matter of syntactic sugar. The grammer
+for processes is presented next, with unchanged definitions ommitted for brevity:
 \\
 
 \begin{lstlisting}
-1) P $\equiv$ Q if P $\equiv_\alpha$ Q
-2) P | inact $\equiv$ P, 
-   P | Q $\equiv$ Q | P, 
-   (P | Q) | R $\equiv$ P | (Q | R)
-3) ($vu$)inact $\equiv$ inact, 
-   ($vuu$)P $\equiv$ ($vu$)P, 
-   ($vuu'$)P $\equiv$ ($vu'u$)P, 
-   ($vu$)P | Q $\equiv$ ($vu$)(P | Q) if $u \notin$ fu(Q), 
-   ($vu$)def D in P $\equiv$ def D in ($vu$)P if $u \notin$ fu(D)
-4) (def D in P) | Q $\equiv$ def D in (P | Q) if fpv(D) $\cap$ fpv(Q) = $\emptyset$
-5) def D in (def D' in P) $\equiv$ def D and D' in P 
-                                    if fpv(D) $\cap$ fpv(D') = $\emptyset$
-\end{lstlisting} 
-
-The operation semantics are then represented using the \emph{reduction relation}, 
-$\rightarrow$. It is assumed the \emph{evaluation relation}, $\downarrow$, 
-is given and $\rightarrow^*$ represents the reflexive, transistive closure of 
-$\rightarrow$. Reduction is the smallest relation on processes and is demonstrated 
-by the following equations:
-\\
-
-\begin{lstlisting}
-[Link]  (accept a(k) in P1) | (request a(k) in P2) 
-            $\rightarrow$ ($v$k)(P1 | P2)
-[Com]   (k![$\tilde{e}$]; P1) | (k?($\tilde{x}$) in P2) 
-            $\rightarrow$ P1 | P2[$\tilde{c}/\tilde{x}$]                   ($\tilde{e} \downarrow \tilde{c}$)
-[Label] (k $\triangleleft$ $\ell_i$; P) | (k $\triangleright$ {$\ell_1$:P$_1$[] ... []$\ell_n$:P$_n$}) 
-            $\rightarrow$ P | Pi                      (1 $\leq$ i $\leq$ n)
-[Pass]  (throw k[k$_0$]; P$_1$) | (catch k(k$_0$) in P$_2$) 
-            $\rightarrow$ P1 | P2
-[If1]   if e then P1 else P2 $\rightarrow$ P1         (e $\downarrow$ true)
-[If2]   if e then P1 else P2 $\rightarrow$ P2         (e $\downarrow$ false)
-[Def]   def D in (X[$\tilde{e}\tilde{k}$] | Q) 
-            $\rightarrow$ def D in (P[$\tilde{c}/\tilde{x}$] | Q)          ($\tilde{e} \downarrow \tilde{c}$, $\tilde{X}$ ($\tilde{x}\tilde{k}$) = P $\subset$ D)
-[Scop]  P $\rightarrow$ P' $\Rightarrow$ ($v$u)P $\rightarrow$ ($v$u)P0
-[Par]   P $\rightarrow$ P' $\Rightarrow$ P | Q $\rightarrow$ P' | Q
-[Str]   P $\equiv$ P' and P' $\rightarrow$ Q' and Q' $\equiv$ Q $\Rightarrow$ P $\rightarrow$ Q
+    P ::= $\bar{u}$[p](y).P              multicast request
+        | u[p](y).P             multicast accept
+        | c!<p,e>.P             value sending
+        | c?(p,x).P             value reception
+        | c!<<p,c'>>.P          channel delegation
+        | c?((q,y)).P           channel reception
+        | c $\oplus$ <p,l>.P            selection
+        | c $\&$ (p,$\{$l$_i$:P$_i\}_{i \in I}$)            branching
+        | X <e,c>               process call
+        | ($v$a)p                  service name hiding
+        | ($v$s)P                  session hiding
+        | s : h                 message queue
 \end{lstlisting}
+
+Session hiding and message queue are elements of \emph{runtime syntax}, 
+as was channel with role. The operational semantics of session types are
+defined by reduction rules, given in the next section. With these, it is
+helpful to define these runtime states to account for communication situations
+that arise within a programs lifetime but are not necessarily visable from
+the program's source. Message queues are used to enable the modelling of
+TCP-like asynchronous communications.
+
+In \texttt{(vs)P} all occurances of \texttt{s[p]} and the queue \texttt{s}
+inside \texttt{P} are bound. A process is \emph{closed} if the only free 
+names in it a are service names. \texttt{fn(Q)(fn(D))} is the set of free 
+names in \texttt{Q(D)}. The set of process variables declared in D and the 
+set of process variables that occur free in Q are \texttt{dpv(D)} and 
+\texttt{fpv(Q)} respectively.
+
+\paragraph{Extended Operational Semantics}
+In addition to the standard rules of structural congruence, multi-party session
+types include a rule for rearranging messages in a queue when the senders or
+receivers are not the same:
+\\
+
+\begin{lstlisting}
+                            P | 0 $\equiv$ P
+                            P | Q $\equiv$ Q | P
+                      (P | Q) | R $\equiv$ P | (Q | R)
+                 ($v$r)P | Q $\equiv$ ($v$r)(P | Q)  if r $\notin$ fn(Q)
+         ($v$r)($v$r')P $\equiv$ ($v$r')($v$r)P, ($v$a) 0 $\equiv$ 0, ($v$s)(s:$\emptyset$) $\equiv$ 0
+                        where r ::= a | s
+
+                       def D in 0 $\equiv$ 0
+      def D in ($v$r)P $\equiv$ ($v$r)def D in P         if r $\notin$ fn(D)
+   (def D in P) | Q $\equiv$ def D in (P | Q)      if dpv(D) $\cap$ fpv(Q) = $\emptyset$
+
+           def D in (def D' in P) $\equiv$ def D' in (def D in P)
+ if (dpv(D) $\bigcup$ fpv(D)) $\cap$ dpv(D') = dpv(D) $\cap$ (dpv(D') $\bigcup$ fpv(D')) = $\emptyset$
+
+s:h$\cdotp$(q,p,$\xi$)$\cdotp$(q',p',$\xi$')$\cdotp$h' $\equiv$ s:h$\cdotp$(q',p',$\xi$')$\cdotp$(q,p,$\xi$)$\cdotp$h'  if p $\neq$ p' or q $\neq$ q'
+\end{lstlisting}
+
+Next we present the rules for reducing processes where $\rightarrow^*$ and 
+$\rightarrow^k$ have the usual expected meaning. These rules describe the
+initialisation of sessions, value passing, output rules and their complementary
+input rules. These operations ensure that the senders match and that the message
+is meant for the specified receiver:
+\\
+
+\begin{lstlisting}
+    [Init]  a[1](y).P$_1$ | $\ldots$ | a[n-1](y).P$_{n-1}$ | $\bar{a}$[n](y).P$_n$ 
+	$\rightarrow$ ($v$s)(P$_1${s[1]/y} | $\ldots$ | P$_{n-1}${s[n-1]/y} | P$_n${s[n]/y} | s:$\emptyset$)
+    [Send]  s[p]!<q,e>/P | s:h 
+        $\rightarrow$ P | s:h$\cdotp$(p,q,$v$)                           (e $\downarrow$ $v$)
+   [Deleg]  s[p]!<<q,s'[p']>>.P | s:h $\rightarrow$ P | s:h$\cdotp$(p,q,s'[p'])
+     [Sel]  s[p]$\oplus$<l,q>.P | s:h         $\rightarrow$ P | s:h$\cdotp$(p,q,l)
+     [Rev]  s[p]?(q,x).P | s:(q,p,$v$)$\cdotp$h $\rightarrow$ P{$v$/x} | s:h
+    [Srev]  s[p]?((q,y)).P | s:(q,p,s'[p'])$\cdotp$h 
+        $\rightarrow$ P{s'[p']/y} | s:h
+  [Branch]  s[p]$\&$(q, {l$_i$}:P$_i)_{i \in I}$) | s:(q,p,l$_j$)$\cdotp$h 
+	$\rightarrow$ P$_j$ | s:h (j $\in$ I)
+    [If-t]  if e then P else Q $\rightarrow$ P                (e $\downarrow$ true)
+    [If-f]  if e then P else Q $\rightarrow$ Q                (e $\downarrow$ false)
+[Proccall]  def X(x,y) = P in (X<e,s[p]> | Q) 
+	$\rightarrow$ def X(x,y) = P in (P{$v$/x}{s[p]/y} | Q)  (e $\downarrow$ $v$)
+
+     [Str]  P $\equiv$ P' and p' $\rightarrow$ Q and Q $\equiv$ Q' $\Rightarrow$ P $\rightarrow$ Q
+\end{lstlisting}
+
+\paragraph{Extended Concepts}
+% important to get a good working example going to demonstrate global typings
+% go into detail about projection here
+% cover the other one in implementation to reduce repetition?
+\newpage
 
 \subsection{Related Work}
 This section discusses much of the work discovered during the intial research 
@@ -987,94 +1131,132 @@ and implemented using multiparty session types; a further extension to the
 binary session types discussed earlier.
 \newpage
 
-\section{Going Forward}
-This section illustrates the plan of action laid out for the rest of the 
-project over the next few months. The first section illustrates the rough
-idea of how long each implementation of the program features will take, 
-with documentation and evaluation time factored in. After that is the 
-outline of how the project will be evaluated.
+\section{Technical Details}
+\subsection{Ruby/C++}
 
-\subsection{Project Outline}
+% comments on the three different methods available?
 
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=\textwidth]{images/gantt-two.png}
-\end{figure}
+\subsection{Timing Tree}
 
-The weeks of the 16\textsuperscript{th} and 23\textsuperscript{th} of March are reserved for revision and
-exam times. Before this work load is spread with consideration for courseworks
-and after this most of the time is allocated with project work in mind. Core
-requirements are aimed to be completed by the end of the Easter break. The weeks 
-after that can be used as contingency in the case of unforseen circumstances, or
-for some extension work as suggested below.
+% some basic compiler type theory here would be good
+% building of AST to traverse for information
 
-\begin{itemize}
-	\item SetUp Parser: The bulk of the work cannot be completed without a good 
-	representation of the AST of the language. Some time will be spent finding 
-	one that is easy to use and descriptive.
-	\item Timing Effects Features: The aim will be for the program to parse a 
-	Sonic Pi code piece provided to it and be able to calculate the virtual time 
-	of the program at each stage. The implementation is broken into different 
-	steps, Constant Timing being the parsing of simple constant expression, 
-	Variable Timing and Function Timing being those more complex timing elements 
-	where variables are passed to different functions in the code or when the 
-	timing is dynamically calculated.
-	\item Formalise Session Types: The current form of Sonic Pi does not have a 
-	full description of the application of session types to the language. The
-	idea is to define the formalisation of the theory of session types applied
-	to Sonic Pi, including local branching, recursion and delegation.
-	\item Implementing Types: This continues the previous point, the idea being 
-	to physically implement the features within the language. This will also act 
-	as tests that the formalisation is written well enough.
-	\item System Hook: Run the verification within the real Sonic Pi IDE
-	\item Cue/Sync Extensions: Currently the cue and sync primitives are very 
-	simplistic, they have no ability to choose what to send and receive in their 
-	messages. This extension will look into building on these primitives and 
-	consider channel passing within session types. There is time allocated for 
-	formalising the initial ideas and then implementing these into the language.
-\end{itemize}
+% why is a second pass for round up information fine?
 
-All items have been allocated some time to write up information about the tasks 
-completed, both in terms of report details and any evaluation data presented. 
-This will ensure maximum utilisation of the time allocated for reporting at the 
-end of the project. Report Submission is dated for the week of the 15
-\textsuperscript{th} of June. Presentation planning will overlap with this final 
-week of reporting as presentations will be given the following week.
+\subsection{Session Graph}
 
-\subsection{Evaluation Outline}
-As this is an educational program it would be ideal if some evaluation would 
-take the form of user studies of Sonic Pi and the extensions made in this 
-project. User groups could contain both those who have used the system before 
-and those who have not, split equally between those who have a technical 
-background and those who have none. It would be interesting to note whether 
-any of those in the User Groups maintained any other creative hobbies outside 
-of this field and how many had some kind of musical awareness and relate this 
-to their reports and the overall findings of the tests.
+% recap important parts of MPST
+% start by explaining the theory of the approach
 
-Another piece that would be of interest would be discovering the execution 
-times of the project on the different architectures that are available. Part 
-of the objectives of the project is to provide a small verification system to 
-run in parallel with a currently running program thread. For this to be a 
-viable addition it must be fast and efficient enough not to interrupt with the 
-existing functionality. On the Windows and Mac versions of the system it is 
-unlikely to make much impact but the Raspberry Pi system is much smaller in 
-it's capabilities.
+% what information was important, why did this link up with session graph?
 
-Lee et al. \cite{LDW87} proposed six features required for a programming environment 
-with a ``first class'' semantics for time:
 
-\begin{itemize}
-	\item The ability to express timing constraints
-	\item Timed communication
-	\item Enforcement of timing constraints
-	\item Tolerance to violations and constraints
-	\item Maintaining consistency in distributed realtime systems
-	\item Static timing verification
-\end{itemize}
 
-On the conclucion of the project we will seek to see how well the extended Sonic 
-Pi application is able to address these issues, to see if it may be described as 
-having a ``first class'' semantics.
+\section{Evaluation}
+
+% notes on speed of data transfer between ruby and C application
+
+% some self evaluation here?
+% -> attempt at boost library and why that was dropped?
+
+% ease of use when put into sonic-pi
+% use of information
+% technical and non technical
+
+\section{Conclusion}
+
+\subsection{Achievement Summary}
+
+\subsection{Future Work}
+
+% \section{Going Forward}
+% This section illustrates the plan of action laid out for the rest of the 
+% project over the next few months. The first section illustrates the rough
+% idea of how long each implementation of the program features will take, 
+% with documentation and evaluation time factored in. After that is the 
+% outline of how the project will be evaluated.
+
+% \subsection{Project Outline}
+
+% \begin{figure}[ht]
+% 	\centering
+% 	\includegraphics[width=\textwidth]{images/gantt-two.png}
+% \end{figure}
+
+% The weeks of the 16\textsuperscript{th} and 23\textsuperscript{th} of March are reserved for revision and
+% exam times. Before this work load is spread with consideration for courseworks
+% and after this most of the time is allocated with project work in mind. Core
+% requirements are aimed to be completed by the end of the Easter break. The weeks 
+% after that can be used as contingency in the case of unforseen circumstances, or
+% for some extension work as suggested below.
+
+% \begin{itemize}
+% 	\item SetUp Parser: The bulk of the work cannot be completed without a good 
+% 	representation of the AST of the language. Some time will be spent finding 
+% 	one that is easy to use and descriptive.
+% 	\item Timing Effects Features: The aim will be for the program to parse a 
+% 	Sonic Pi code piece provided to it and be able to calculate the virtual time 
+% 	of the program at each stage. The implementation is broken into different 
+% 	steps, Constant Timing being the parsing of simple constant expression, 
+% 	Variable Timing and Function Timing being those more complex timing elements 
+% 	where variables are passed to different functions in the code or when the 
+% 	timing is dynamically calculated.
+% 	\item Formalise Session Types: The current form of Sonic Pi does not have a 
+% 	full description of the application of session types to the language. The
+% 	idea is to define the formalisation of the theory of session types applied
+% 	to Sonic Pi, including local branching, recursion and delegation.
+% 	\item Implementing Types: This continues the previous point, the idea being 
+% 	to physically implement the features within the language. This will also act 
+% 	as tests that the formalisation is written well enough.
+% 	\item System Hook: Run the verification within the real Sonic Pi IDE
+% 	\item Cue/Sync Extensions: Currently the cue and sync primitives are very 
+% 	simplistic, they have no ability to choose what to send and receive in their 
+% 	messages. This extension will look into building on these primitives and 
+% 	consider channel passing within session types. There is time allocated for 
+% 	formalising the initial ideas and then implementing these into the language.
+% \end{itemize}
+
+% All items have been allocated some time to write up information about the tasks 
+% completed, both in terms of report details and any evaluation data presented. 
+% This will ensure maximum utilisation of the time allocated for reporting at the 
+% end of the project. Report Submission is dated for the week of the 15
+% \textsuperscript{th} of June. Presentation planning will overlap with this final 
+% week of reporting as presentations will be given the following week.
+
+% \subsection{Evaluation Outline}
+% As this is an educational program it would be ideal if some evaluation would 
+% take the form of user studies of Sonic Pi and the extensions made in this 
+% project. User groups could contain both those who have used the system before 
+% and those who have not, split equally between those who have a technical 
+% background and those who have none. It would be interesting to note whether 
+% any of those in the User Groups maintained any other creative hobbies outside 
+% of this field and how many had some kind of musical awareness and relate this 
+% to their reports and the overall findings of the tests.
+
+% Another piece that would be of interest would be discovering the execution 
+% times of the project on the different architectures that are available. Part 
+% of the objectives of the project is to provide a small verification system to 
+% run in parallel with a currently running program thread. For this to be a 
+% viable addition it must be fast and efficient enough not to interrupt with the 
+% existing functionality. On the Windows and Mac versions of the system it is 
+% unlikely to make much impact but the Raspberry Pi system is much smaller in 
+% it's capabilities.
+
+% Lee et al. \cite{LDW87} proposed six features required for a programming environment 
+% with a ``first class'' semantics for time:
+
+% \begin{itemize}
+% 	\item The ability to express timing constraints
+% 	\item Timed communication
+% 	\item Enforcement of timing constraints
+% 	\item Tolerance to violations and constraints
+% 	\item Maintaining consistency in distributed realtime systems
+% 	\item Static timing verification
+% \end{itemize}
+
+% On the conclucion of the project we will seek to see how well the extended Sonic 
+% Pi application is able to address these issues, to see if it may be described as 
+% having a ``first class'' semantics.
 
 % \section{Final Thoughts}
 
@@ -1090,7 +1272,7 @@ having a ``first class'' semantics.
   \emph{http://www.raspberrypi.org/about/}
 
 \bibitem{AB13}
-  Aaron, S. and Blackwell, A.F.,
+  Aaron, S., and Blackwell, A.F.,
   \emph{From Sonic Pi to Overtone: Creative Musical Experiences with Domain-Specific and Functional Languages},
   The First ACM SIGPLAN Workshop on Functional Art, Music, Modeling \& Design,
   Boston, Massachusetts, USA,
@@ -1098,45 +1280,51 @@ having a ``first class'' semantics.
   (2013)
 
 \bibitem{AOB14}
-  Aaron, S., Orchard, D. and Blackwell, A.F.,
+  Aaron, S., Orchard, D., and Blackwell, A.F.,
   \emph{Temporal Semanics for a Living Coding Language},
   Proceedings of the 2nd ACM SIGPLAN International Workshop on Functional Art, Music, Modeling \& Design,
   Sweden, ACM, pp. 37-47,
   (2014)
 
 \bibitem{BAD14}
-  Blackwell, A.F., Aaron, S. and Drury, R., 
+  Blackwell, A.F., Aaron, S., and Drury, R., 
   \emph{Exploring Creative Learning for the Internet of Things Era},
   In B. du Boulay and J. Good (Eds) Proceedings of the Psychology of Programming Interest Group Annual Conference, 
   pp. 147-158,
   (PPIG 2014)
 
 \bibitem{BB92}
-  Berry, G. and Boudol, G.,
+  Berry, G., and Boudol, G.,
   \emph{The chemical abstract machine},
   TCS, 96 pp.217–248, 
   (1992)
 
 \bibitem{BC05}
-  Blackwell, A.F. and Collins, N.,
+  Blackwell, A.F., and Collins, N.,
   \emph{The Programming Language as a Musical Instrument},
   In Proceedings of the Psychology of Programming Interest Group Annual Conference,
   pp. 120-130,
   (PPIG 2005)
 
 \bibitem{BMNR14}
-  Blackwell, A., McLean, A., Noble, J. and Rohrhuber, J.,
+  Blackwell, A., McLean, A., Noble, J., and Rohrhuber, J.,
   \emph{Collaboration and Learning Through Live Coding},
   Dagsthul Seminar, Dagstuhl Reports 3,
   no. 9, pp. 130-168,
   (2014)
 
 \bibitem{Ch12}
-  Church, L., Rothwell, N., Downie, M., deLahunta, S. and Blackwell, A.F.,
+  Church, L., Rothwell, N., Downie, M., deLahunta, S., and Blackwell, A.F.,
   \emph{Sketching by Programming in the Choreohraphic Language Agent},
   In Proceedings of the Psychology of Programming Interest Group Annual Conference,
   pp. 163-174,
   (PPIG 2012)
+
+\bibitem{CCPY15}
+  Coppo, M., Dezani-Ciancaglini, M., Padovani, L., and Yoshida, N.,
+  \emph{A Gentle Introduction to Multiparty Asynchronous Session Types},
+  SFM 2015, LNCS 9104, pp. 146-178,
+  (2015)
 
 \bibitem{DfEO13}
   Department for Education and Ofsted,
@@ -1152,25 +1340,32 @@ having a ``first class'' semantics.
   (2013)
 
 \bibitem{HJ94}
-  Hansson, H. and Jonsson, B.,
+  Hansson, H., and Jonsson, B.,
   \emph{A Logic for Reasoning About Time and Reliability},
   Formal Aspects of Computing 9,
   no 5., pp. 512-535,
   (1994)
 
 \bibitem{HMBCY11}
-  Honda, K., Mukhamedov, A., Brown, G., Chen, T. and Yoshida, N.,
+  Honda, K., Mukhamedov, A., Brown, G., Chen, T., and Yoshida, N.,
   \emph{Scribbling Interactions with a Formal Foundation},
   In 7th International Conference on Distributed Computing and Internet Technology,
-  p. 55 - 75,
+  p. 55-75,
   (ICDCIT 2011)
 
 \bibitem{HVM98}
-  Honda, K., Vasconcelos, V.T. and Kubo, M.,
+  Honda, K., Vasconcelos, V.T., and Kubo, M.,
   \emph{Language Primitives and Type Disciplines for Structured Communication-Based Programming},
   ESOP'98, LNCS 1381,
   pp. 22-38,
   (1998)
+
+\bibitem{HYC08}
+  Honda, K., Yoshida, N., and Carbone, M.,
+  \emph{Multiparty Asynchronous Session Types},
+  POPL'08, San Francisco, Calfornia, USA,
+  pp. 273-284,
+  (2008)
 
 \bibitem{IG13}
   The IEEE and The Open Group,
@@ -1201,41 +1396,41 @@ having a ``first class'' semantics.
   (2013)
 
 \bibitem{ME14}
-  McDirmid, S. and Edwards, J.,
+  McDirmid, S., and Edwards, J.,
   \emph{Programming with Managed Time},
   Tech. Report, Microsoft,
   (2014)
 
 \bibitem{NY14}
-  Ng, N. and Yoshida, N.,
+  Ng, N., and Yoshida, N.,
   \emph{Pabble: Parameterised Scribble for Parallel Programming},
   In 22nd Euromicro International Conference on Parallel, Distributed and Network-Based Processing, 
   p. 707 - 714,
   (PDP 2014)
 
 \bibitem{LDW87}
-  Lee, I., Davidson, S. and Wolfe, V.,
+  Lee, I., Davidson, S., and Wolfe, V.,
   \emph{Motivating Time as a First Class Entity},
   Technical Reports (CIS),
   pp. 288,
   (1987)
 
 \bibitem{SG10}
-  Sorensen, A. and Gardner, H.,
+  Sorensen, A., and Gardner, H.,
   \emph{Programming with Time: Cyber-Physical Programming with Impromptu},
   ACM Sigplan Notcies 45,
   no. 10, 822-834,
   (2010)
 
 \bibitem{W10}
-  Woolford, K., Blackwell, A.F., Norman, S.J. \& Chevalier, C.,
+  Woolford, K., Blackwell, A.F., Norman, S.J., and Chevalier, C.,
   \emph{Crafting a Critical Technical Practice},
   Leonardo 43(2),
   202-203,
   (2010)
 
 \bibitem{WC03}
-  Wang, G. and Cook, P.R.,
+  Wang, G., and Cook, P.R.,
   \emph{ChucK: A Concurrent, On-The-Fly Audo Programming Language},
   International Computer Music Conference,
   pp. 1-8,
@@ -1249,7 +1444,7 @@ having a ``first class'' semantics.
   (2006)
 
 \bibitem{YT87}
-  Yonezawa, A. and Tokoro, M.,
+  Yonezawa, A., and Tokoro, M.,
   \emph{Object-Oriented Concurrent Programming},
   MIT Press,
   (1987)
