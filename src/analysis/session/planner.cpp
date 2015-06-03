@@ -40,7 +40,7 @@ graph::SyncNode* Planner::makeSync(int line, std::string symbol)
 void Planner::makeGraph(ast::NodeTree* tree)
 {
 	int currBlk = 0;
-
+	bool timeProgression = false;
 	std::stack<graph::GraphNode*> symbols;
 
 	ast::TreeIterator start = tree->begin();
@@ -49,16 +49,22 @@ void Planner::makeGraph(ast::NodeTree* tree)
 	for (ast::TreeIterator it = start; it != end; ++it)
 	{
 		ast::VisitableNode* curr = &(*it);
+		std::cout << "CURR VALUE: " << curr->value << "\n";
 		if (curr->value == "block")
 		{
 			if (!symbols.empty())
 			{
+				if (timeProgression)
+				{
+					symbols.push(new graph::GraphNode());
+					updateIndex();
+					timeProgression = false;
+				}
 				makeSubGraph(symbols);
 			}
 			++currBlk;
 		}
 
-		bool timeProgression = false;
 		graph::GraphNode* node = NULL;
 		if (curr->value == "cue")
 		{
@@ -75,13 +81,16 @@ void Planner::makeGraph(ast::NodeTree* tree)
 			node = syncNode;
 		} 
 		
-		timeProgression = (curr->value == "sleep");
+		if (curr->value == "sleep")
+		{
+			timeProgression = true;
+		}
 
 		if (node)
 		{
 			symbols.push(node);
 			updateIndex();
-
+			std::cout << timeProgression << "\n";
 			// empty node to mark message clusters in processes
 			if (timeProgression)
 			{
@@ -92,6 +101,13 @@ void Planner::makeGraph(ast::NodeTree* tree)
 		}
 	}
 
+	// catch last sleeps
+	if (timeProgression)
+	{
+		symbols.push(new graph::GraphNode());
+		updateIndex();
+		timeProgression = false;
+	}
 	// catch last block
 	makeSubGraph(symbols);
 	graph->setNodeCount(getIndex());
@@ -105,6 +121,7 @@ void Planner::makeSubGraph(std::stack<graph::GraphNode*>& symbols)
 	sub->name.append("P").append(std::to_string(subCount++));
 
 	bool flag = true;
+	std::cout << "Symbol size: " << symbols.size() << "\n";
 	while (!symbols.empty())
 	{
 		node = *(&symbols.top());
