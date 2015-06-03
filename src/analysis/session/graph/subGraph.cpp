@@ -9,6 +9,16 @@ SubGraph::SubGraph()
 	lastIndex  = -1;
 }
 
+graph::SGIterator SubGraph::begin()
+{
+	return *(new SGIterator(*this));
+}
+
+graph::SGIterator SubGraph::end()
+{
+	return *(new SGIterator(*this, true));
+}
+
 void SubGraph::addNode(graph::GraphNode* node)
 {
 	nodes.push_front(node);

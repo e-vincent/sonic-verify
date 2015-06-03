@@ -12,6 +12,7 @@
 
 #include "analysis/session/graph/nodes/nodes.h"
 #include "analysis/session/graph/subGraph.h"
+#include "analysis/session/graph/sgIterator.h"
 
 namespace graph
 {

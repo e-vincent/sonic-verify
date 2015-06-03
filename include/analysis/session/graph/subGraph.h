@@ -7,6 +7,7 @@
 #include <map>
 #include <vector>
 
+#include "analysis/session/graph/sgIterator.h"
 #include "analysis/session/graph/nodes/graphNode.h"
 #include "analysis/session/graph/typeVisitor.h"
 
@@ -30,20 +31,24 @@ struct arcData
     }
 };
 
+class SGIterator;
+
 class SubGraph
 {
 private:
 	int firstIndex;
 	int lastIndex;
-	std::list<graph::GraphNode*> nodes;
-	std::map<int, int> arcs;
 	std::string processType;
-	// char* consumableType;
 
 public:
+	std::list<graph::GraphNode*> nodes;
+	std::map<int, int> arcs;
 	std::string name;
 
 	SubGraph();
+
+	SGIterator begin();
+	SGIterator end();
 
 	void addNode(graph::GraphNode* node);
 	void addArc(int from, int to);
@@ -56,9 +61,6 @@ public:
 	bool inrange(int index);
 
 	std::string sType();
-	// char* consumableSType();
-	// void setConsumableSType();
-	// void setConsumableSType(char* type);
 	void constructType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs);
 };
 

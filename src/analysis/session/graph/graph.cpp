@@ -129,9 +129,27 @@ void Graph::printTypes()
 
 void Graph::printGlobal()
 {
-	std::vector<std::string> matcher;
+	std::vector<graph::SGIterator> it_store;
+	std::vector<graph::SGIterator> end_store;
 	std::cout << "Node Count: " << size() << "\n";
 
+	for (auto sub : blocks)
+	{
+		it_store.push_back(sub->begin());
+		end_store.push_back(sub->end());
+	}
+
+	for (int i = 0; i < (int)it_store.size(); ++i)
+	{
+		auto it  = it_store[i];
+		auto end = end_store[i];
+
+		while(it != end)
+		{
+			std::cout << (&(*it))->toSType() << "\n";
+			++it;
+		}
+	}
 
 	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
 	// boost::char_separator<char> sep(":");

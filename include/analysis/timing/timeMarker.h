@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "parse/builder.h"
-#include "parse/treeIterator.h"
+#include "parse/ast/treeIterator.h"
 #include "parse/ast/vTimeVisitor.h"
 
 #include "parse/ast/nodes/visitableNode.h"

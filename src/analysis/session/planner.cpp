@@ -58,7 +58,7 @@ void Planner::makeGraph(ast::NodeTree* tree)
 			++currBlk;
 		}
 
-		//bool timeProgression = false;
+		bool timeProgression = false;
 		graph::GraphNode* node = NULL;
 		if (curr->value == "cue")
 		{
@@ -74,15 +74,21 @@ void Planner::makeGraph(ast::NodeTree* tree)
 			graph->addToArc(syncNode, subCount);
 			node = syncNode;
 		} 
-		else if (curr->value == "sleep")
-		{
-			std::cout << "Found Sleep\n";
-		}
+		
+		timeProgression = (curr->value == "sleep");
 
 		if (node)
 		{
 			symbols.push(node);
 			updateIndex();
+
+			// empty node to mark message clusters in processes
+			if (timeProgression)
+			{
+				symbols.push(new graph::GraphNode());
+				updateIndex();
+				timeProgression = false;
+			}
 		}
 	}
 

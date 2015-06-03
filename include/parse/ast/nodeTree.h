@@ -5,7 +5,7 @@
 #include <iterator>
 #include <memory>
 
-#include "parse/treeIterator.h"
+#include "parse/ast/treeIterator.h"
 #include "parse/ast/nodes/visitableNode.h"
 #include "analysis/pTrace.h"
 
