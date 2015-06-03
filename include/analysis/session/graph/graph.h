@@ -8,6 +8,8 @@
 #include <list>
 #include <vector>
 
+#include <boost/tokenizer.hpp>
+
 #include "analysis/session/graph/nodes/nodes.h"
 #include "analysis/session/graph/subGraph.h"
 
@@ -39,6 +41,7 @@ public:
 	void printGlobal();
 	void printSubType(int block);
 	int blockCount();
+	bool dual(char one, char two);
 };
 
 

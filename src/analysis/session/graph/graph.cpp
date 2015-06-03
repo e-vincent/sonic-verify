@@ -121,34 +121,25 @@ void Graph::printTypes()
 {
 	for (auto sub : blocks)
 	{
-		sub->printType(arcs);
+		sub->constructType(arcs);
+		std::cout << "SubGraph " << sub->name 
+			<< "\n has processType " << sub->sType() << "\n";
 	}
 }
 
 void Graph::printGlobal()
 {
+	std::vector<std::string> matcher;
 	std::cout << "Node Count: " << size() << "\n";
-	for (auto sub : blocks)
-	{
-		sub->setConsumableSType();
-	}
 
-	for (auto sub : blocks)
-	{
-		if (sub->consumableSType() != NULL)
-		{
-			sub->setConsumableSType(strtok(sub->consumableSType(), "."));			
-		}
 
-		std::cout << sub->consumableSType() << "\n";
+	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+	// boost::char_separator<char> sep(":");
+	// tokenizer tok(sub->sType(), sep);
+	// for(tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
+	// {
 
-		if (sub->consumableSType() != NULL)
-		{
-			sub->setConsumableSType(strtok(NULL, "."));			
-		}
-
-		std::cout << sub->consumableSType() << "\n";
-	}
+	// }		
 }
 
 void Graph::printSubType(int block)
@@ -159,6 +150,12 @@ void Graph::printSubType(int block)
 int Graph::blockCount()
 {
 	return blocks.size();
+}
+
+bool Graph::dual(char one, char two)
+{
+	return ((one == '!') && (two == '?')) 
+			|| ((one == '?') && (two == '!'));
 }
 
 } // namespace graph

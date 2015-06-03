@@ -38,7 +38,7 @@ private:
 	std::list<graph::GraphNode*> nodes;
 	std::map<int, int> arcs;
 	std::string processType;
-	char* consumableType;
+	// char* consumableType;
 
 public:
 	std::string name;
@@ -56,10 +56,10 @@ public:
 	bool inrange(int index);
 
 	std::string sType();
-	char* consumableSType();
-	void setConsumableSType();
-	void setConsumableSType(char* type);
-	void printType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs);
+	// char* consumableSType();
+	// void setConsumableSType();
+	// void setConsumableSType(char* type);
+	void constructType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs);
 };
 
 } // namespace graph

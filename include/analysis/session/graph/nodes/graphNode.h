@@ -30,7 +30,7 @@ public:
 	virtual std::string toSType();
 
 	virtual void accept(analysis::TypeVisitor*) {};
-	virtual void accept(analysis::TypeVisitor*, std::string&, std::vector<std::pair<std::string, std::string>>) {};
+	virtual void accept(analysis::TypeVisitor*, std::vector<std::pair<std::string, std::string>>) {};
 };
 
 } // namespace analysis

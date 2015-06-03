@@ -67,25 +67,33 @@ bool SubGraph::inrange(int index)
 
 std::string SubGraph::sType()
 {
+	for (auto node : nodes)
+	{
+		processType.append(node->toSType());
+		processType.append(".");
+	}
+
+	// take out last .
+	processType.erase(processType.length() - 1);
 	return processType;
 }
 
-char* SubGraph::consumableSType()
-{
-	return consumableType;
-}
+// char* SubGraph::consumableSType()
+// {
+// 	return consumableType;
+// }
 
-void SubGraph::setConsumableSType()
-{
-	consumableType = &processType[0];
-}
+// void SubGraph::setConsumableSType()
+// {
+// 	consumableType = &processType[0];
+// }
 
-void SubGraph::setConsumableSType(char* type)
-{
-	consumableType = type;
-}
+// void SubGraph::setConsumableSType(char* type)
+// {
+// 	consumableType = type;
+// }
 
-void SubGraph::printType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs)
+void SubGraph::constructType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs)
 {
 	analysis::TypeVisitor* visitor = new analysis::TypeVisitor();
 	// std::cout << name << "\n";
@@ -112,15 +120,12 @@ void SubGraph::printType(std::map<std::pair<arcData, std::string>, std::vector<s
 			}
 		}
 
-		node->accept(visitor, processType, interactions);
+		node->accept(visitor, interactions);
 		// for (auto action : interactions)
 		// {
 		// 	std::cout << action.first << " " << action.second << "\n";
 		// }
 	}
-
-	std::cout << "SubGraph " << name 
-		<< "\n has processType " << processType << "\n";
 
 	delete visitor;
 }

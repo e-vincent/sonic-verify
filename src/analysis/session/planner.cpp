@@ -58,6 +58,7 @@ void Planner::makeGraph(ast::NodeTree* tree)
 			++currBlk;
 		}
 
+		//bool timeProgression = false;
 		graph::GraphNode* node = NULL;
 		if (curr->value == "cue")
 		{
@@ -66,13 +67,16 @@ void Planner::makeGraph(ast::NodeTree* tree)
 			graph->startArc(cueNode, subCount);
 			node = cueNode;
 		} 
-		
-		if (curr->value == "sync")
+		else if (curr->value == "sync")
 		{
 			ast::VisitableNode* next  = &(*(++it));
 			graph::SyncNode* syncNode = makeSync(curr->line(), next->acceptType());
 			graph->addToArc(syncNode, subCount);
 			node = syncNode;
+		} 
+		else if (curr->value == "sleep")
+		{
+			std::cout << "Found Sleep\n";
 		}
 
 		if (node)

@@ -10,10 +10,10 @@ void TypeVisitor::visit(graph::CueNode* cueNode)
 	cueNode->setSType("!");
 }
 
-void TypeVisitor::visit(graph::CueNode* cueNode, std::string& type, 
+void TypeVisitor::visit(graph::CueNode* cueNode, 
 		std::vector<std::pair<std::string, std::string>> interactions)
 {
-	typer(cueNode, type, "&&", interactions);
+	typer(cueNode, "&&", interactions);
 }
 
 void TypeVisitor::visit(graph::SyncNode* syncNode)
@@ -21,13 +21,13 @@ void TypeVisitor::visit(graph::SyncNode* syncNode)
 	syncNode->setSType("?");
 }
 
-void TypeVisitor::visit(graph::SyncNode* syncNode, std::string& type, 
+void TypeVisitor::visit(graph::SyncNode* syncNode, 
 		std::vector<std::pair<std::string, std::string>> interactions)
 {
-	typer(syncNode, type, "||", interactions);
+	typer(syncNode, "||", interactions);
 }
 
-void TypeVisitor::typer(graph::GraphNode* node, std::string& type, std::string typeSymbol,
+void TypeVisitor::typer(graph::GraphNode* node, std::string typeSymbol,
 		std::vector<std::pair<std::string, std::string>> interactions)
 {
 	bool flag = false;
@@ -47,14 +47,7 @@ void TypeVisitor::typer(graph::GraphNode* node, std::string& type, std::string t
 	}
 	compound.append(")").append(node->toSType());
 
-	// ensure we have more characters than the empty string
-	// will mean we've built some types before now
-	if (type > "")
-	{
-		type.append(".");
-	}
-
-	type.append(compound);	
+	node->setSType(compound);	
 }
 
 } // namespace analysis
