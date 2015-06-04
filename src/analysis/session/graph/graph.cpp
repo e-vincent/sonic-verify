@@ -129,8 +129,16 @@ void Graph::printTypes()
 
 void Graph::printGlobal()
 {
+	buildGlobalType();
+	std::cout << global << "\n";
+}
+
+void Graph::buildGlobalType()
+{
 	std::vector<std::list<graph::GraphNode*>::iterator> node_store;
 	std::vector<std::list<graph::GraphNode*>::iterator> node_ends;
+
+	std::vector<std::string> types;
 
 	for (auto sub : blocks)
 	{
@@ -138,17 +146,88 @@ void Graph::printGlobal()
 		node_ends.push_back(sub->nodes.end());
 	}
 
+	size_t counter = 0;
 	while (!node_store.empty())
 	{
+		parseBlocks(node_store, node_ends, types, counter);
+	}
+
+	for (auto sub : blocks)
+	{
+		node_store.push_back(sub->nodes.begin());
+		node_ends.push_back(sub->nodes.end());
+	}
+
+	// run once more with start of types to catch end syncs
+	parseBlocks(node_store, node_ends, types, counter);
+
+	// shave last char from type
+	// then print
+	global.erase(global.length() - 1);
+}
+
+void Graph::parseBlocks(std::vector<std::list<graph::GraphNode*>::iterator>& node_store,
+		std::vector<std::list<graph::GraphNode*>::iterator>& node_ends,
+		std::vector<std::string>& types, size_t& counter)
+{
+
 		for (size_t i = 0; i < node_store.size(); ++i)
 		{
 			std::list<graph::GraphNode*>::iterator list = node_store[i];
 			std::list<graph::GraphNode*>::iterator ends = node_ends[i];
 			
-			while(((*list)->toSType() != "time") && (list != ends))
+			// store this block in a temp
+			std::vector<std::string> temp;
+
+			// 'type blocks' denoted by passage of time
+			// or reaching end of list
+			// or temporarily halted by blocking sync call
+			while(((*list)->toSType() != "time") && (list != ends)
+					&& ((*list)->toSType().back() != '?')) 
 			{
 				std::cout << (*list)->toSType() << "\n";
+				temp.push_back((*list)->toSType());
 				++list;
+			}
+
+			if ((*list)->toSType().back() == '?')
+			{
+				for (auto type : types)
+				{
+					if (type == (*list)->toSType())
+					{
+						//set type to untypeable
+						break;
+					}
+				}
+
+				std::cout << (*list)->toSType() << "\n";
+				temp.push_back((*list)->toSType());
+				++list;
+			}
+
+			int offset = 0;
+			// do any current tokens dual our stored set?
+			for (auto str : temp)
+			{
+				for (auto type : types)
+				{
+					// check they work with the same message
+					// check they are dual types
+					if (str.front() == type.front() 
+							&& dual(str.back(), type.back()))
+					{
+						resolveTypes(str, types, type, offset);
+					}
+
+					++offset;
+				}
+			}
+
+			// once types have been resolved, push temp
+			for (auto str : temp)
+			{
+				types.push_back(str);
 			}
 
 			if ((*list)->toSType() == "time")
@@ -170,19 +249,32 @@ void Graph::printGlobal()
 
 			++list;
 		}
-	}
-	// typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-	// boost::char_separator<char> sep(":");
-	// tokenizer tok(sub->sType(), sep);
-	// for(tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
-	// {
 
-	// }		
+		std::cout << "Out of For\n";
+		++counter;
+
+		if (counter == blocks.size() && !types.empty())
+		{
+			types.clear();
+		}
+		// reset at each time progression
+		// types.clear();
+	
 }
 
 void Graph::printSubType(int block)
 {
 	std::cout << "Print block " << block << "\n";
+}
+
+void Graph::appendGlobal(std::string type)
+{
+	global.append(type);
+}
+
+std::string Graph::globalType()
+{
+	return global;
 }
 
 int Graph::blockCount()
@@ -194,6 +286,58 @@ bool Graph::dual(char one, char two)
 {
 	return ((one == '!') && (two == '?')) 
 			|| ((one == '?') && (two == '!'));
+}
+
+void Graph::resolveTypes(std::string str, std::vector<std::string>& types, 
+		std::string type, int offset)
+{
+	std::string orDlim  = "||"; // sync
+	std::string andDlim = "&&"; // cue
+	std::string search;
+	size_t found;
+
+	boost::char_separator<char> sep(":()");
+	tokenizer tok(str, sep);
+	tokenizer::iterator tok_iter = tok.begin();
+
+	for (++tok_iter; tok_iter != tok.end(); ++tok_iter)
+	{
+		search = *tok_iter;
+		found  = search.find(orDlim);
+		if (found != std::string::npos)
+		{
+			std::cout << "or type\n";
+		}
+
+		found  = search.find(andDlim);
+		if (found != std::string::npos)
+		{
+			std::cout << "and type\n";
+		}
+
+		found  = type.find(search);
+		if(found != std::string::npos)
+		{
+			std::cout << "new relation\n";
+			boost::char_separator<char> sep("P");
+			tokenizer token(search, sep);
+
+			std::string result = "";
+			for (tokenizer::iterator tok_it = token.begin(); tok_it != token.end(); ++tok_it)
+			{
+				std::cout << *tok_it << "\n";
+				result.append("P").append(*tok_it);
+				if (tok_it == token.begin())
+				{
+					result.append("->");
+				}
+			}
+
+			result.append(".");
+			appendGlobal(result);
+			types.erase(types.begin() + offset);
+		}
+	}
 }
 
 } // namespace graph
