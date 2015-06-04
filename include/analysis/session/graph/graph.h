@@ -7,12 +7,12 @@
 #include <map>
 #include <list>
 #include <vector>
+#include <algorithm>
 
 #include <boost/tokenizer.hpp>
 
 #include "analysis/session/graph/nodes/nodes.h"
 #include "analysis/session/graph/subGraph.h"
-#include "analysis/session/graph/sgIterator.h"
 
 namespace graph
 {

@@ -88,9 +88,6 @@ void Planner::makeGraph(ast::NodeTree* tree)
 
 		if (node)
 		{
-			symbols.push(node);
-			updateIndex();
-			std::cout << timeProgression << "\n";
 			// empty node to mark message clusters in processes
 			if (timeProgression)
 			{
@@ -98,6 +95,9 @@ void Planner::makeGraph(ast::NodeTree* tree)
 				updateIndex();
 				timeProgression = false;
 			}
+
+			symbols.push(node);
+			updateIndex();
 		}
 	}
 

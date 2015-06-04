@@ -5,7 +5,7 @@ path = "src/assets/sp/"
 
  ## Session ##
 #filename = path + "session/sync_many.txt"
-filename = path + "session/deadlock_simple.txt"
+filename = path + "session/no_deadlock_sub_type.txt"
 #filename = path + "session/weird_sync.txt"
 #filename = path + "session/double_symbol.txt"
 #filename = path + "session/interaction_three.txt"

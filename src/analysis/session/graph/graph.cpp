@@ -129,29 +129,49 @@ void Graph::printTypes()
 
 void Graph::printGlobal()
 {
-	std::vector<graph::SGIterator> it_store;
-	std::vector<graph::SGIterator> end_store;
-	std::cout << "Node Count: " << size() << "\n";
+	std::vector<std::list<graph::GraphNode*>::iterator> node_store;
+	std::vector<std::list<graph::GraphNode*>::iterator> node_ends;
 
 	for (auto sub : blocks)
 	{
-		it_store.push_back(sub->begin());
-		end_store.push_back(sub->end());
+		node_store.push_back(sub->nodes.begin());
+		node_ends.push_back(sub->nodes.end());
 	}
 
-	for (int i = 0; i < (int)it_store.size(); ++i)
+	while (!node_store.empty())
 	{
-		auto it  = it_store[i];
-		auto end = end_store[i];
-
-		while(it != end)
+		for (size_t i = 0; i < node_store.size(); ++i)
 		{
-			std::cout << (&(*it))->toSType() << "\n";
-			++it;
+			std::list<graph::GraphNode*>::iterator list = node_store[i];
+			std::list<graph::GraphNode*>::iterator ends = node_ends[i];
+			
+			while(((*list)->toSType() != "time") && (list != ends))
+			{
+				std::cout << (*list)->toSType() << "\n";
+				++list;
+			}
+
+			if ((*list)->toSType() == "time")
+			{
+				++list;
+			}
+
+			// if the current list ended, clear it from our vector
+			// otherwise, update the current index for next run
+			if (list == ends)
+			{
+				node_store.erase(node_store.begin());
+				node_ends.erase(node_ends.begin());
+			}
+			else
+			{
+				node_store[i] = list;
+			}
+
+			++list;
 		}
 	}
-
-	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+	// typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
 	// boost::char_separator<char> sep(":");
 	// tokenizer tok(sub->sType(), sep);
 	// for(tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)

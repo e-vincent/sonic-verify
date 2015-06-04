@@ -7,7 +7,6 @@
 #include <map>
 #include <vector>
 
-#include "analysis/session/graph/sgIterator.h"
 #include "analysis/session/graph/nodes/graphNode.h"
 #include "analysis/session/graph/typeVisitor.h"
 
@@ -31,8 +30,6 @@ struct arcData
     }
 };
 
-class SGIterator;
-
 class SubGraph
 {
 private:
@@ -46,9 +43,6 @@ public:
 	std::string name;
 
 	SubGraph();
-
-	SGIterator begin();
-	SGIterator end();
 
 	void addNode(graph::GraphNode* node);
 	void addArc(int from, int to);
