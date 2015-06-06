@@ -10,35 +10,37 @@
 \contentsline {subsubsection}{\numberline {2.2.3}Sonic Pi V2.0}{8}
 \contentsline {paragraph}{Timing Sleep}{8}
 \contentsline {paragraph}{Threading}{10}
-\contentsline {paragraph}{The IDE}{14}
-\contentsline {subsection}{\numberline {2.3}Live Programming}{15}
-\contentsline {subsection}{\numberline {2.4}Session Types}{16}
-\contentsline {subsubsection}{\numberline {2.4.1}Binary Session Types}{17}
-\contentsline {paragraph}{Syntax Summary}{17}
+\contentsline {paragraph}{The IDE}{13}
+\contentsline {subsection}{\numberline {2.3}Live Programming}{14}
+\contentsline {subsection}{\numberline {2.4}Session Types}{15}
+\contentsline {subsubsection}{\numberline {2.4.1}Binary Session Types}{16}
+\contentsline {paragraph}{Syntax Summary}{16}
 \contentsline {paragraph}{Operational Semantics}{17}
-\contentsline {paragraph}{Basic Concepts}{18}
+\contentsline {paragraph}{Basic Concepts}{17}
+\contentsline {paragraph}{Example Situation}{18}
 \contentsline {subsubsection}{\numberline {2.4.2}Multi-Party Session Types}{19}
 \contentsline {paragraph}{Extended Syntax}{20}
-\contentsline {paragraph}{Extended Operational Semantics}{21}
-\contentsline {paragraph}{Extended Concepts}{22}
-\contentsline {section}{\numberline {3}Related Work}{23}
-\contentsline {section}{\numberline {4}Design \& Technical Implementation}{25}
-\contentsline {subsection}{\numberline {4.1}Integration}{25}
-\contentsline {subsection}{\numberline {4.2}Timing Tree}{25}
-\contentsline {subsubsection}{\numberline {4.2.1}Building the AST}{25}
-\contentsline {subsubsection}{\numberline {4.2.2}\texttt {pTrace}}{26}
-\contentsline {subsection}{\numberline {4.3}Session Graph}{26}
-\contentsline {subsubsection}{\numberline {4.3.1}Planning the Graph}{26}
-\contentsline {paragraph}{Initial Design}{26}
-\contentsline {paragraph}{Keeping Time}{28}
-\contentsline {subsubsection}{\numberline {4.3.2}Global Construction}{29}
-\contentsline {paragraph}{Sub-Typing}{31}
-\contentsline {section}{\numberline {5}Evaluation}{32}
-\contentsline {subsection}{\numberline {5.1}Ruby/C++}{32}
-\contentsline {subsection}{\numberline {5.2}Visual Adaptation}{32}
-\contentsline {section}{\numberline {6}Conclusion}{33}
-\contentsline {subsection}{\numberline {6.1}Future Work}{33}
-\contentsline {paragraph}{Function Parametres}{33}
-\contentsline {paragraph}{Branching Session Types}{33}
-\contentsline {paragraph}{Detailed Time Nodes}{33}
-\contentsline {subsection}{\numberline {6.2}Achievement Summary}{33}
+\contentsline {paragraph}{Extended Operational Semantics}{20}
+\contentsline {paragraph}{Extended Concepts}{21}
+\contentsline {paragraph}{Example Situation}{22}
+\contentsline {section}{\numberline {3}Related Work}{24}
+\contentsline {section}{\numberline {4}Design \& Technical Implementation}{26}
+\contentsline {subsection}{\numberline {4.1}Integration}{26}
+\contentsline {subsection}{\numberline {4.2}Timing Tree}{26}
+\contentsline {subsubsection}{\numberline {4.2.1}Building the AST}{26}
+\contentsline {subsubsection}{\numberline {4.2.2}\texttt {pTrace}}{27}
+\contentsline {subsection}{\numberline {4.3}Session Graph}{27}
+\contentsline {subsubsection}{\numberline {4.3.1}Planning the Graph}{27}
+\contentsline {paragraph}{Initial Design}{28}
+\contentsline {paragraph}{Keeping Time}{29}
+\contentsline {subsubsection}{\numberline {4.3.2}Global Construction}{30}
+\contentsline {paragraph}{Sub-Typing}{32}
+\contentsline {section}{\numberline {5}Evaluation}{34}
+\contentsline {subsection}{\numberline {5.1}Ruby/C++}{34}
+\contentsline {subsection}{\numberline {5.2}Visual Adaptation}{34}
+\contentsline {section}{\numberline {6}Conclusion}{35}
+\contentsline {subsection}{\numberline {6.1}Future Work}{35}
+\contentsline {paragraph}{Function Parametres}{35}
+\contentsline {paragraph}{Branching Session Types}{35}
+\contentsline {paragraph}{Detailed Time Nodes}{35}
+\contentsline {subsection}{\numberline {6.2}Achievement Summary}{35}

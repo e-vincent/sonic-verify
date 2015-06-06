@@ -6,7 +6,7 @@
 \usepackage{multicol, titlesec}
 \usepackage{fancyvrb}
 \usepackage{enumitem}
-\usepackage{amsmath}
+\usepackage{amsmath, amssymb}
 
 \titleformat
 	{\paragraph}
@@ -36,6 +36,32 @@
 	commentstyle = \ttfamily\color{red},
 	keywordstyle = \ttfamily\color{blue},
 	stringstyle  = \color{orange}
+}
+
+\newenvironment{myitemize}{ 
+\begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt}
+    \setlength{\parsep}{0pt}     
+}{ 
+\end{itemize}                  
+}
+
+\newenvironment{blockquote}{
+	\par
+	\medskip
+	\leftskip=4em\rightskip=3em
+	\noindent\ignorespaces
+}{
+	\par\medskip
+}
+
+\def\therefore{
+	\leavevmode
+	\lower0.4ex\hbox{$\cdot$}
+	\kern-.5em\raise0.7ex\hbox{$\cdot$}
+	\kern-0.55em\lower0.4ex\hbox{$\cdot$}
+	\thinspace
 }
 
 \lstset{
@@ -159,10 +185,9 @@ The remainder of this report is broken down as follows:
 \section{Background}
 In this section we begin with a short history of Computing in Schools followed 
 by explaining the ideas and features of Sonic Pi, the live coding IDE that forms 
-the basis of this project. We then move on to explain the subject of both Living 
+the basis of this project. We then move on to explain the subject of both Live 
 Programming and Session Types in further detail and seek to relate them back to 
-the current aims of the project. We conclude with details on some of the related 
-work in these areas of research.
+the current aims of the project.
 
 \subsection{Computing in Schools}
 Some of the earliest significant pieces of work towards the 
@@ -509,6 +534,16 @@ correctly.
 	\captionof{lstlisting}{Named Threads}
 \end{minipage}
 
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[language = ruby]
+    live_loop :foo do
+        play :c1, release: 8, cutoff: rrand(70, 130)
+        sleep 8
+    end
+	\end{lstlisting}
+	\captionof{lstlisting}{Live Loops}
+\end{minipage}
+
 While running a program, Sonic Pi's \texttt{live\_loops} will automatically update 
 the program without skipping any beats. This gives the users a great amount of 
 freedom to experiment with different sounds without having to stop the program 
@@ -521,23 +556,12 @@ commands. Each time a \texttt{live\_loop} loops it will generate a new \texttt{c
 event which we are able to \texttt{sync} on to. \texttt{cue} is an asynchronous,
 non-blocking message and \texttt{sync} is a blocking message.
 
-\begin{minipage}{\textwidth}
-	\begin{lstlisting}[language = ruby]
-    live_loop :foo do
-        play :c1, release: 8, cutoff: rrand(70, 130)
-        sleep 8
-    end
-	\end{lstlisting}
-	\captionof{lstlisting}{Live Loops}
-\end{minipage}
-
-\clearpage
 \begin{multicols}{2}
 The Snippets to the right demonstrate a rough workflow of how a user would use 
 the \texttt{cue} and \texttt{sync} features. To begin with we assume the loops 
 \texttt{:foo} and \texttt{:bar} are out of time.
 
-To work with the current example one would begin to fix the situation by 
+We can start to fix the situation by 
 changing the sleep time in \texttt{:foo} to 0.5s. Most likely, this will still 
 sound incorrect. This is because the two loops are likely to now be out of 
 time with each other. Both \texttt{:foo} and \texttt{:bar} are producing \texttt{
@@ -548,12 +572,11 @@ a \texttt{live\_loop} will send a \texttt{cue} message at the start of each loop
 In this case we have synced \texttt{:bar} onto \texttt{:foo}'s \texttt{cue} 
 message.
 
-This gives way to some very obvious deadlock scenarios (shown in Snippet 10) 
+This gives way to some very obvious deadlock scenarios (example shown in Snippet 10) 
 that users must avoid. Here we have created two \texttt{live\_loop}s, \texttt{:foo}
 and \texttt{:bar}. Both threads finish with a blocking call, waiting for a
-\texttt{cue} message from the other loop. The issue is, since both loops are blocked
-at the same time, neither loop will ever trigger another \texttt{cue}. This
-situation is thus frozen and the music is dead.
+\texttt{cue} message from the other loop. The issue here is, since both loops 
+are blocked at the same time, neither loop will ever trigger another \texttt{cue}. 
 
 	\begin{minipage}{0.5\textwidth}
 
@@ -571,7 +594,6 @@ end
 			\end{lstlisting}
 			\captionof{lstlisting}{Out of Sync Live Loops}
 		\end{minipage}
-
 		\begin{minipage}{\textwidth}
 			\begin{lstlisting}[language = ruby]
 live_loop :foo do
@@ -727,7 +749,7 @@ apply to Sonic Pi's Ruby-like syntax.
 
 Session Types consist of the following key ideas:
 
-\begin{itemize}[noitemsep]
+\begin{itemize}
 	\item A basic structural concept known as \emph{sessions}. These are designated 
 	via \emph{channels}. The collection of session interactions is what constitutes a 
 	program; those interactions are performed via the channels. As well as the 
@@ -750,10 +772,11 @@ Session Types consist of the following key ideas:
 	Without this there would be no way to guarantee the typability of a program, 
 	ensuring that two communicating processes always have compatible patterns of 
 	communication. It is the incompatibility of interaction patterns that is one 
-	of the main reasons for bugs in commmunication-based programming.
+	of the main reasons for bugs in commmunication-based programming\footnote{We choose not to present the full formalisation of the type system 
+	in this report as the focus is much more on the construction of the 
+	communication protocols than on their underlying types. Interested parties can 
+	read on this futher in such papers as \cite{HVM98} and \cite{HYC08}}.
 \end{itemize}
-
-% Relate Session Types to project
 
 \subsubsection{Binary Session Types}
 \paragraph{Syntax Summary}
@@ -852,7 +875,6 @@ abstraction for describing that interaction. Communications of sessions are done
 via a \emph{channel} and can be initiated as follows:
 
 \begin{multicols}{2}
-%	\begin{minipage}{\textwidth}
 
 	\begin{minipage}{0.5\textwidth}
 		\begin{verbatim}
@@ -865,7 +887,6 @@ via a \emph{channel} and can be initiated as follows:
 \hspace*{15pt}: Initiating a Session
 	\end{minipage}
 
-%	\end{minipage}
 \end{multicols}
 
 The \texttt{request} first requests the initiation of a \emph{session} (with 
@@ -876,18 +897,36 @@ On the other hand, \texttt{accept} receives the request to initiate the session
 parenthesis and the keyword \texttt{in} show scope binding.
 
 Via this generated channel, we can then perform three kinds of atomic operation:
+\\
 
+\begin{multicols}{2}
+
+	\begin{minipage}{0.5\textwidth}
 \begin{lstlisting}
-1) k![e$_1$, ..., e$_n$]; P      k?(x$_1$, ..., x$_n$) in P
-2) k $\triangleleft$ $\ell$; P                k $\triangleright$ {$\ell$$_1$:P$_1$[] ... []$\ell$$_n$:P$_n$}
-3) throw k[k$_0$]; P         catch k(k$_0$) in P 
-\end{lstlisting}	
+    k![e$_1$, ..., e$_n$]; P    
+    k?(x$_1$, ..., x$_n$) in P
+    k $\triangleleft$ $\ell$; P  
+    k $\triangleright$ {$\ell$$_1$:P$_1$[] ... []$\ell$$_n$:P$_n$}
+    throw k[k$_0$]; P       
+    catch k(k$_0$) in P 
+\end{lstlisting}
+	\end{minipage}
+	
+	\begin{minipage}{0.5\textwidth}
 
-\begin{enumerate}
-  \item Data Sending/Receiving
-  \item Label Selection/Branching
-  \item Channel Sending/Receiving
-\end{enumerate}
+% \hspace*{15pt}: Initiating a Session
+\vspace{5pt}
+\begin{myitemize}
+  \item[] : Data Sending
+  \item[] : Data Receiving
+  \item[] : Label Selection
+  \item[] : Label Branching
+  \item[] : Channel Sending
+  \item[] : Channel Receiving
+\end{myitemize}
+	\end{minipage}
+
+\end{multicols}
 
 \emph{Data sending/receiving} is the standard synchronous message passing. 
 \emph{e\textsubscript{i}} denotes expression and we assume the \emph{x} 
@@ -903,20 +942,33 @@ the concept of the same name in object-based programming \cite{YT87}.
 
 We futher define the session types with the following standard constructs, 
 organised by session:
+\\
 
+\begin{multicols}{2}
+
+	\begin{minipage}{0.5\textwidth}
 \begin{lstlisting}
-1) P1 | P2
-2) ($v$a)P ($v$k)P 
-3) if e then P else Q 
-4) def X$_1$($\tilde{x}$$_1$ $\tilde{k}$$_1$) = P$_1$ and ... and X$_n$($\tilde{x}$$_n$ $\tilde{k}$$_n$) = P$_n$ in P
+    P1 | P2
+    ($v$a)P ($v$k)P 
+    if e then P else Q 
+    def X$_1$($\tilde{x}$$_1$ $\tilde{k}$$_1$) = P$_1$ and 
+       ... and X$_n$($\tilde{x}$$_n$ $\tilde{k}$$_n$) = P$_n$ in P
 \end{lstlisting}
+	\end{minipage}
+	
+	\begin{minipage}{0.5\textwidth}
 
-\begin{enumerate}
-  \item Concurrent Composition
-  \item Name/Channel Hiding
-  \item Conditional
-  \item Recursion
-\end{enumerate}
+% \hspace*{15pt}: Initiating a Session
+\vspace{5pt}
+\begin{myitemize}
+  \item[] : Concurrent Composition
+  \item[] : Name/Channel Hiding
+  \item[] : Conditional
+  \item[] : Recursion
+\end{myitemize}
+	\end{minipage}
+
+\end{multicols}
 
 \emph{Hiding} declares a name/channel to be local in its scope (here 
 \texttt{P}). Whilst not used in regular programming it is needed in the 
@@ -927,6 +979,38 @@ replication but multiple is preferable for well-structured programs.
 % Also write up a working example of binary ST
 %    ATM examples from course would be a good one -> cite Nobuko?
 
+\paragraph{Example Situation}
+To put the information discussed here into some context, this next section
+introduces a basic example of session types througha basic ATM system\footnote{
+A simplified recreation of the example found in \cite{HVM98}, section 4}. 
+In this situation there is one \texttt{ATM} agent that offers two services, 
+balancing or depositing. These services are offered as two branch 
+\emph{labels}. Firstly, the user will establish a \emph{session} via $a$. The 
+user can then input their verification code (validation of this is ommitted
+for the current example). If \emph{balance} is chosen, then the 
+\texttt{ATM} requests the value from the bank and shows this to the user, before
+returning to the menu state. If \emph{deposit} is selected, the 
+\texttt{ATM} accepts the deposited amount to be sent to the bank, and again
+returns to the menu state. A user may exit at any time via \emph{quit}. This 
+effectively demonstrates continuous unbounded interactions in session types.
+
+The following implementation demonstrates this agent:
+\\
+\begin{lstlisting}
+  ATM($a$,$y$)       = accept $a$($z$) in $k$![$id$]. ATM$_1$[$a$,$y$,$id$,$z$]
+  ATM$_1$($a$,$y$,$id$,$s$) = $s$ $\triangleright$ { $\emph{deposit}$: request $y$($h$) in $s$?($amt$) in
+                         $h \triangleleft \emph{deposit}$. $h$![$id$, $amt$]. ATM$_1$[$a$,$y$,$id$,$s$]
+                    [] $\emph{balance}$: request $y$($h$) in 
+                         $h \triangleleft \emph{balance}$. $h$?($amt$) in
+                              $s$![$amt$]. ATM$_1$[$a$,$y$,$id$,$s$]
+                    [] $\emph{quit}$: ATM($a$, $y$) }
+\end{lstlisting}
+
+A simple user agent may look as follows:
+\\
+\begin{lstlisting}
+  request $a$($z$) in $z$![$myID$]. $z \triangleleft \emph{quit}$ 
+\end{lstlisting}
 
 \subsubsection{Multi-Party Session Types}
 Multi-Party Asynchronous Session Types are a class of behavourial types
@@ -1062,20 +1146,99 @@ is meant for the specified receiver:
 % important to get a good working example going to demonstrate global typings
 % go into detail about projection here
 % cover the other one in implementation to reduce repetition?
+From this we can now define the communication type system for multi-party 
+session types\cite{CCPY15}. In this, \emph{Global Types} describe the whole
+conversation scenario. \emph{Session Types} are constructed through 
+\emph{projection} of the global type on the individual participants of
+the scenario. The grammar for this is presented next:
+
+
+The global types describe the various actions of a participant \texttt{p} sending
+either a value of a given Sort, a channel of a given Type, or some label to the
+partcipant \texttt{q} and then interaction continues according to the following
+global type \texttt{G} (or \texttt{G$_i$} in the case of branching). In this 
+grammar, the style of recursive types uses \emph{equi-recursion}; there is no
+distinction between the type \texttt{${\mu}$t.G} and the unfolding 
+\texttt{G\{${\mu}$t.G/t\}}.
+
+The session types represent the actions performed by single participants. For 
+example, the \emph{send} type, \texttt{!<p, S>.T} describes the sending of a 
+value of sort S to participant \texttt{p}. Recursion is guarded in session types
+as they are in global types.
+
+The concept of \emph{projection} between global types and session types is
+formalised in Definition 1, as found in \cite{HYC08}.
+
+\begin{blockquote}
+	\textbf{Definition 1:} \emph{The projection of a global type \texttt{G} onto 
+	a particiapnt \texttt{q} is defined by induction on \texttt{G}}:
+\end{blockquote}
+\begin{align*}
+	(\texttt{p} \rightarrow \texttt{p'}:\texttt{<U>}.\texttt{$G$'}) \upharpoonright \texttt{q = }  
+	\begin{cases}
+\hspace{5pt} !\langle \texttt{p',U} \rangle (\texttt{$G$'}\upharpoonright \texttt{q}) \hspace{22pt}if \hspace{5pt} \texttt{q = p} \\
+\hspace{5pt} ?(\texttt{p',U}) (\texttt{$G$'}\upharpoonright \texttt{q}) \hspace{20pt}if \hspace{5pt} \texttt{q = p'} \\
+\hspace{5pt} \texttt{$G'$}\upharpoonright \texttt{q} \hspace{65pt} otherwise
+	\end{cases}
+\end{align*}
+\begin{align*}
+	(\texttt{p} \rightarrow \texttt{p'}:\texttt{p',\{l$_{i}:G_{i}$\}$_{i \in I}$}) \upharpoonright \texttt{q = }  
+	\begin{cases}
+\hspace{5pt} \oplus \langle \texttt{p',\{l$_{i}:T_{i}$\}$_{i \in I}$} \rangle (\texttt{$G$'}\upharpoonright \texttt{q}) \hspace{22pt}if \hspace{5pt} \texttt{q = p} \\
+\hspace{5pt} \&(\texttt{p',\{l$_{i}:G_{i}$}\upharpoonright \texttt{q\}$_{i \in I}$}) \hspace{40pt} if \hspace{5pt} \texttt{q = p'} \\
+\hspace{5pt} \texttt{$G_{i_0}$}\upharpoonright \texttt{q} \hspace{77pt} where \hspace{5pt} \texttt{$i_{0}$} \in I \hspace{5pt} if \hspace{3pt} \texttt{q} \neq \texttt{p,}\hspace{3pt}\texttt{q} \neq \texttt{p'} \\
+\hspace{115pt} and \hspace{3pt} \texttt{$G_{i}$} \upharpoonright \texttt{q} = \texttt{$G_{j}$} \upharpoonright \texttt{q} \hspace{3pt} for\hspace{3pt} all\hspace{3pt} i,\hspace{3pt} j \in I
+	\end{cases}
+\end{align*}
+\begin{align*}
+	(\mu\texttt{t$G$}) \upharpoonright \texttt{q = }
+	\begin{cases}
+\hspace{5pt} \mu\texttt{t}(\texttt{$G$} \upharpoonright \texttt{q}) \hspace{20pt} if \hspace{5pt} \texttt{$G$} \upharpoonright \texttt{q} \neq \texttt{t} \\
+\hspace{5pt} \texttt{end} \hspace{48pt} otherwise
+	\end{cases} 
+\end{align*}
+\begin{align*}
+	\texttt{t} \upharpoonright \texttt{q = t} 
+	\hspace{40pt} \texttt{end} \upharpoonright \texttt{q = end}
+\end{align*}
+
+\paragraph{Example Situation}
+To fully illustrate the basic featurs and functionalities of the calculus we
+discuss a standard two-buyers-protocol, demonstrated here as a sequence 
+diagram:
+
+
+First \texttt{B1} sends a title to \texttt{S} and in responce \texttt{S}
+sends a quote to both \texttt{B1} and \texttt{B2}. \texttt{B1} will then
+suggests what contribution it can make to \texttt{B2} who will either
+accept this amount and coordinate the purchase with \texttt{S}, or it will
+abort the discussion. Decomposing this into three binary session types
+could be logically very difficult, and most likely we would lose some of
+the essential sequencing information in the process. Instead, let us transform
+this scenario into the following global type. Global types are presented as
+numbers, so a clear key is also provided.
+
+\begin{lstlisting}
+ 1)  1 $\rightarrow$ 3 : $\langle$string$\rangle$                         B1 = 1
+ 2)  3 $\rightarrow$ 1 : $\langle$int$\rangle$                            B2 = 2
+ 3)  3 $\rightarrow$ 2 : $\langle$int$\rangle$                             S = 3
+ 4)  1 $\rightarrow$ 2 : $\langle$int$\rangle$
+ 5)  2 $\rightarrow$ 3 : { ok: 2 $\rightarrow$ 3 : $\langle$string$\rangle$. 3 $\rightarrow$ 2 : $\langle$date$\rangle$. end,
+                quit: end }
+\end{lstlisting}
 \newpage
 
 \section{Related Work}
 %make more of a subsection thing? more discussion about tools?
 This section discusses much of the work discovered during the intial research 
-of the project. There are many interesting live programming environments out 
-in use in the world, with each having an interesting approach to the technical 
+of the project. There are many interesting live programming environments in
+the world, with each having an interesting approach to the technical 
 challenges surrounding the issue of temporal semantics. We briefly discuss 
 some languages/environments that have made use of the Session Types structures 
-as described previously as this gives a clearer picture of their use and 
+as this gives a clearer picture of their use and 
 viability within the real world. It is worth noting that, to date, there is no 
-apparent system which seeks to apply the Session Typing structure to a live 
-programming paradigm to address some of the concurrency issues faced in that 
-field.
+apparent system which seeks to apply the Session Type protocol to a live 
+programming paradigm and their associated concurrency features.
 
 As noted by Rorhruber \cite{BMNR14}, there have been many publications and 
 discussions relating to alternative approaches for temporal semantics and 
@@ -1147,7 +1310,7 @@ binary session types discussed earlier.
 \section{Design \& Technical Implementation}
 This chapter of the report focuses on the high level design of the project.
 We begin by outlining how the project integrates with the existing Sonic-Pi
-project \footnote{As found at https://github.com/samaaron/sonic-pi} and the 
+project\footnote{As found at https://github.com/samaaron/sonic-pi} and the 
 choice of languages used. Discussion of the limitations of this approach is 
 saved until the evaluation section. We then focus on the implementation in 
 two core sections, one for each main feature contribution of the project.
@@ -1184,7 +1347,7 @@ it. The ability to write function calls either with or without parenthesis
 or ommit semi-colons between statements increases the complexity of the ruby 
 grammar to the degree it was infeesable to write such a parser specifically 
 for Sonic-Pi. However, given Sonic-Pi's ruby-like nature, we elected to use 
-the open-source ruby-parser \footnote{As found at https://github.com/whitequark/parser}
+the open-source ruby-parser\footnote{As found at https://github.com/whitequark/parser}
 for its simplicity and ease of set-up. It is relatively lightweight whilst 
 still providing useful statistics such as line numbers, statement counts and
 column numbers. In transferring this data to our own C++ application we are 
@@ -1259,41 +1422,22 @@ of local types while the \texttt{Graph} class handles the global type.
 
 \paragraph{Initial Design}
 
-\begin{multicols}{2}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[language = ruby]
+           # P0                        # P1
+           in_thread do                in_thread do 
+             loop do                     loop do
+               cue :B                      cue :A 
+               sync :A                     sleep 1
+               sleep 1                     sync :B
+               play 63                     sleep 0.5
+             end                         end
+           end                         end
+	\end{lstlisting}
+	\captionof{lstlisting}{Forming Types}
+\end{minipage}
 
-	\begin{minipage}{0.45\textwidth}
-		\begin{lstlisting}[language = ruby]
-    # P0
-    in_thread do
-      loop do
-        cue :B 
-        sync :A
-        sleep 1
-        play 63
-      end
-    end
-		\end{lstlisting}
-		\captionof{lstlisting}{Forming Types}	
-	\end{minipage}
-  
-	\begin{minipage}{0.45\textwidth}
-		\begin{lstlisting}[language = ruby]
-    # P1
-    in_thread do 
-      loop do
-        cue :A 
-        sleep 1
-        sync :B
-        sleep 0.5
-      end
-    end
-		\end{lstlisting}
-		\captionof{lstlisting}{Forming Types}
-	\end{minipage}
-
-\end{multicols}
-
-Initially when forming the types of threads, the program of snippets 11/12
+Initially when forming the types of threads, the program of snippet 11
 would produce a type of the form:
 \\
 \begin{lstlisting}
@@ -1376,7 +1520,7 @@ the form:
   P1 :=  A:P1P0!.time.B:P0P1?.time
 \end{lstlisting}
 
-More importantly the program from snippet 13 will look as follows:
+More importantly the program from snippet 12 will look as follows:
 \\
 \begin{lstlisting}
   foo := foo:P0P1!.time.bar:P1P0?
@@ -1555,9 +1699,9 @@ $\hphantom{tabs}$ \texttt{B:(P0P1)!.A:(P1P0)?}
 
 The accurate type for the second process would be \texttt{B:(P0P1)?.A:(P0P1)!}, 
 (or one could keep \texttt{P1} unchanged and swap the terms in the other process). 
-To handle this, the project makes use of sub-typing the \texttt{cue} type 
-\footnote{As remarked by Dominic Orchard in (either a paper or a presentation, 
-look this up)}.
+To handle this, the project makes use of sub-typing the \texttt{cue} type\footnote{
+As suggested by Dominic Orchard in his presentation on `Verifying and Timing
+Concurrent Instruments'}.
 
 	\begin{minipage}{0.5\textwidth}
 
@@ -1590,9 +1734,20 @@ look this up)}.
 	\end{minipage}
 \end{multicols}
 
-%write this out in full theorectical detail
+The formal outline for this feature is:
 
-Typing Test
+\begin{lstlisting}
+    A!.P <: P.A!
+\end{lstlisting}
+
+Given this we may say that:
+
+\begin{lstlisting}
+     A:(P0P1)!.B:(P0P1)? <: B:(P0P1)?.A:(P0P1)!
+     B:(P0P1)!.A:(P1P0)? = dual(B:(P0P1)?.A:(P0P1)!)
+
+    $\therefore$ B:(P0P1)!.A:(P1P0)? $\cong$ dual(A:(P0P1)!.B:(P0P1)?)
+\end{lstlisting}
 \newpage
 
 \section{Evaluation}
