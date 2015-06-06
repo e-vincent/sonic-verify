@@ -110,12 +110,12 @@ timing effects and the existing concurrency primitives of the language.
 
 \subsection{Objectives}
 In the current version of Sonic Pi there is no means to verify the timing effects
-or the communication patterns of the pattern. This is to say, user's must judge
-themselves that the program is timed correctly and that the program is free from
-concurrency bugs. The first point can be difficult for novice programmers, 
-potentially moreso for those with little musical experience. The later can be
-difficult for even some experienced programmers due to the nondeterministic 
-nature of some concurrency bugs.
+or the communication patterns of the program. This is to say, users must judge
+themselves how long the current program is, that the program is timed correctly,
+and that the program is free from concurrency bugs. The first point can be 
+difficult for novice programmers, potentially moreso for those with little 
+musical experience. The later can be difficult for even some experienced 
+programmers due to the nondeterministic nature of some concurrency bugs.
 
 In building analysis for the timing effects of the program, we hope to develop
 something that is sufficiently lightweight so that it may eventually be run
@@ -127,31 +127,33 @@ and program architecture and efficient design for this matter.
 In developing the communication patterns of Sonic Pi we aim to utilise the
 theory of Session Types and apply them to this context. Session Types will
 enable us to define a clearly understandable structure to the communication
-patterns of the program; this will enable the tool to identify difficult bugs
+protocol of the program; this will enable the tool to identify difficult bugs
 such as deadlocks and thrashing behaviour. This is possibly the first application
 of this concept to the live programming paradigm of which Sonic Pi is a part.
-
-% % Initial Project Outline %%%%%%%%%%%%%%%%
-% This project's aim is to formalise the concurrency and timing aspects of the 
-% language and develop a program analysis tool that can be used to identify 
-% program bugs such as deadlock and thrashing behaviour. The formalism and 
-% analysis will build on initial work describing timing and concurrent 
-% interaction via effect systems and session types. The project combines 
-% theoretical aspects of type system and analysis design, as well as practical 
-% work developing a responsive program analysis engine.
 
 \subsection{Report Structure}
 The remainder of this report is broken down as follows:
 
-% \begin{itemize}
-% 	\item Background: We detail the histories of Sonic Pi, Live Programming 
-% 	and Session Types as fields of research and conclude with work relating to
-% 	these subjects.
-
-% 	\item Going Forward: The bulk of this section details the expected 
-% 	timeline of the project and ideas for how to evaluate progress during and 
-% 	at the conclusion of the project.
-% \end{itemize}
+\begin{itemize}
+	\item Background: We detail the histories of Sonic Pi, Live Programming 
+	and Session Types as fields of research and conclude with work relating to
+	these subjects.
+	\item Related Work: We detail the existing work in the field Live Programming
+	as a whole and with the focus on musical programming. We also detail some
+	of the existing applications of Session Types outlining the approaches and
+	differences therein.
+	\item Design \& Technical Implementation: Here the chapter is broken into
+	two core sections, focusing on both the timing effects of Sonic Pi and
+	the session types of Sonic Pi in turn. We discuss chosen languages and key
+	libraries used in the design of the program and then move into general
+	implementation and interesting algorithms and code from each section.
+	\item Evaluation: Here we evaluate the success of the project. We discuss
+	the limitations of the current state of the project and outline qualitive
+	and quantative metrics for the project.
+	\item Conclusion: Here we present possible improvement for the project in
+	the future work section before closing with a summary of those objectives
+	achieved.
+\end{itemize}
 \newpage
 
 \section{Background}
@@ -296,7 +298,7 @@ correct timing of musical notation which puts them at odds with user
 expectations. To demonstrate this more concretely, below are two further code 
 snippets demonstrating Sonic Pi's basic threading abilities. Sampling is a 
 feature of Sonic Pi V2.0 but is presented here in the context of V1.0 
-programs as the two versions are syntaxtically similar.
+programs as the two versions are syntactically similar.
 
 \begin{multicols}{2}
 In Snippet 3 the desired outcome is to play MIDI note 60 together with the 
@@ -374,8 +376,8 @@ and also not consistent across different runs of the same program.
 Sonic Pi V2.0 sought to address this temporal issue and introduces the 
 interesting concept of a \emph{time system} and associated \emph{time safety}, 
 which draw an analogy from the familiar programming concepts of \emph{type 
-systems} and \emph{type safety}. As noted before, V2.0 maintains syntactic 
-compatability with V1.0, so it conceptually as useful to apply in the 
+systems} and \emph{type safety}. V2.0 maintains syntactic 
+compatability with V1.0, so it as conceptually useful to apply in the 
 educational context as before. The power behind V2.0 is that its temporal 
 semantics now react as a user would expect them to, making it a viable program 
 for the musically experienced who have some concept of what they want to 
@@ -476,9 +478,9 @@ code concurrently. Threads can be named as shown in Snippet 6 in a similar way
 to how functions are named in Sonic Pi. The simple nature of its loop syntax 
 enables this to be as easy a concept to grasp as the previously defined 
 temporal semantics. These threads alone do not allow for the live coding that 
-Sonic Pi has been created for. With a simple \texttt{in\_thread} it is more 
-verbose to change the program sound as the program is running. For this, Sonic 
-Pi V2.0 provides \texttt{live\_loop}.
+Sonic Pi has been created for; a developer must combine each thread with a loop
+in order to produce constant sound. Sonic Pi V2.0 provides the \texttt{live\_loop}
+keyword to capture the same effect with less writing.
 
 An interesting point to note about Sonic Pi V2.0 is that actually running the 
 program starts the current program in another thread. Because of this one can 
@@ -507,9 +509,7 @@ correctly.
 	\captionof{lstlisting}{Named Threads}
 \end{minipage}
 
-\texttt{live\_loops} can be named much more cleanly than \texttt{in\_threads} 
-and are where Sonic Pi really comes into its live coding roots. Whilst 
-running a program, Sonic Pi's \texttt{live\_loops} will automatically update 
+While running a program, Sonic Pi's \texttt{live\_loops} will automatically update 
 the program without skipping any beats. This gives the users a great amount of 
 freedom to experiment with different sounds without having to stop the program 
 and wait for anything to compile and run, as is the case with standard 
@@ -517,8 +517,9 @@ programming. This feature, however, is directly affected by the previously
 described temporal semantics, in that loops can easily become out of time with 
 each other while a performance is happening. To combat this, Sonic Pi provides 
 synchronisation semantics in the form of the \texttt{cue} and \texttt{sync} 
-commands. Each time a live loop loops it will generate a new \texttt{cue} 
-event which we are able to \texttt{sync} on to. 
+commands. Each time a \texttt{live\_loop} loops it will generate a new \texttt{cue} 
+event which we are able to \texttt{sync} on to. \texttt{cue} is an asynchronous,
+non-blocking message and \texttt{sync} is a blocking message.
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[language = ruby]
@@ -534,23 +535,26 @@ event which we are able to \texttt{sync} on to.
 \begin{multicols}{2}
 The Snippets to the right demonstrate a rough workflow of how a user would use 
 the \texttt{cue} and \texttt{sync} features. To begin with we assume the loops 
-\texttt{foo} and \texttt{bar} are out of time.
+\texttt{:foo} and \texttt{:bar} are out of time.
 
 To work with the current example one would begin to fix the situation by 
-changing the sleep time in \texttt{foo} to 0.5s. Most likely, this will still 
+changing the sleep time in \texttt{:foo} to 0.5s. Most likely, this will still 
 sound incorrect. This is because the two loops are likely to now be out of 
-time with each other. Both \texttt{foo} and \texttt{bar} are producing \texttt{
+time with each other. Both \texttt{:foo} and \texttt{:bar} are producing \texttt{
 cue} events, but these are not being used and so both loops are running with 
 no regard to the other. We can fix this by \emph{syncing} one thread to the 
-other, so that it will only fire when the other thread has looped. In this 
-case we have synced \texttt{bar} onto \texttt{foo}.
+other, so that it will only fire when the other thread has looped (since
+a \texttt{live\_loop} will send a \texttt{cue} message at the start of each loop).
+In this case we have synced \texttt{:bar} onto \texttt{:foo}'s \texttt{cue} 
+message.
 
 This gives way to some very obvious deadlock scenarios (shown in Snippet 10) 
-that users must avoid. If you create two live loops, \texttt{one} and 
-\texttt{two} writing a situation that results in either \texttt{cue :one} in the 
-second thread and \texttt{cue :two} in the first, or similar with \texttt{sync} 
-then this will result in a deadlock as both threads wait for the call from the 
-other.
+that users must avoid. Here we have created two \texttt{live\_loop}s, \texttt{:foo}
+and \texttt{:bar}. Both threads finish with a blocking call, waiting for a
+\texttt{cue} message from the other loop. The issue is, since both loops are blocked
+at the same time, neither loop will ever trigger another \texttt{cue}. This
+situation is thus frozen and the music is dead.
+
 	\begin{minipage}{0.5\textwidth}
 
 		\begin{minipage}{\textwidth}
@@ -590,15 +594,15 @@ end
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[language = ruby]
 	live_loop :foo do
-	    cue :bar
 	    play :e4, release: 0.5
 	    sleep 0.5
+	    sync :bar
 	end
 
 	live_loop :bar do
-	    cue :foo
 	    sample :bd_haus
 	    sleep 1
+	    sync :foo
 	end
 	\end{lstlisting}
 	\captionof{lstlisting}{Deadlock - both loops waiting for cue}
@@ -919,6 +923,11 @@ organised by session:
 Operation Semantics of session types. Recursion could be achieved through 
 replication but multiple is preferable for well-structured programs.
 
+% Rewrite the formatting for these bits
+% Also write up a working example of binary ST
+%    ATM examples from course would be a good one -> cite Nobuko?
+
+
 \subsubsection{Multi-Party Session Types}
 Multi-Party Asynchronous Session Types are a class of behavourial types
 specifically targeted at describing protocols in distribute systems
@@ -1055,7 +1064,8 @@ is meant for the specified receiver:
 % cover the other one in implementation to reduce repetition?
 \newpage
 
-\subsection{Related Work}
+\section{Related Work}
+%make more of a subsection thing? more discussion about tools?
 This section discusses much of the work discovered during the intial research 
 of the project. There are many interesting live programming environments out 
 in use in the world, with each having an interesting approach to the technical 
@@ -1134,31 +1144,467 @@ and implemented using multiparty session types; a further extension to the
 binary session types discussed earlier.
 \newpage
 
-\section{Technical Details}
-\subsection{Ruby/C++}
+\section{Design \& Technical Implementation}
+This chapter of the report focuses on the high level design of the project.
+We begin by outlining how the project integrates with the existing Sonic-Pi
+project \footnote{As found at https://github.com/samaaron/sonic-pi} and the 
+choice of languages used. Discussion of the limitations of this approach is 
+saved until the evaluation section. We then focus on the implementation in 
+two core sections, one for each main feature contribution of the project.
 
-% comments on the three different methods available?
+\subsection{Integration}
+
+% basic outline of sonic pi
+% The basic architecture of Sonic Pi can be broken into the server side of the application and the gui. The gui brings a hard dependency on the Qt framework, implemented in C++, whilst the server application is developed with ruby. 
+% In order to generate and manipulate sounds, Sonic Pi is implemented in terms f the SuperCollider synthesis server which provides the ability to define arbitiary synthesiers and trigger and manipulate them in real time\cite{AB13}
+% The main entry point for Sonic Pi lies in the spider_eval method of the spider class
+% defined in the server modules. It is here we intercept the currently played pieces of music and run our own analysis modules.
+
+% once the hookup is done write out the code examples of how messages are passed along
+% maybe make a basic diagram of Sonic Pi interactions with/without our project
 
 \subsection{Timing Tree}
+In calculating the virtual time at any point within the program the initial 
+requirement is to parse the given program and store it for later access. A 
+natural approach to this mimics compiler technology, wherein we define some
+grammar by which to parse our programs and then build some Abstract Syntax Tree 
+to store all of the program information as parent/children nodes. Once this 
+is built successfully we are able to traverse the tree as often as we require 
+to build the trace of the program. The diagram below provides an overview of the 
+different classes and their interactions for this section:
+
+% diagram!
+
+
+
+\subsubsection{Building the AST}
+Whilst ruby has been valued in the Sonic-Pi project for its hugely forgiving
+syntax in a classroom setting, this feature increases the difficulty of parsing 
+it. The ability to write function calls either with or without parenthesis 
+or ommit semi-colons between statements increases the complexity of the ruby 
+grammar to the degree it was infeesable to write such a parser specifically 
+for Sonic-Pi. However, given Sonic-Pi's ruby-like nature, we elected to use 
+the open-source ruby-parser \footnote{As found at https://github.com/whitequark/parser}
+for its simplicity and ease of set-up. It is relatively lightweight whilst 
+still providing useful statistics such as line numbers, statement counts and
+column numbers. In transferring this data to our own C++ application we are 
+able to simplify the node count of our AST by wrapping certain nodes into 
+tighter definitions. For example, the parser would output an integer as a node 
+of type \texttt{int} with a child node holding the actual integer value. In 
+building the AST of our C++ application we could wrap these definitions into 
+a single node of type \texttt{IntNode} with held the integer value as a 
+member field. \texttt{float} and \texttt{symbol} nodes acted in a similar
+fashion:
+
+% diagramtic example of a sym node
+
+Statement lists are captured in the AST by nodes of type \texttt{begin} whilst
+loops and function definitions are denoted by \texttt{block} types. 
+\texttt{block} is a useful node type as it will always take three children, 
+one describing the type of block, the second listing the arguments taken by 
+the block and the final describing the root of the next statement list. 
+
+% block node diagrams
+
+Whilst in the source code the end of a block is defined using the \texttt{end}
+keyword, in the AST blocks can be viewed as self-contained trees; there is
+no need for an \texttt{end}-type node. Most nodes are not necessarily aware
+that they are in one block, with the parser providing no information
+as to what scope level the code is at, at any given time. Entry to a block is
+easy to detect, but leaving a block is more difficult. In general, when handling
+whether a given node is within a particular function call we are required to
+carry block index information and test whether parent indexes are different
+at each node. It is not enough to store the block depth of each node in our AST
+as sequential functions might think they are part of the same block; the
+distinction is important later on when we start to calculate the contribution
+of each function to the current virtual time of the program.
+
+% block detection diagrams
+
+
+
 
 % some basic compiler type theory here would be good
 % building of AST to traverse for information
 
+\subsubsection{\texttt{pTrace}}
+
+
 % why is a second pass for round up information fine?
 
 \subsection{Session Graph}
+Session Types describe communication protocols via message passing. In Sonic Pi
+the message originates at a \texttt{cue} statement and is `consumed' by the
+\texttt{sync} statement. Given this, we elect to transform the AST used in
+timing analysis into a directed graph, consisting purely of \texttt{CueNode}s,
+\texttt{SyncNodes}s and other \texttt{GraphNode}s to represent the passage
+of time more generally in this analysis. Originally this third node type
+was ommitted from the construction of the graph but on consideration of
+message order in Sonic Pi it became clear that chronology was important 
+information to maintain. This is discussed in more detail later in this section.
+
+Presented next is the overall design of this section. Once the graph is
+built the entry point to the analysis for this section calls on each sub 
+graph to construct each session type and then the global type.
+
+% diagram here
+
+\subsubsection{Planning the Graph}
+As shown by the previous diagram, each \texttt{Graph} is constructed as
+a list of \texttt{SubGraph}s where each \texttt{SubGraph} represents
+one process within the program. The idea behind this is to maintain
+the chronology of the nodes in each process and to enable easy analysis
+of the program on a per-process level. \texttt{SubGraph} handles the construction
+of local types while the \texttt{Graph} class handles the global type.
+
+\paragraph{Initial Design}
+
+\begin{multicols}{2}
+
+	\begin{minipage}{0.45\textwidth}
+		\begin{lstlisting}[language = ruby]
+    # P0
+    in_thread do
+      loop do
+        cue :B 
+        sync :A
+        sleep 1
+        play 63
+      end
+    end
+		\end{lstlisting}
+		\captionof{lstlisting}{Forming Types}	
+	\end{minipage}
+  
+	\begin{minipage}{0.45\textwidth}
+		\begin{lstlisting}[language = ruby]
+    # P1
+    in_thread do 
+      loop do
+        cue :A 
+        sleep 1
+        sync :B
+        sleep 0.5
+      end
+    end
+		\end{lstlisting}
+		\captionof{lstlisting}{Forming Types}
+	\end{minipage}
+
+\end{multicols}
+
+Initially when forming the types of threads, the program of snippets 11/12
+would produce a type of the form:
+\\
+\begin{lstlisting}
+  P0 :=  B:P0P1!.A:P1P0?
+  P1 :=  A:P1P0!.B:P0P1?
+\end{lstlisting}
+
+For the global type, a message can defined a passing from process \texttt{P0}
+to process \texttt{P1}, written \texttt{P0->P1}, if the types in processes 
+\texttt{P0} and \texttt{P1} dual each other. The algorithm we have for processing
+each type starts in the first type of each block and stores each token. If
+the next token is a dual of any of the tokens in our store we write out the
+next part of the global type and remove them from the store. If not, we
+remove any \texttt{cue} types from the current store, keep the \texttt{sync} 
+types and then place the current token at the top of the store and continue 
+until all type block have been consumed.
+
+% diagram of internal graphs here, showing that nodes in these graphs 
+% are chronological
+
+The reason we may process tokens in this way is demonstrated in figure().
+A Sonic Pi program will always increment its virtual time as we run through a
+program. \texttt{SubGraph}s are written in the order they are defined in 
+the source by line number. Given this, within a \texttt{SubGraph} if
+\texttt{n1.index < n2.index}, \texttt{n1} has resolved first. In later sections
+we will refer to this as the `horizontal' relationship between nodes. In 
+two concurrent \texttt{SubGraph}s, \texttt{n.index < m.index} and \texttt{n} 
+will be resolved first by the interpreter but they may have the same virtual 
+time within the program, thus they are compared to each other as well as 
+those tokens processed one previously. We will refer to this as the `vertical'
+relationship between nodes. The terms are purely a useful reference to the
+diagram presented in figure() rather than a physical property of the nodes
+or source lines.
+
+There is a small limitation in this design as it will allow certain untypable
+programs to be typed.
+
+An example of instance one can be shown with snippet 10 presented earlier, 
+reproduced below for clarity. As it is, this will produce the same session
+graph as the previous code snippet, which produces a feesable global type.
+The actual result for this should be untypable as both loops will become stuck
+at each \texttt{sync} node. 
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[language = ruby]
+	live_loop :foo do
+	    play :e4, release: 0.5
+	    sleep 0.5
+	    sync :bar
+	end
+
+	live_loop :bar do
+	    sample :bd_haus
+	    sleep 1
+	    sync :foo
+	end
+	\end{lstlisting}
+	\captionof{lstlisting}{Deadlock - types under this approach}
+\end{minipage}
+
+\paragraph{Keeping Time}
+To combat this we updated the construction of the graph to take into account
+a very basic notion of the passage of time. As the AST is being traversed, each
+instance of a \texttt{BodyNode} of value \emph{sleep} will create an empty
+\texttt{GraphNode} in the session graph. This does not break the order relation
+described previously but it does change the grouping of the `vertical' 
+relationship of the nodes. Rather than mapping each column as one relation, with
+the total set of relationship being equal to the maximum number of types in
+any one \texttt{SubGraph}, each `vertical' relation can be defined as the
+set of nodes between each \emph{time} node.
+
+% updated graph diagram here
+% highlights each vertical relation group
+
+Refering back to snippets 11/12, the program graph constructed now takes
+the form:
+\\
+\begin{lstlisting}
+  P0 :=  B:P0P1!.A:P1P0?.time
+  P1 :=  A:P1P0!.time.B:P0P1?.time
+\end{lstlisting}
+
+More importantly the program from snippet 13 will look as follows:
+\\
+\begin{lstlisting}
+  foo := foo:P0P1!.time.bar:P1P0?
+  bar := bar:P1P0!.time.foo:P0P1?
+\end{lstlisting}
+
+As before we process each block one `vertical' relation at a time. We take
+care in this iteration to make a note when a block is stuck at a \texttt{sync}
+node as we should not process any further tokens from this block. Rather than
+processing until the each of each token block, we process the first token group
+again in the event any trailing syncs would be triggered by the next loop. In
+the event we run into the same \texttt{sync} node that we are currently blocked
+on then we are able to return that this global type is not typeable.
+
+% new graph style
+
+\subsubsection{Global Construction}
+
 
 % recap important parts of MPST
 % start by explaining the theory of the approach
 
 % what information was important, why did this link up with session graph?
 
+As discussed previously in section(), the usual approach to multi-party session 
+types is to construct the global type of your program and then project the 
+individual process types from that. With this one can then write each process, 
+ensuring that all communication protocols remain consistent as development 
+proceeds. Projection is a simple and decidable approach to session times.
 
+This approach is not so feesable in this instance as we have already been 
+presented with the full source. Instead we are required to build the global
+type from the individual process types provided, the aim being to verify
+the communication of the program through this process. Whilst notably more
+difficult, this approach is also, thankfully, proveably decidable. There is
+no situation where any algorithmic approach to the problem will not terminate
+with some answer. In the cases where our program's global type is not
+typable, this suggests some communication error within the provided program.
+
+Given the dual types \texttt{A:P0P1?} and \texttt{A:P0P1!} we can transform 
+this into the global typing \texttt{P0->P1}, representing the fact that a 
+messagevis being transfered from \texttt{P0} to \texttt{P1}. \texttt{A} is not
+represented within this global type as it acts as the name of the channel on
+which the message is being sent. In this sense you can consider Sonic Pi
+to be a series of zero size messages being sent on each channel between
+each process.
+
+Interestingly the syntax of Sonic Pi allows for some interesting situations,
+some of which are not technically typable in strict Session Types but are
+perfectly valid, and sometimes useful, situations to occur in Sonic Pi.
+
+The first such situation we consider is when we have several \texttt{cue}
+signals with the potential to trigger one \texttt{sync}.
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[language = ruby]
+    # P0                # P1                # P2
+    in_thread do        in_thread do        in_thread do
+      loop do             loop do             loop do
+        cue :A              sync :A             cue :A
+        sleep 1             sleep 1             sleep 1
+      end                 end                 end
+    end                 end                 end
+	\end{lstlisting}
+	\captionof{lstlisting}{One \texttt{sync}, multiple \texttt{cue}}
+\end{minipage}
+
+In this scenario the \texttt{sync} in \texttt{P1} may be triggered by either
+of the \texttt{cue}s present in the other two threads. Whilst unusual,
+it is not unreasonable to suggest this is a valid program. It may be that the
+developer has set up the rest of the program code so that threads \texttt{P1} 
+and \texttt{P2} alternate for each loop that \texttt{P1} performs. The use
+of this in a musical sense could be an interesting drum riff to underpin the
+song, or some decorative melodies. To capture this information Sonic Pi 
+proposes an `\emph{or}' type, denoted by \texttt{||}. Given this notation the
+decomposed types for this set of threads is:
+\\
+\begin{lstlisting}
+  P0 := A:(P0P1)!
+  P1 := A:(P0P1||P2P1)?
+  P2 := A:(P2P1)!
+\end{lstlisting}
+
+Notice in this instance we are referring only to the `strict' types of each 
+process, rather than our graphical representation of the process, so the
+\texttt{time} elements discussed in the previous section have been ommitted 
+for this discussion.
+
+In terms of processing the global type, when each of these types line up
+into the same `vertical' relationship, the type constructed has the form 
+\texttt{(P0||P2)->P1}. The algorithm discussed previously does not need
+adapting to handle this new type form. The tokens are not removed from the
+stored pool until every node in the group has been processed. We are only
+required to add in some new code to handle the case where we have detected
+the extra information else we may actually print the types as a composition,
+\texttt{P0->P1.P2->P1}. This is a valid session type but is not an accurate
+definition for this situation.
+
+The other situation we considered is when one \texttt{cue} can trigger
+multiple \texttt{sync} statements. This is equally as untypable in strict
+session types but equally as viable from a musical point of view. The developer
+may have multiple melodies playing concurrently that should all sync onto the
+same drum beat.
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[language = ruby]
+    # P0                # P1                # P2
+    in_thread do        in_thread do        in_thread do
+      loop do             loop do             loop do
+        sync :A             cue :A              sync :A
+        sleep 1             sleep 1             sleep 1
+      end                 end                 end
+    end                 end                 end
+	\end{lstlisting}
+	\captionof{lstlisting}{One \texttt{cue}, multiple \texttt{sync}}
+\end{minipage}
+
+In this situation we propose a simple `\emph{and}' type. \texttt{cue} is an
+asynchronous message that propogates out to all processes currently waiting.
+Given this, the \texttt{cue} present in \texttt{P1} will trigger the \texttt{sync}
+in \texttt{P0} \emph{and} the \texttt{sync} in \texttt{P2}. The types we 
+print for this are as follows:
+\\
+\begin{lstlisting}
+  P0 := A:(P1P0)?
+  P1 := A:(P1P0&&P1P2)!
+  P2 := A:(P1P2)?
+\end{lstlisting}
+
+As before, the algorithm for creating global types from this type set is not
+affected. The \texttt{sync} statements will either be in the store from a previous
+iteration of the algorithm or be handled as all statements from the same `vertical'
+relationship will be processed. The global type for this situation will be printed
+as \texttt{P1->(P0\&\&P2)}. In the event these statements are separated by time
+progression, the type will print as the usual global type involving two processes.
+\texttt{sync} statements will still be stored as described earlier, either to be
+consumed by a later \texttt{cue} of the correct dual typing or to be hit again
+and processed as an untypable program.
+
+On initial consideration one might define the \texttt{||}-type as a dual of the
+\texttt{\&\&}-type, and vis versa, but this is inaccurate for the context in which
+they are used. The main component of these types is still the act of sending or
+receiving a message, so dual typings are still based off of the dual relationship
+of `\texttt{?}' and `\texttt{!}'. The two types we introduce here are more like
+a `typing sugar' to describe situations where a process can send and received
+multiple messages at the same time. This is not a situation that session types
+usually handle. Session Types are defined by their use of message queues, sending
+message packets (be they single packets or multiple) in sequence along the 
+\emph{same} channel to \emph{single} receivers. It does not define a situation
+where one can trasmit a message on one channel to multiple places. In this case
+this projects presents an interesting evolution of session types for this field.
+We have implemented multiple modes that our project can operate under to reflect
+this, so developers can choose to analysis under `strict' typing or under the
+`Sonic Pi' typing outlined here.
+
+\paragraph{Sub-Typing}
+\begin{multicols}{2}
+Introducing the concept of time progression into the graph also handles one other
+case that the initial column approach did not.
+
+Under the initial algorithm, both \texttt{cue} statements in snippet 16 would be
+processed and then discarded, as \texttt{cue} statements do not persist in the 
+statement store. However, these statements all execute at the same virtual time 
+in the program; both \texttt{cue}s will trigger both \texttt{sync}s in the Sonic 
+Pi environment. 
+\\
+\begin{lstlisting}
+  P0 := B:(P0P1)!.A:(P1P0)?
+  P1 := A:(P0P1)!.B:(P0P1)?
+\end{lstlisting}
+
+In `strict' session types this is inaccurate:
+
+$\hphantom{tabs}$ \texttt{B:(P0P1)!.A:(P1P0)?} 
+\\ $\hphantom{tabular} \neq$ \texttt{dual(A:(P0P1)!.B:(P0P1)?)}
+
+The accurate type for the second process would be \texttt{B:(P0P1)?.A:(P0P1)!}, 
+(or one could keep \texttt{P1} unchanged and swap the terms in the other process). 
+To handle this, the project makes use of sub-typing the \texttt{cue} type 
+\footnote{As remarked by Dominic Orchard in (either a paper or a presentation, 
+look this up)}.
+
+	\begin{minipage}{0.5\textwidth}
+
+		\begin{minipage}{\textwidth}
+			\begin{lstlisting}[language=ruby]
+	# P0 
+	in_thread do
+	  loop do   
+	    cue :B  
+	    sync :A 
+	    play 60 
+	    sleep 0.5 
+	  end 
+	end           
+
+
+	# P1
+	in_thread do
+	  loop do
+	    cue :A
+	    sync :B
+	    play 64
+	    sleep 0.5
+	  end
+	end
+			\end{lstlisting}
+			\captionof{lstlisting}{Sub-Typing \texttt{cue}}
+		\end{minipage}
+
+	\end{minipage}
+\end{multicols}
+
+%write this out in full theorectical detail
+
+Typing Test
+\newpage
 
 \section{Evaluation}
+\subsection{Ruby/C++}
+
+% comments on the three different methods available?
 
 % notes on speed of data transfer between ruby and C application
 
+% mention other ruby parser options -> maybe find some benchmark stats
+
+\subsection{Visual Adaptation}
 % some self evaluation here?
 % -> attempt at boost library and why that was dropped?
 
@@ -1166,102 +1612,47 @@ binary session types discussed earlier.
 % use of information
 % technical and non technical
 
-\section{Conclusion}
+\newpage
 
-\subsection{Achievement Summary}
+\section{Conclusion}
+In this chapter we bring the project to a close by first discussing various 
+improvements for the project, and other features that we might implement 
+in the future, before concluding with a summary of achievements. 
 
 \subsection{Future Work}
+\paragraph{Function Parametres}
+In its current state, the project is able to detect the use of functions
+and accurately update the current program state to show the current virtual
+time at a given point. That said, it is not able to do so with variable
+amounts of sleep. When a function is called with an argument that affects the
+amount of time the process must sleep for, the project cannot detect the
+argument passed into the function and apply this where necessary.
 
-% \section{Going Forward}
-% This section illustrates the plan of action laid out for the rest of the 
-% project over the next few months. The first section illustrates the rough
-% idea of how long each implementation of the program features will take, 
-% with documentation and evaluation time factored in. After that is the 
-% outline of how the project will be evaluated.
+\paragraph{Branching Session Types}
+This iteration of the project cannot accurately handle branching statements 
+within a program. There is some interesting theory to be considered in this
+improvement as labels will not be passed between processes as standard Session
+Types may expect them to be. Instead it is more likely that a given if-statement
+will be considered as an unlabelled branching type and its condition
+can be marked as the dual selection type repesenting all possible label choices.
+The subsequent global type for this statement appears as an internal message
+from the process to itself; this is not an accurate application of branching
+types but suits the given situation neatly.
 
-% \subsection{Project Outline}
+\paragraph{Detailed Time Nodes}
+In the current iteration of the session graph, the passage of time is simply
+denoted by an empty \texttt{GraphNode} with no extra information. In most cases
+this works well but in the event that there are two processes, \texttt{P0} and
+\texttt{P1}, it may be that \texttt{P0} processes two passages of time of equal
+length two one passage in \texttt{P1}. In this case the current node of 
+\texttt{P1} will be testing itself against the wrong position in \texttt{P0} 
+leading to an inaccurate type analysis. In the future we could investigate
+incorporating more of the information calculated in the timing affects portion
+of the program into the construction of the session graph.
 
-% \begin{figure}[ht]
-% 	\centering
-% 	\includegraphics[width=\textwidth]{images/gantt-two.png}
-% \end{figure}
+\subsection{Achievement Summary}
+\newpage
 
-% The weeks of the 16\textsuperscript{th} and 23\textsuperscript{th} of March are reserved for revision and
-% exam times. Before this work load is spread with consideration for courseworks
-% and after this most of the time is allocated with project work in mind. Core
-% requirements are aimed to be completed by the end of the Easter break. The weeks 
-% after that can be used as contingency in the case of unforseen circumstances, or
-% for some extension work as suggested below.
-
-% \begin{itemize}
-% 	\item SetUp Parser: The bulk of the work cannot be completed without a good 
-% 	representation of the AST of the language. Some time will be spent finding 
-% 	one that is easy to use and descriptive.
-% 	\item Timing Effects Features: The aim will be for the program to parse a 
-% 	Sonic Pi code piece provided to it and be able to calculate the virtual time 
-% 	of the program at each stage. The implementation is broken into different 
-% 	steps, Constant Timing being the parsing of simple constant expression, 
-% 	Variable Timing and Function Timing being those more complex timing elements 
-% 	where variables are passed to different functions in the code or when the 
-% 	timing is dynamically calculated.
-% 	\item Formalise Session Types: The current form of Sonic Pi does not have a 
-% 	full description of the application of session types to the language. The
-% 	idea is to define the formalisation of the theory of session types applied
-% 	to Sonic Pi, including local branching, recursion and delegation.
-% 	\item Implementing Types: This continues the previous point, the idea being 
-% 	to physically implement the features within the language. This will also act 
-% 	as tests that the formalisation is written well enough.
-% 	\item System Hook: Run the verification within the real Sonic Pi IDE
-% 	\item Cue/Sync Extensions: Currently the cue and sync primitives are very 
-% 	simplistic, they have no ability to choose what to send and receive in their 
-% 	messages. This extension will look into building on these primitives and 
-% 	consider channel passing within session types. There is time allocated for 
-% 	formalising the initial ideas and then implementing these into the language.
-% \end{itemize}
-
-% All items have been allocated some time to write up information about the tasks 
-% completed, both in terms of report details and any evaluation data presented. 
-% This will ensure maximum utilisation of the time allocated for reporting at the 
-% end of the project. Report Submission is dated for the week of the 15
-% \textsuperscript{th} of June. Presentation planning will overlap with this final 
-% week of reporting as presentations will be given the following week.
-
-% \subsection{Evaluation Outline}
-% As this is an educational program it would be ideal if some evaluation would 
-% take the form of user studies of Sonic Pi and the extensions made in this 
-% project. User groups could contain both those who have used the system before 
-% and those who have not, split equally between those who have a technical 
-% background and those who have none. It would be interesting to note whether 
-% any of those in the User Groups maintained any other creative hobbies outside 
-% of this field and how many had some kind of musical awareness and relate this 
-% to their reports and the overall findings of the tests.
-
-% Another piece that would be of interest would be discovering the execution 
-% times of the project on the different architectures that are available. Part 
-% of the objectives of the project is to provide a small verification system to 
-% run in parallel with a currently running program thread. For this to be a 
-% viable addition it must be fast and efficient enough not to interrupt with the 
-% existing functionality. On the Windows and Mac versions of the system it is 
-% unlikely to make much impact but the Raspberry Pi system is much smaller in 
-% it's capabilities.
-
-% Lee et al. \cite{LDW87} proposed six features required for a programming environment 
-% with a ``first class'' semantics for time:
-
-% \begin{itemize}
-% 	\item The ability to express timing constraints
-% 	\item Timed communication
-% 	\item Enforcement of timing constraints
-% 	\item Tolerance to violations and constraints
-% 	\item Maintaining consistency in distributed realtime systems
-% 	\item Static timing verification
-% \end{itemize}
-
-% On the conclucion of the project we will seek to see how well the extended Sonic 
-% Pi application is able to address these issues, to see if it may be described as 
-% having a ``first class'' semantics.
-
-% \section{Final Thoughts}
 
 \begin{thebibliography}{9}
 

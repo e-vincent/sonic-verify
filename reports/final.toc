@@ -10,23 +10,35 @@
 \contentsline {subsubsection}{\numberline {2.2.3}Sonic Pi V2.0}{8}
 \contentsline {paragraph}{Timing Sleep}{8}
 \contentsline {paragraph}{Threading}{10}
-\contentsline {paragraph}{The IDE}{12}
-\contentsline {subsection}{\numberline {2.3}Live Programming}{14}
-\contentsline {subsection}{\numberline {2.4}Session Types}{15}
-\contentsline {subsubsection}{\numberline {2.4.1}Binary Session Types}{15}
-\contentsline {paragraph}{Syntax Summary}{15}
-\contentsline {paragraph}{Operational Semantics}{16}
-\contentsline {paragraph}{Basic Concepts}{17}
-\contentsline {subsubsection}{\numberline {2.4.2}Multi-Party Session Types}{18}
-\contentsline {paragraph}{Extended Syntax}{19}
-\contentsline {paragraph}{Extended Operational Semantics}{20}
-\contentsline {paragraph}{Extended Concepts}{20}
-\contentsline {subsection}{\numberline {2.5}Related Work}{21}
-\contentsline {section}{\numberline {3}Technical Details}{23}
-\contentsline {subsection}{\numberline {3.1}Ruby/C++}{23}
-\contentsline {subsection}{\numberline {3.2}Timing Tree}{23}
-\contentsline {subsection}{\numberline {3.3}Session Graph}{23}
-\contentsline {section}{\numberline {4}Evaluation}{23}
-\contentsline {section}{\numberline {5}Conclusion}{23}
-\contentsline {subsection}{\numberline {5.1}Achievement Summary}{23}
-\contentsline {subsection}{\numberline {5.2}Future Work}{23}
+\contentsline {paragraph}{The IDE}{14}
+\contentsline {subsection}{\numberline {2.3}Live Programming}{15}
+\contentsline {subsection}{\numberline {2.4}Session Types}{16}
+\contentsline {subsubsection}{\numberline {2.4.1}Binary Session Types}{17}
+\contentsline {paragraph}{Syntax Summary}{17}
+\contentsline {paragraph}{Operational Semantics}{17}
+\contentsline {paragraph}{Basic Concepts}{18}
+\contentsline {subsubsection}{\numberline {2.4.2}Multi-Party Session Types}{19}
+\contentsline {paragraph}{Extended Syntax}{20}
+\contentsline {paragraph}{Extended Operational Semantics}{21}
+\contentsline {paragraph}{Extended Concepts}{22}
+\contentsline {section}{\numberline {3}Related Work}{23}
+\contentsline {section}{\numberline {4}Design \& Technical Implementation}{25}
+\contentsline {subsection}{\numberline {4.1}Integration}{25}
+\contentsline {subsection}{\numberline {4.2}Timing Tree}{25}
+\contentsline {subsubsection}{\numberline {4.2.1}Building the AST}{25}
+\contentsline {subsubsection}{\numberline {4.2.2}\texttt {pTrace}}{26}
+\contentsline {subsection}{\numberline {4.3}Session Graph}{26}
+\contentsline {subsubsection}{\numberline {4.3.1}Planning the Graph}{26}
+\contentsline {paragraph}{Initial Design}{26}
+\contentsline {paragraph}{Keeping Time}{28}
+\contentsline {subsubsection}{\numberline {4.3.2}Global Construction}{29}
+\contentsline {paragraph}{Sub-Typing}{31}
+\contentsline {section}{\numberline {5}Evaluation}{32}
+\contentsline {subsection}{\numberline {5.1}Ruby/C++}{32}
+\contentsline {subsection}{\numberline {5.2}Visual Adaptation}{32}
+\contentsline {section}{\numberline {6}Conclusion}{33}
+\contentsline {subsection}{\numberline {6.1}Future Work}{33}
+\contentsline {paragraph}{Function Parametres}{33}
+\contentsline {paragraph}{Branching Session Types}{33}
+\contentsline {paragraph}{Detailed Time Nodes}{33}
+\contentsline {subsection}{\numberline {6.2}Achievement Summary}{33}
