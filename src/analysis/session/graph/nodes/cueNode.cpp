@@ -12,9 +12,9 @@ void CueNode::accept(analysis::TypeVisitor* v)
 	v->visit(this);
 }
 
-void CueNode::accept(analysis::TypeVisitor* v, std::string& type, std::vector<std::pair<std::string, std::string>> interactions)
+void CueNode::accept(analysis::TypeVisitor* v, std::vector<std::pair<std::string, std::string>> interactions)
 {
-	v->visit(this, type, interactions);
+	v->visit(this, interactions);
 }
 
 } // namespace graph

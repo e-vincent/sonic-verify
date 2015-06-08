@@ -1,0 +1,25 @@
+live_loop :ding do
+  sync :A
+  cue :B
+  sync :C
+  sleep 0.5
+end
+
+live_loop :dang do
+  cue :A
+  cue :C
+  sleep 1
+end
+
+live_loop :dong do
+  sync :B
+  cue :C
+  sleep 0.5
+end
+
+live_loop :deng do
+  sync :B
+  sync :C
+  sync :A
+  sleep 0.5
+end

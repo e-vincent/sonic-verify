@@ -4,7 +4,11 @@
 namespace graph
 {
 
-GraphNode::GraphNode() { }
+GraphNode::GraphNode()
+{
+	stype = "time";
+}
+
 GraphNode::GraphNode(int index, int line, std::string symbol)
 {
 	this->index  = index;

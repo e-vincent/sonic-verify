@@ -7,52 +7,47 @@ TypeVisitor::TypeVisitor() { }
 
 void TypeVisitor::visit(graph::CueNode* cueNode)
 {
-	cueNode->appendSType("!");
+	cueNode->setSType("!");
 }
 
-void TypeVisitor::visit(graph::CueNode* cueNode, std::string& type, std::vector<std::pair<std::string, std::string>> interactions)
+void TypeVisitor::visit(graph::CueNode* cueNode, 
+		std::vector<std::pair<std::string, std::string>> interactions)
 {
-	bool flag = false;
-	std::string compound = "(";
-	for (auto action : interactions)
-	{
-		std::string type;
-		type.append(action.first).append(action.second);
-		if (flag)
-		{
-			compound.append("&&");
-		}
-		flag = true;
-		compound.append(type);
-	}
-	compound.append(")").append(cueNode->toSType());
-
-	type.append(compound);
+	typer(cueNode, "&&", interactions);
 }
 
 void TypeVisitor::visit(graph::SyncNode* syncNode)
 {
-	syncNode->appendSType("?");
+	syncNode->setSType("?");
 }
 
-void TypeVisitor::visit(graph::SyncNode* syncNode, std::string& type, std::vector<std::pair<std::string, std::string>> interactions)
+void TypeVisitor::visit(graph::SyncNode* syncNode, 
+		std::vector<std::pair<std::string, std::string>> interactions)
+{
+	typer(syncNode, "||", interactions);
+}
+
+void TypeVisitor::typer(graph::GraphNode* node, std::string typeSymbol,
+		std::vector<std::pair<std::string, std::string>> interactions)
 {
 	bool flag = false;
-	std::string compound = "(";
+	std::string compound = node->symbol;
+	compound.append(":");
+	compound.append("(");
 	for (auto action : interactions)
 	{
 		std::string type;
 		type.append(action.first).append(action.second);
 		if (flag)
 		{
-			compound.append("||");
+			compound.append(typeSymbol);
 		}
 		flag = true;
 		compound.append(type);
 	}
-	compound.append(")").append(syncNode->toSType());
+	compound.append(")").append(node->toSType());
 
-	type.append(compound);
+	node->setSType(compound);	
 }
 
 } // namespace analysis

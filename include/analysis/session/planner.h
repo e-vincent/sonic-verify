@@ -4,14 +4,12 @@
 #include <iostream>
 #include <stack>
 
-#include "rice/Array.hpp"
-
 #include "main.h"
 
 #include "analysis/session/graph/nodes/nodes.h"
 #include "analysis/session/graph/graph.h"
 #include "parse/ast/nodeTree.h"
-#include "parse/treeIterator.h"
+#include "parse/ast/treeIterator.h"
 
 namespace analysis
 {

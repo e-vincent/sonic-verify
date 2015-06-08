@@ -6,9 +6,8 @@ namespace analysis
 Planner::Planner()
 {
 	currIndex = 0;
-	subCount = 0;
+	subCount  = 0;
 	graph = new graph::Graph();
-	std::cout << "New Party Planner\n";
 }
 
 Planner::~Planner()
@@ -24,18 +23,16 @@ void Planner::setUp()
 	std::cout << "\n\n === Arc Results === \n";
 	graph->printArcs();
 	graph->printTypes();
+	graph->printGlobal();
 }
 
 graph::CueNode* Planner::makeCue(int line, std::string symbol)
 {
-	std::cout << "MAKE CUE\n";
-	std::cout << line << " " << symbol << " " << "\n";
 	return new graph::CueNode(getIndex(), line, symbol);
 }
 
 graph::SyncNode* Planner::makeSync(int line, std::string symbol)
 {
-	std::cout << "MAKE SYNC\n";
 	return new graph::SyncNode(getIndex(), line, symbol);
 }
 
@@ -43,7 +40,7 @@ graph::SyncNode* Planner::makeSync(int line, std::string symbol)
 void Planner::makeGraph(ast::NodeTree* tree)
 {
 	int currBlk = 0;
-
+	bool timeProgression = false;
 	std::stack<graph::GraphNode*> symbols;
 
 	ast::TreeIterator start = tree->begin();
@@ -52,11 +49,17 @@ void Planner::makeGraph(ast::NodeTree* tree)
 	for (ast::TreeIterator it = start; it != end; ++it)
 	{
 		ast::VisitableNode* curr = &(*it);
+		std::cout << "CURR VALUE: " << curr->value << "\n";
 		if (curr->value == "block")
 		{
 			if (!symbols.empty())
 			{
-				std::cout << "New Block" << "\n";
+				if (timeProgression)
+				{
+					symbols.push(new graph::GraphNode());
+					updateIndex();
+					timeProgression = false;
+				}
 				makeSubGraph(symbols);
 			}
 			++currBlk;
@@ -66,30 +69,48 @@ void Planner::makeGraph(ast::NodeTree* tree)
 		if (curr->value == "cue")
 		{
 			ast::VisitableNode* next = &(*(++it));
-			graph::CueNode* cueNode = makeCue(curr->line(), next->acceptType());
-			std::cout << "Found C/S Line " << curr->line() << "\n";
+			graph::CueNode* cueNode  = makeCue(curr->line(), next->acceptType());
 			graph->startArc(cueNode, subCount);
 			node = cueNode;
 		} 
-		
-		if (curr->value == "sync")
+		else if (curr->value == "sync")
 		{
-			ast::VisitableNode* next = &(*(++it));
+			ast::VisitableNode* next  = &(*(++it));
 			graph::SyncNode* syncNode = makeSync(curr->line(), next->acceptType());
-			std::cout << "Found C/S Line " << curr->line() << "\n"; 
 			graph->addToArc(syncNode, subCount);
 			node = syncNode;
+		} 
+		
+		if (curr->value == "sleep")
+		{
+			timeProgression = true;
 		}
 
 		if (node)
 		{
+			// empty node to mark message clusters in processes
+			if (timeProgression)
+			{
+				symbols.push(new graph::GraphNode());
+				updateIndex();
+				timeProgression = false;
+			}
+
 			symbols.push(node);
 			updateIndex();
 		}
 	}
 
+	// catch last sleeps
+	if (timeProgression)
+	{
+		symbols.push(new graph::GraphNode());
+		updateIndex();
+		timeProgression = false;
+	}
 	// catch last block
 	makeSubGraph(symbols);
+	graph->setNodeCount(getIndex());
 }
 
 void Planner::makeSubGraph(std::stack<graph::GraphNode*>& symbols)
@@ -100,6 +121,7 @@ void Planner::makeSubGraph(std::stack<graph::GraphNode*>& symbols)
 	sub->name.append("P").append(std::to_string(subCount++));
 
 	bool flag = true;
+	std::cout << "Symbol size: " << symbols.size() << "\n";
 	while (!symbols.empty())
 	{
 		node = *(&symbols.top());

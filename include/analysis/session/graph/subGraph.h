@@ -35,11 +35,11 @@ class SubGraph
 private:
 	int firstIndex;
 	int lastIndex;
-	std::list<graph::GraphNode*> nodes;
-	std::map<int, int> arcs;
 	std::string processType;
 
 public:
+	std::list<graph::GraphNode*> nodes;
+	std::map<int, int> arcs;
 	std::string name;
 
 	SubGraph();
@@ -55,7 +55,7 @@ public:
 	bool inrange(int index);
 
 	std::string sType();
-	void printType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs);
+	void constructType(std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs);
 };
 
 } // namespace graph

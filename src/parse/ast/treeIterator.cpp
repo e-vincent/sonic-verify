@@ -1,4 +1,4 @@
-#include "parse/treeIterator.h"
+#include "parse/ast/treeIterator.h"
 
 namespace ast
 {

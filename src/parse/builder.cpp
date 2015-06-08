@@ -19,34 +19,29 @@ Builder::~Builder()
 ast::BodyNode* Builder::makeNode(Rice::Symbol token, int index, 
 		int parent, int line, int statement, int blkDepth)
 {
-	std::cout << "Current Depth: " << blkDepth << "\n";
 	return new ast::BodyNode(token.str(), index, parent, line, statement, blkDepth);
 }
 
 ast::IntNode* Builder::makeInt(int num, int index, int parent,
 		int line, int statement, int blkDepth)
 {
-	std::cout << "Current Depth: " << blkDepth << "\n";
 	return new ast::IntNode(num, index, parent, line, statement, blkDepth);
 }
 
 ast::FloatNode* Builder::makeFloat(float num, int index, int parent,
 		int line, int statement, int blkDepth)
 {
-	std::cout << "Current Depth: " << blkDepth << "\n";
 	return new ast::FloatNode(num, index, parent, line, statement, blkDepth);
 }
 
 ast::SymNode* Builder::makeSymbol(std::string sym, int index, int parent,
 		int line, int statement, int blkDepth)
 {
-	std::cout << "Current Depth: " << blkDepth << "\n";
 	return new ast::SymNode(sym, index, parent, line, statement, blkDepth);
 }
 
 ast::SendNode* Builder::makeSend(int index, int parent, int line, int statement, int blkDepth)
 {
-	std::cout << "Current Depth: " << blkDepth << "\n";
 	return new ast::SendNode(index, parent, line, statement, blkDepth);
 }
 
