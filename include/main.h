@@ -2,6 +2,7 @@
 #include "rice/Constructor.hpp"
 
 #include "parse/builder.h"
+#include "analysis/infoFetcher.h"
 #include "analysis/timing/timeMarker.h"
 #include "analysis/session/planner.h"
 

@@ -1,4 +1,4 @@
-\documentclass[11pt]{scrartcl}
+\documentclass[11pt, abstracton]{scrartcl}
 \usepackage{a4, fullpage}
 
 \usepackage{color, xcolor}
@@ -7,6 +7,8 @@
 \usepackage{fancyvrb}
 \usepackage{enumitem}
 \usepackage{amsmath, amssymb}
+\usepackage{afterpage}
+\usepackage{lipsum}
 
 \titleformat
 	{\paragraph}
@@ -76,10 +78,25 @@
 \begin{document}
 
 \title{Musical Concurrent Programming \\ With Sonic Pi}
-\subtitle{Interim Report}
+\subtitle{Final Report}
 \author{Eleanor Vincent}
 \date{\today}
 \maketitle
+\afterpage{\null\newpage}
+\newpage
+
+\begin{abstract}
+\noindent\lipsum[1]
+\end{abstract}
+\afterpage{\null\newpage}
+\newpage
+
+\renewcommand{\abstractname}{Acknowledgements}
+
+\begin{abstract}
+\noindent\lipsum[1]
+\end{abstract}
+\afterpage{\null\newpage}
 \newpage
 
 \tableofcontents
@@ -88,6 +105,8 @@
 \section{Introduction}
 
 \subsection{Motivation}
+% need more on the concurrency verification motivation!!
+% easy to feed into how difficult that can be to teach?
 For many years it has not been a requirement that children should learn much
 about the vast field of computing during their formative years in UK 
 Education. In 2012, the Government began to re-recognise the signifiance of 
@@ -101,17 +120,19 @@ The movement is not purely restriced to the UK. In the US there is a similarly
 led campaign calling to recognise the topic as relevant to all contempary 
 sciences. It calls ``Computational Thinking'' a universally applicable 
 attitude and skill set everyone, not just computer scientists, would be eager 
-to learn and use \cite{Wing06}.
+to learn and use \cite{Wing06}. A recent Microsoft article, as part of the 
+\#WeSpeakCode campaign, claims that 75\% of students in the Asia Pacific region
+wish that programming could be offered as a core subject in their schools \cite{micro}.
 
-There is a general struggle within the humanties courses available in schools to 
-remain relevant in light of a quickly developing technical world. Music schemes 
+There is a general struggle within the humanties courses available in UK schools 
+to remain relevant in light of a quickly developing technical world. Music schemes 
 within the UK frequently report to have suffered funding cuts and education is 
 focused on learning a variety of specific instruments, with little focus on 
 musical technology.
 
-As well as the necessity of Computer Science and Music within schools, there 
-is an increasing recognition of the power of programming amongst the general 
-populace. A growing hacker and maker movement has been making programming a 
+As well as recognising Computer Science and Music within schools, there 
+is an increasing recognition of the power of programming amongst other disciplines. 
+A growing hacker and maker movement has been making programming a 
 much more accessible skill \cite{BAD14}; it presents itself as a viable and 
 useful hobby amongst a vast range of ages and professions and this is as much 
 because of the availability of useful resources that would be frequently used 
@@ -121,61 +142,120 @@ reported at PPIG \cite{Ch12,BC05}, and investigations into the craft practices
 of existing professional software developers who work in professional art 
 contexts \cite{W10}.
 
-Sonic Pi is one of many projects designed to support both computing and music 
-lessons within schools. Sonic Pi is an environment for creating live-coded 
-music at a level of complexity which is well suited to a first-programming 
-language \cite{sp}. Many available languages are suitable as a first-programming 
-language, but not all attempt to make themselves an inviting gateway into the 
-realm of technical programming and innovation. Sonic Pi seeks to provide an 
-exploratory and invigorating introduction into programming whilst being complex 
-enough to lead a user through into much more complicated programming ideas and 
-use cases with a managable learning curve. By presenting a musical system it 
-seeks to break down the barrier between the technical elite and the hobbyist. In 
-this report Sonic Pi will be presented in terms of the formalisation of its 
-timing effects and the existing concurrency primitives of the language. 
+At the same time as this we have entered an age where concurrency and 
+distribution have become some of the most pressing issues in computing. As we 
+begin to process hugely increased amounts of data the ideas of parallelism and 
+exploiting concurrency are becoming more and more pronounced. In this day and age
+it is almost impossible to find a person who does not own a mobile, most likely a 
+`smart' device, which relies on communicationwith other such devices to function 
+effectively. 
+
+Concurrency theory has been an active field of research since the 1960s, producing
+many formalisms over that time which have improved the field of computing. One 
+such formalism is that of process calculi, a field that $\pi$-calculus is a strong
+member of. Another type of process calculi, CSP, was highly influential in 
+bringing to light such languages as Go: a relatively young language but praised
+for its concurrency primitives and performance. Golang can be found in the backend
+of many notable technology companies. Models of concurrency are being used for
+reasoning and specification as well as at all stages of the development life
+cycle: design, implementation, testing, etc...
+
+Whilst there has been much in the field to support a programmer as they produce
+type-safe code, the same cannot be said for communication-safe code. Concurrency
+bugs such as deadlocks and thrashing behaviour can be as hard to locate now as
+ever before. Some tools and techniques exist to handle these situations, such as
+mutexes and locks \cite{T95}, but even with such tools there is no garauntee
+that some obscure situation will not arise to break it on the same level as 
+\emph{type-safety}.
+
+% This is not so much a motivation - switch out for concurrency
+% Sonic Pi is one of many projects designed to support both computing and music 
+% lessons within schools. Sonic Pi is an environment for creating live-coded 
+% music at a level of complexity which is well suited to a first-programming 
+% language \cite{sp}. Many available languages are suitable as a first-programming 
+% language, but not all attempt to make themselves an inviting gateway into the 
+% realm of technical programming and innovation. Sonic Pi seeks to provide an 
+% exploratory and invigorating introduction into programming whilst being complex 
+% enough to lead a user through into much more complicated programming ideas and 
+% use cases with a managable learning curve. By presenting a musical system it 
+% seeks to break down the barrier between the technical elite and the hobbyist. In 
+% this report Sonic Pi will be presented in terms of the formalisation of its 
+% timing effects and the existing concurrency primitives of the language. 
 
 \subsection{Objectives}
 In the current version of Sonic Pi there is no means to verify the timing effects
 or the communication patterns of the program. This is to say, users must judge
 themselves how long the current program is, that the program is timed correctly,
-and that the program is free from concurrency bugs. The first point can be 
-difficult for novice programmers, potentially moreso for those with little 
-musical experience. The later can be difficult for even some experienced 
-programmers due to the nondeterministic nature of some concurrency bugs.
+and that the program is free from concurrency bugs. This can be difficult enough 
+in a static environment; in Sonic Pi there is the additional requirement to do 
+all of these things during a live performance (studio audience included)! The 
+first point can be difficult for novice programmers, potentially moreso for 
+those with little musical experience. The latter can be difficult for even some 
+experienced programmers due to the non-deterministic nature of some concurrency 
+bugs.
 
 In building analysis for the timing effects of the program, we hope to develop
-something that is sufficiently lightweight so that it may eventually be run
-during a live performance of the program. This leads to interesting challenges
-in terms of the heuristics used when parsing the program and what solutions will 
-lead to the best possible results. We plan to utilise the speed of the platform
-and program architecture and efficient design for this matter.
+something that is sufficiently lightweight so that it may be run during a live 
+performance of the program. This leads to interesting challenges in terms of the 
+heuristics used when parsing the program and what solutions will lead to the best 
+possible results. We plan to utilise the speed of the platform and program 
+architecture and efficient design for this matter.
 
 In developing the communication patterns of Sonic Pi we aim to utilise the
 theory of Session Types and apply them to this context. Session Types will
 enable us to define a clearly understandable structure to the communication
 protocol of the program; this will enable the tool to identify difficult bugs
-such as deadlocks and thrashing behaviour. This is possibly the first application
-of this concept to the live programming paradigm of which Sonic Pi is a part.
+such as deadlocks and thrashing behaviour. In identify problems in this manner,
+we will be able to reduce the number of crashes developers experience whilst 
+writing code `on-the-fly'.
+
+\subsection{Contributions}
+We have produced a lightweight shared library, often affectionately referred to 
+as Sonic-Verify, that enables a variety of different analysis of a program 
+written for the Sonic Pi IDE. The project analyses the timing effects of the 
+program, outputting such information as the total `virtual time' elapsed by the 
+program and more specific detail, such as function durations. This implementation
+of a formal timing system presents an improved environment in which developers
+may code more asthetically pleasing music in a live environment. 
+
+This is also the first instance of the theory of Session Types being applied in 
+a (musical) live programming context. With this analysis we are able to output 
+the decomposed types of all processes in the program and the associated global 
+type, presenting an intuitive description of the interactions of processes 
+within the source code. This presents an exciting new realm of possibility in
+terms of concurrency verification and the application of Session Types in 
+existing distributed paradigms.
+
+We have implemented a set of tests that systematically verifies the results that
+our project produces; it covers a range of features starting from the most basic
+of sequential programs through into full music sources, with complex function
+call structures and multiple interacting process threads. Finally, we have fitted
+this library into the existing Sonic Pi IDE in a manner that is beneficial to both
+new coders and `old hat's alike. 
 
 \subsection{Report Structure}
 The remainder of this report is broken down as follows:
 
 \begin{itemize}
-	\item Background: We detail the histories of Sonic Pi, Live Programming 
-	and Session Types as fields of research and conclude with work relating to
-	these subjects.
+	\item Background: We detail the basic concepts of Sonic Pi and its timing 
+	effects, and Session Types to give an adequate foundation for the work 
+	presented in this project. We also explore the field of Live Programming 
+	as part of the background research.
 	\item Related Work: We detail the existing work in the field Live Programming
-	as a whole and with the focus on musical programming. We also detail some
-	of the existing applications of Session Types outlining the approaches and
+	with a particular focus on those with musical contexts. We also detail some
+	of the existing applications of Session Types, outlining the approaches and
 	differences therein.
 	\item Design \& Technical Implementation: Here the chapter is broken into
 	two core sections, focusing on both the timing effects of Sonic Pi and
 	the session types of Sonic Pi in turn. We discuss chosen languages and key
 	libraries used in the design of the program and then move into general
-	implementation and interesting algorithms and code from each section.
+	implementation and interesting algorithms and code from each section. The
+	section concludes with a brief discussion of the architecure of the Sonic 
+	Pi IDE and how we chose to integrate our verification library.
 	\item Evaluation: Here we evaluate the success of the project. We discuss
 	the limitations of the current state of the project and outline qualitive
-	and quantative metrics for the project.
+	and quantative metrics for the project, including a systematic test of
+	the correctness of our approach.
 	\item Conclusion: Here we present possible improvement for the project in
 	the future work section before closing with a summary of those objectives
 	achieved.
@@ -227,14 +307,16 @@ important feature for a musical language. Some of the concepts that Sonic Pi
 is well suited to teach, in direct relevance to the current UK Computing in 
 Schools Cirruculum, are conditionals, iteration, variables, functions, 
 algorithms and data structures. Sonic Pi also extends beyond these concepts to 
-include such things as multi-threading and hot-swapping of code as these are 
+include such features as multi-threading and hot-swapping of code as these are 
 likely to be of crucial importance in the future of programming contexts \cite{
-AOB14}.
+AOB14}. It also presents an inviting environment to teach concepts such as 
+parallelism and concurrency; a core strength of the program as these can be
+notoriously difficult concepts to explain.
 
 This section first gives a brief description of the Raspberry Pi then explores 
 the implementation of Sonic Pi V1.0, mainly to give appropriate context to the 
-timing system that Sonic Pi V2.0 currently imeplments. There is then be some 
-short discussion on the particular features of Sonic Pi V2.0.
+timing system that Sonic Pi V2.0 currently imeplments. There is then a 
+short discussion on the features of Sonic Pi V2.0.
 
 \subsubsection{Raspberry Pi}
 The Raspberry Pi was developed as a very low cost computer system to enable 
@@ -244,7 +326,7 @@ they could tinker with or expose the programming layer. The idea came about in
 up Computer Science after their A-Levels. The reasons for this were attributed 
 to many contributing events such as the end of the ``dot com'' boom, the focus 
 of IT lessons on Microsoft software and building very basic HTML websites and 
-the increased availability of out-of-the-box games consoles over the Amigo, BBC 
+the increased availability of out-of-the-box games consoles over the Amiga, BBC 
 Micro, Spectrum ZX and Commodore 64 machines that promoted individual 
 experimentation so freely in the past \cite{rp}.
 
@@ -263,7 +345,7 @@ Schools.
 \subsubsection{Sonic Pi V1.0}
 
 \begin{multicols}{2}
-Sonic Pi V1.0 was designed to port the language Overture to the Raspberry Pi in 
+Sonic Pi V1.0 was designed to port the language Overtone to the Raspberry Pi in 
 order to focus on driving specific educational objectives; the idea in mind was 
 to teach a target audience of 12-year-olds that had no previous experience with 
 programming; it would bring them from the state of ``this is a computer'' through 
@@ -546,15 +628,15 @@ correctly.
 
 While running a program, Sonic Pi's \texttt{live\_loops} will automatically update 
 the program without skipping any beats. This gives the users a great amount of 
-freedom to experiment with different sounds without having to stop the program 
-and wait for anything to compile and run, as is the case with standard 
+freedom to experiment with different sounds without having to reset the program
+with every small edit, as is the case with standard 
 programming. This feature, however, is directly affected by the previously 
-described temporal semantics, in that loops can easily become out of time with 
-each other while a performance is happening. To combat this, Sonic Pi provides 
+described temporal semantics; loops can easily become out of time with 
+each other during a performance. To combat this, Sonic Pi provides 
 synchronisation semantics in the form of the \texttt{cue} and \texttt{sync} 
 commands. Each time a \texttt{live\_loop} loops it will generate a new \texttt{cue} 
 event which we are able to \texttt{sync} on to. \texttt{cue} is an asynchronous,
-non-blocking message and \texttt{sync} is a blocking message.
+non-blocking operation and \texttt{sync} is a blocking operation.
 
 \begin{multicols}{2}
 The Snippets to the right demonstrate a rough workflow of how a user would use 
@@ -592,7 +674,7 @@ live_loop :bar do
     sleep 1
 end
 			\end{lstlisting}
-			\captionof{lstlisting}{Out of Sync Live Loops}
+			\captionof{lstlisting}{Out of Sync Live Loops} \label{outofsync}
 		\end{minipage}
 		\begin{minipage}{\textwidth}
 			\begin{lstlisting}[language = ruby]
@@ -607,7 +689,7 @@ live_loop :bar do
     sleep 1
 end
 			\end{lstlisting}
-			\captionof{lstlisting}{Synced Live Loops}
+			\captionof{lstlisting}{Synced Live Loops} \label{synced}
 		\end{minipage}
 
 	\end{minipage}
@@ -647,7 +729,7 @@ minmal confusion. For this reason the IDE only consists of five key components:
 \begin{figure}[t]
 	\centering
 	\includegraphics[width=\textwidth]{images/sonic-ide.png}
-	\caption{Sonic Pi V2.1.1 IDE - Apple Mac View}
+	\caption{Sonic Pi V2.1.1 IDE - Apple Mac View} \label{macview}
 \end{figure}
 
 Sonic Pi originally choose not to have a file save system as the workspaces 
@@ -778,240 +860,6 @@ Session Types consist of the following key ideas:
 	read on this futher in such papers as \cite{HVM98} and \cite{HYC08}}.
 \end{itemize}
 
-\subsubsection{Binary Session Types}
-\paragraph{Syntax Summary}
-
-The base sets of the syntax used to describe session types are as follows:
-
-\begin{itemize}[noitemsep]
-	\item[] \emph{names}: ranged over by \emph{a,b...}
-	\item[] \emph{channels}: ranged over by \emph{k, k'...}
-	\item[] \emph{variables}: ranged over by \emph{x, y...}
-	\item[] \emph{constants}: ranged over by \emph{c, c'...}
-	\item[] \emph{expressions}: ranged over by \emph{e, e'...}
-	\item[] \emph{labels}: ranged over by \emph{l,l'...}
-	\item[] \emph{process variables}: ranged over by \emph{X, Y... u, u'...}
-\end{itemize}
-
-\emph{Processes}, ranged over by \texttt{P, Q...}, are given by the following 
-grammar:
-\\
-
-\begin{lstlisting}
-    P ::= request a(k) in P          session request
-        | accept a(k) in P           session acceptance
-        | k![$\tilde{e}$]; P                    data sending
-        | k?($\tilde{x}$) in P                  data reception
-        | k $\triangleleft$ $\ell$; P                     label selection
-        | k $\triangleright$ {$\ell$$_1$:P$_1$[] ... []$\ell$$_n$:P$_n$}         label branching
-        | throw k[k$_0$]; P              channel sending
-        | catch k(k$_0$) in P            channel reception
-        | if e then P else Q         conditional branch
-        | P | Q                      parallel composition
-        | inact                      inaction
-        | ($v$u)P                       name/channel hiding
-        | def D in P                 recursion
-        | X[$\tilde{e}\tilde{k}$]                        process variables
-\end{lstlisting}
-\begin{lstlisting}
-    D ::= X$_1$($\tilde{x}_1\tilde{k}_1$) = P1 and ...           declaration for recursion
-                and X$_n$($\tilde{x}_n\tilde{k}_n$) = P$_n$ 
-\end{lstlisting}
-
-``$|$'' is the weakest association; the others listed have the same association. 
-Parenthesis denote binders which bind the corresponding free occurrences. We use standard simulataneous substitution, written $ $. The sets of free names/channels/variables/process variables of, for example program \texttt{P}, are written as \texttt{fn(P), fc(P), fv(P) and fpv(P)} respectively. Processes without free variables or free channels are called programs.
-
-\paragraph{Operational Semantics}
-The consise definition of the operational semantics of session types requires the 
-definition of the concept \emph{structural congruence}, $\equiv$ \cite{BB92, M92},
-as the smallest congruence relation on processes. The following equations are
-presented as examples:
-\\
-
-\begin{lstlisting}
-                         P $\equiv$ Q if P $\equiv_\alpha$ Q
-                          P | inact $\equiv$ P, 
-                          P | Q $\equiv$ Q | P, 
-                    (P | Q) | R $\equiv$ P | (Q | R)
-                       ($vu$)inact $\equiv$ inact, 
-                ($vuu$)P $\equiv$ ($vu$)P, ($vuu'$)P $\equiv$ ($vu'u$)P, 
-              ($vu$)P | Q $\equiv$ ($vu$)(P | Q) if $u \notin$ fu(Q), 
-           ($vu$)def D in P $\equiv$ def D in ($vu$)P if $u \notin$ fu(D)
-   (def D in P) | Q $\equiv$ def D in (P | Q) if fpv(D) $\cap$ fpv(Q) = $\emptyset$
-    def D in (def D' in P) $\equiv$ def D and D' in P 
-                                       if fpv(D) $\cap$ fpv(D') = $\emptyset$
-\end{lstlisting} 
-
-The operation semantics are then represented using the \emph{reduction relation}, 
-$\rightarrow$. It is assumed the \emph{evaluation relation}, $\downarrow$, 
-is given and $\rightarrow^*$ represents the reflexive, transistive closure of 
-$\rightarrow$. Reduction is the smallest relation on processes and is demonstrated 
-by the following equations:
-\\
-
-\begin{lstlisting}
- [Link]  (accept a(k) in P1) | (request a(k) in P2) 
-            $\rightarrow$ ($v$k)(P1 | P2)
-  [Com]  (k![$\tilde{e}$]; P1) | (k?($\tilde{x}$) in P2) 
-            $\rightarrow$ P1 | P2[$\tilde{c}/\tilde{x}$]                   ($\tilde{e} \downarrow \tilde{c}$)
-[Label]  (k $\triangleleft$ $\ell_i$; P) | (k $\triangleright$ {$\ell_1$:P$_1$[] ... []$\ell_n$:P$_n$}) 
-            $\rightarrow$ P | Pi                      (1 $\leq$ i $\leq$ n)
- [Pass]  (throw k[k$_0$]; P$_1$) | (catch k(k$_0$) in P$_2$) 
-            $\rightarrow$ P1 | P2
-  [If1]  if e then P1 else P2 $\rightarrow$ P1        (e $\downarrow$ true)
-  [If2]  if e then P1 else P2 $\rightarrow$ P2        (e $\downarrow$ false)
-  [Def]  def D in (X[$\tilde{e}\tilde{k}$] | Q) 
-            $\rightarrow$ def D in (P[$\tilde{c}/\tilde{x}$] | Q)          ($\tilde{e} \downarrow \tilde{c}$, $\tilde{X}$ ($\tilde{x}\tilde{k}$) = P $\subset$ D)
- [Scop]  P $\rightarrow$ P' $\Rightarrow$ ($v$u)P $\rightarrow$ ($v$u)P0
-  [Par]  P $\rightarrow$ P' $\Rightarrow$ P | Q $\rightarrow$ P' | Q
-  [Str]  P $\equiv$ P' and P' $\rightarrow$ Q' and Q' $\equiv$ Q $\Rightarrow$ P $\rightarrow$ Q
-\end{lstlisting}
-
-\paragraph{Basic Concepts}
-
-The central idea to presenting structure is the \emph{session}. A \emph{session} 
-is a set of reciprocal interactions between two parties and serves as a unit of 
-abstraction for describing that interaction. Communications of sessions are done 
-via a \emph{channel} and can be initiated as follows:
-
-\begin{multicols}{2}
-
-	\begin{minipage}{0.5\textwidth}
-		\begin{verbatim}
-  request a(k) in P    accept a(k) in P 
-		\end{verbatim}
-	\end{minipage}
-	
-	\begin{minipage}{0.5\textwidth}
-
-\hspace*{15pt}: Initiating a Session
-	\end{minipage}
-
-\end{multicols}
-
-The \texttt{request} first requests the initiation of a \emph{session} (with 
-\emph{name a}) as well as the generation of a fresh \emph{channel} (with 
-\emph{name k}) which \texttt{program P} will then use for later communication. 
-On the other hand, \texttt{accept} receives the request to initiate the session 
-\emph{a} and generates channel \emph{k} for use in \texttt{P}. In this function, 
-parenthesis and the keyword \texttt{in} show scope binding.
-
-Via this generated channel, we can then perform three kinds of atomic operation:
-\\
-
-\begin{multicols}{2}
-
-	\begin{minipage}{0.5\textwidth}
-\begin{lstlisting}
-    k![e$_1$, ..., e$_n$]; P    
-    k?(x$_1$, ..., x$_n$) in P
-    k $\triangleleft$ $\ell$; P  
-    k $\triangleright$ {$\ell$$_1$:P$_1$[] ... []$\ell$$_n$:P$_n$}
-    throw k[k$_0$]; P       
-    catch k(k$_0$) in P 
-\end{lstlisting}
-	\end{minipage}
-	
-	\begin{minipage}{0.5\textwidth}
-
-% \hspace*{15pt}: Initiating a Session
-\vspace{5pt}
-\begin{myitemize}
-  \item[] : Data Sending
-  \item[] : Data Receiving
-  \item[] : Label Selection
-  \item[] : Label Branching
-  \item[] : Channel Sending
-  \item[] : Channel Receiving
-\end{myitemize}
-	\end{minipage}
-
-\end{multicols}
-
-\emph{Data sending/receiving} is the standard synchronous message passing. 
-\emph{e\textsubscript{i}} denotes expression and we assume the \emph{x} 
-variables are all distinct.
-
-\emph{Brancing/Selection} is the minimisation of method invocation in object-
-based programming. The labels are assumed to be pairwise distinct. 
-
-\emph{Channel Passing}, also referred to as \emph{Delegation}, passes a channel 
-which is being used in a session to another process, enabling us to radically 
-chance the structure of a session. \emph{Delegation} is the generalisation of 
-the concept of the same name in object-based programming \cite{YT87}.
-
-We futher define the session types with the following standard constructs, 
-organised by session:
-\\
-
-\begin{multicols}{2}
-
-	\begin{minipage}{0.5\textwidth}
-\begin{lstlisting}
-    P1 | P2
-    ($v$a)P ($v$k)P 
-    if e then P else Q 
-    def X$_1$($\tilde{x}$$_1$ $\tilde{k}$$_1$) = P$_1$ and 
-       ... and X$_n$($\tilde{x}$$_n$ $\tilde{k}$$_n$) = P$_n$ in P
-\end{lstlisting}
-	\end{minipage}
-	
-	\begin{minipage}{0.5\textwidth}
-
-% \hspace*{15pt}: Initiating a Session
-\vspace{5pt}
-\begin{myitemize}
-  \item[] : Concurrent Composition
-  \item[] : Name/Channel Hiding
-  \item[] : Conditional
-  \item[] : Recursion
-\end{myitemize}
-	\end{minipage}
-
-\end{multicols}
-
-\emph{Hiding} declares a name/channel to be local in its scope (here 
-\texttt{P}). Whilst not used in regular programming it is needed in the 
-Operation Semantics of session types. Recursion could be achieved through 
-replication but multiple is preferable for well-structured programs.
-
-% Rewrite the formatting for these bits
-% Also write up a working example of binary ST
-%    ATM examples from course would be a good one -> cite Nobuko?
-
-\paragraph{Example Situation}
-To put the information discussed here into some context, this next section
-introduces a basic example of session types througha basic ATM system\footnote{
-A simplified recreation of the example found in \cite{HVM98}, section 4}. 
-In this situation there is one \texttt{ATM} agent that offers two services, 
-balancing or depositing. These services are offered as two branch 
-\emph{labels}. Firstly, the user will establish a \emph{session} via $a$. The 
-user can then input their verification code (validation of this is ommitted
-for the current example). If \emph{balance} is chosen, then the 
-\texttt{ATM} requests the value from the bank and shows this to the user, before
-returning to the menu state. If \emph{deposit} is selected, the 
-\texttt{ATM} accepts the deposited amount to be sent to the bank, and again
-returns to the menu state. A user may exit at any time via \emph{quit}. This 
-effectively demonstrates continuous unbounded interactions in session types.
-
-The following implementation demonstrates this agent:
-\\
-\begin{lstlisting}
-  ATM($a$,$y$)       = accept $a$($z$) in $k$![$id$]. ATM$_1$[$a$,$y$,$id$,$z$]
-  ATM$_1$($a$,$y$,$id$,$s$) = $s$ $\triangleright$ { $\emph{deposit}$: request $y$($h$) in $s$?($amt$) in
-                         $h \triangleleft \emph{deposit}$. $h$![$id$, $amt$]. ATM$_1$[$a$,$y$,$id$,$s$]
-                    [] $\emph{balance}$: request $y$($h$) in 
-                         $h \triangleleft \emph{balance}$. $h$?($amt$) in
-                              $s$![$amt$]. ATM$_1$[$a$,$y$,$id$,$s$]
-                    [] $\emph{quit}$: ATM($a$, $y$) }
-\end{lstlisting}
-
-A simple user agent may look as follows:
-\\
-\begin{lstlisting}
-  request $a$($z$) in $z$![$myID$]. $z \triangleleft \emph{quit}$ 
-\end{lstlisting}
-
 \subsubsection{Multi-Party Session Types}
 Multi-Party Asynchronous Session Types are a class of behavourial types
 specifically targeted at describing protocols in distribute systems
@@ -1033,199 +881,6 @@ from a single behaviour. To handle this, multi-party session types
 introduces the concept of a global type; an abstraction of the global
 scenario, whereby we can construct the local types of each process and
 again ensure the composability of the interactions\cite{HYC08}. 
-
-First we will outline the formal syntax and operational semantics of 
-multi-party session types. After this we will detail the concepts behind 
-multi-party session types by way of examples.
-
-\paragraph{Extended Syntax}
-The base sets for multi-party session types are as found in the binary
-definition with one addition:
-
-\begin{itemize}[noitemsep]
-	\item[] \emph{participant number}: ranged over by \emph{p, q...}
-\end{itemize}
-
-We also define \emph{channel with role}, $s[p]$, as a runtime requirement
-(detailed fully after the refined process grammar).
-
-\emph{Process} syntax, such as session request/acceptance, value 
-send/receive, and channel delegation/reception, has been updated to reflect
-the multi-party nature of this communication. As in \cite{CCPY15}, the 
-calculus described here uses communication actions that specify exactly
-one receiver (rather than a non-empty set of receivers) and recursive
-definitions with exactly one data parametre and one channel parametre. Presenting
-the syntax in this manner simplifies the presentation of the material as
-allowing multiple receivers is largely a matter of syntactic sugar. The grammer
-for processes is presented next, with unchanged definitions ommitted for brevity:
-\\
-
-\begin{lstlisting}
-    P ::= $\bar{u}$[p](y).P              multicast request
-        | u[p](y).P             multicast accept
-        | c!<p,e>.P             value sending
-        | c?(p,x).P             value reception
-        | c!<<p,c'>>.P          channel delegation
-        | c?((q,y)).P           channel reception
-        | c $\oplus$ <p,l>.P            selection
-        | c $\&$ (p,$\{$l$_i$:P$_i\}_{i \in I}$)            branching
-        | X <e,c>               process call
-        | ($v$a)p                  service name hiding
-        | ($v$s)P                  session hiding
-        | s : h                 message queue
-\end{lstlisting}
-
-Session hiding and message queue are elements of \emph{runtime syntax}, 
-as was channel with role. The operational semantics of session types are
-defined by reduction rules, given in the next section. With these, it is
-helpful to define these runtime states to account for communication situations
-that arise within a programs lifetime but are not necessarily visable from
-the program's source. Message queues are used to enable the modelling of
-TCP-like asynchronous communications.
-
-In \texttt{(vs)P} all occurances of \texttt{s[p]} and the queue \texttt{s}
-inside \texttt{P} are bound. A process is \emph{closed} if the only free 
-names in it a are service names. \texttt{fn(Q)(fn(D))} is the set of free 
-names in \texttt{Q(D)}. The set of process variables declared in D and the 
-set of process variables that occur free in Q are \texttt{dpv(D)} and 
-\texttt{fpv(Q)} respectively.
-
-\paragraph{Extended Operational Semantics}
-In addition to the standard rules of structural congruence, multi-party session
-types include a rule for rearranging messages in a queue when the senders or
-receivers are not the same:
-\\
-
-\begin{lstlisting}
-                            P | 0 $\equiv$ P
-                            P | Q $\equiv$ Q | P
-                      (P | Q) | R $\equiv$ P | (Q | R)
-                 ($v$r)P | Q $\equiv$ ($v$r)(P | Q)  if r $\notin$ fn(Q)
-         ($v$r)($v$r')P $\equiv$ ($v$r')($v$r)P, ($v$a) 0 $\equiv$ 0, ($v$s)(s:$\emptyset$) $\equiv$ 0
-                             where r ::= a | s
-
-                       def D in 0 $\equiv$ 0
-      def D in ($v$r)P $\equiv$ ($v$r)def D in P       if r $\notin$ fn(D)
-   (def D in P) | Q $\equiv$ def D in (P | Q)    if dpv(D) $\cap$ fpv(Q) = $\emptyset$
-
-          def D in (def D' in P) $\equiv$ def D' in (def D in P)
-if (dpv(D) $\cup$ fpv(D)) $\cap$ dpv(D') = dpv(D) $\cap$ (dpv(D') $\cup$ fpv(D')) = $\emptyset$
-
-s:h$\cdotp$(q,p,$\xi$)$\cdotp$(q',p',$\xi$')$\cdotp$h' $\equiv$ s:h$\cdotp$(q',p',$\xi$')$\cdotp$(q,p,$\xi$)$\cdotp$h'
-                                         if p $\neq$ p' or q $\neq$ q'
-\end{lstlisting}
-
-Next we present the rules for reducing processes where $\rightarrow^*$ and 
-$\rightarrow^k$ have the usual expected meaning. These rules describe the
-initialisation of sessions, value passing, output rules and their complementary
-input rules. These operations ensure that the senders match and that the message
-is meant for the specified receiver:
-\\
-
-\begin{lstlisting}
-    [Init]  a[1](y).P$_1$ | $\ldots$ | a[n-1](y).P$_{n-1}$ | $\bar{a}$[n](y).P$_n$ 
-	$\rightarrow$ ($v$s)(P$_1${s[1]/y} | $\ldots$ | P$_{n-1}${s[n-1]/y} | P$_n${s[n]/y} | s:$\emptyset$)
-    [Send]  s[p]!<q,e>/P | s:h 
-        $\rightarrow$ P | s:h$\cdotp$(p,q,$v$)                           (e $\downarrow$ $v$)
-   [Deleg]  s[p]!<<q,s'[p']>>.P | s:h $\rightarrow$ P | s:h$\cdotp$(p,q,s'[p'])
-     [Sel]  s[p]$\oplus$<l,q>.P | s:h         $\rightarrow$ P | s:h$\cdotp$(p,q,l)
-     [Rev]  s[p]?(q,x).P | s:(q,p,$v$)$\cdotp$h $\rightarrow$ P{$v$/x} | s:h
-    [Srev]  s[p]?((q,y)).P | s:(q,p,s'[p'])$\cdotp$h 
-        $\rightarrow$ P{s'[p']/y} | s:h
-  [Branch]  s[p]$\&$(q, {l$_i$}:P$_i)_{i \in I}$) | s:(q,p,l$_j$)$\cdotp$h 
-	$\rightarrow$ P$_j$ | s:h (j $\in$ I)
-    [If-t]  if e then P else Q $\rightarrow$ P                (e $\downarrow$ true)
-    [If-f]  if e then P else Q $\rightarrow$ Q                (e $\downarrow$ false)
-[Proccall]  def X(x,y) = P in (X<e,s[p]> | Q) 
-	$\rightarrow$ def X(x,y) = P in (P{$v$/x}{s[p]/y} | Q)  (e $\downarrow$ $v$)
-
-     [Str]  P $\equiv$ P' and p' $\rightarrow$ Q and Q $\equiv$ Q' $\Rightarrow$ P $\rightarrow$ Q
-\end{lstlisting}
-
-\paragraph{Extended Concepts}
-% important to get a good working example going to demonstrate global typings
-% go into detail about projection here
-% cover the other one in implementation to reduce repetition?
-From this we can now define the communication type system for multi-party 
-session types\cite{CCPY15}. In this, \emph{Global Types} describe the whole
-conversation scenario. \emph{Session Types} are constructed through 
-\emph{projection} of the global type on the individual participants of
-the scenario. The grammar for this is presented next:
-
-
-The global types describe the various actions of a participant \texttt{p} sending
-either a value of a given Sort, a channel of a given Type, or some label to the
-partcipant \texttt{q} and then interaction continues according to the following
-global type \texttt{G} (or \texttt{G$_i$} in the case of branching). In this 
-grammar, the style of recursive types uses \emph{equi-recursion}; there is no
-distinction between the type \texttt{${\mu}$t.G} and the unfolding 
-\texttt{G\{${\mu}$t.G/t\}}.
-
-The session types represent the actions performed by single participants. For 
-example, the \emph{send} type, \texttt{!<p, S>.T} describes the sending of a 
-value of sort S to participant \texttt{p}. Recursion is guarded in session types
-as they are in global types.
-
-The concept of \emph{projection} between global types and session types is
-formalised in Definition 1, as found in \cite{HYC08}.
-
-\begin{blockquote}
-	\textbf{Definition 1:} \emph{The projection of a global type \texttt{G} onto 
-	a particiapnt \texttt{q} is defined by induction on \texttt{G}}:
-\end{blockquote}
-\begin{align*}
-	(\texttt{p} \rightarrow \texttt{p'}:\texttt{<U>}.\texttt{$G$'}) \upharpoonright \texttt{q = }  
-	\begin{cases}
-\hspace{5pt} !\langle \texttt{p',U} \rangle (\texttt{$G$'}\upharpoonright \texttt{q}) \hspace{22pt}if \hspace{5pt} \texttt{q = p} \\
-\hspace{5pt} ?(\texttt{p',U}) (\texttt{$G$'}\upharpoonright \texttt{q}) \hspace{20pt}if \hspace{5pt} \texttt{q = p'} \\
-\hspace{5pt} \texttt{$G'$}\upharpoonright \texttt{q} \hspace{65pt} otherwise
-	\end{cases}
-\end{align*}
-\begin{align*}
-	(\texttt{p} \rightarrow \texttt{p'}:\texttt{p',\{l$_{i}:G_{i}$\}$_{i \in I}$}) \upharpoonright \texttt{q = }  
-	\begin{cases}
-\hspace{5pt} \oplus \langle \texttt{p',\{l$_{i}:T_{i}$\}$_{i \in I}$} \rangle (\texttt{$G$'}\upharpoonright \texttt{q}) \hspace{22pt}if \hspace{5pt} \texttt{q = p} \\
-\hspace{5pt} \&(\texttt{p',\{l$_{i}:G_{i}$}\upharpoonright \texttt{q\}$_{i \in I}$}) \hspace{40pt} if \hspace{5pt} \texttt{q = p'} \\
-\hspace{5pt} \texttt{$G_{i_0}$}\upharpoonright \texttt{q} \hspace{77pt} where \hspace{5pt} \texttt{$i_{0}$} \in I \hspace{5pt} if \hspace{3pt} \texttt{q} \neq \texttt{p,}\hspace{3pt}\texttt{q} \neq \texttt{p'} \\
-\hspace{115pt} and \hspace{3pt} \texttt{$G_{i}$} \upharpoonright \texttt{q} = \texttt{$G_{j}$} \upharpoonright \texttt{q} \hspace{3pt} for\hspace{3pt} all\hspace{3pt} i,\hspace{3pt} j \in I
-	\end{cases}
-\end{align*}
-\begin{align*}
-	(\mu\texttt{t$G$}) \upharpoonright \texttt{q = }
-	\begin{cases}
-\hspace{5pt} \mu\texttt{t}(\texttt{$G$} \upharpoonright \texttt{q}) \hspace{20pt} if \hspace{5pt} \texttt{$G$} \upharpoonright \texttt{q} \neq \texttt{t} \\
-\hspace{5pt} \texttt{end} \hspace{48pt} otherwise
-	\end{cases} 
-\end{align*}
-\begin{align*}
-	\texttt{t} \upharpoonright \texttt{q = t} 
-	\hspace{40pt} \texttt{end} \upharpoonright \texttt{q = end}
-\end{align*}
-
-\paragraph{Example Situation}
-To fully illustrate the basic featurs and functionalities of the calculus we
-discuss a standard two-buyers-protocol, demonstrated here as a sequence 
-diagram:
-
-
-First \texttt{B1} sends a title to \texttt{S} and in responce \texttt{S}
-sends a quote to both \texttt{B1} and \texttt{B2}. \texttt{B1} will then
-suggests what contribution it can make to \texttt{B2} who will either
-accept this amount and coordinate the purchase with \texttt{S}, or it will
-abort the discussion. Decomposing this into three binary session types
-could be logically very difficult, and most likely we would lose some of
-the essential sequencing information in the process. Instead, let us transform
-this scenario into the following global type. Global types are presented as
-numbers, so a clear key is also provided.
-
-\begin{lstlisting}
- 1)  1 $\rightarrow$ 3 : $\langle$string$\rangle$                         B1 = 1
- 2)  3 $\rightarrow$ 1 : $\langle$int$\rangle$                            B2 = 2
- 3)  3 $\rightarrow$ 2 : $\langle$int$\rangle$                             S = 3
- 4)  1 $\rightarrow$ 2 : $\langle$int$\rangle$
- 5)  2 $\rightarrow$ 3 : { ok: 2 $\rightarrow$ 3 : $\langle$string$\rangle$. 3 $\rightarrow$ 2 : $\langle$date$\rangle$. end,
-                quit: end }
-\end{lstlisting}
 \newpage
 
 \section{Related Work}
@@ -1309,36 +964,37 @@ binary session types discussed earlier.
 
 \section{Design \& Technical Implementation}
 This chapter of the report focuses on the high level design of the project.
-We begin by outlining how the project integrates with the existing Sonic-Pi
-project\footnote{As found at https://github.com/samaaron/sonic-pi} and the 
-choice of languages used. Discussion of the limitations of this approach is 
-saved until the evaluation section. We then focus on the implementation in 
-two core sections, one for each main feature contribution of the project.
+We start with a short discussion on which languages we have used and why, before
+moving into the main body. This chapter is split into two core parts, one 
+focusing on the design and implementation of the timing effects system, and
+the second focused on the session types and associated graph structure. In 
+discussing the timing effects system we begin with the overall design of the tree
+structure used to process the information, and the class structure of this section
+of the project. After this we focus on the \texttt{pTrace} class, which holds
+the timing data collected for the tree. Here we discuss the formalisation of the
+timing system and our implementation of it. Similarly in the second section we
+discuss the design of the graph and the class structure for this feature and then
+focus on the formalisation of session types and our implementation of them. We 
+finish the chapter with a short focus on how the library is finally integrated
+into the Sonic Pi IDE\footnote{As found at https://github.com/samaaron/sonic-pi}, 
+including a very high-level overview of the architecture of the program.
 
-\subsection{Integration}
-
-% basic outline of sonic pi
-% The basic architecture of Sonic Pi can be broken into the server side of the application and the gui. The gui brings a hard dependency on the Qt framework, implemented in C++, whilst the server application is developed with ruby. 
-% In order to generate and manipulate sounds, Sonic Pi is implemented in terms f the SuperCollider synthesis server which provides the ability to define arbitiary synthesiers and trigger and manipulate them in real time\cite{AB13}
-% The main entry point for Sonic Pi lies in the spider_eval method of the spider class
-% defined in the server modules. It is here we intercept the currently played pieces of music and run our own analysis modules.
-
-% once the hookup is done write out the code examples of how messages are passed along
-% maybe make a basic diagram of Sonic Pi interactions with/without our project
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/timing.jpg}
+	\caption{Tree UML} \label{tree}
+\end{figure}
+\newpage
 
 \subsection{Timing Tree}
 In calculating the virtual time at any point within the program the initial 
 requirement is to parse the given program and store it for later access. A 
-natural approach to this mimics compiler technology, wherein we define some
-grammar by which to parse our programs and then build some Abstract Syntax Tree 
-to store all of the program information as parent/children nodes. Once this 
+natural approach to this mimics compiler technology: we define some
+grammar by which to parse our programs, and then build some Abstract Syntax Tree 
+to store all of the program information. Once this 
 is built successfully we are able to traverse the tree as often as we require 
-to build the trace of the program. The diagram below provides an overview of the 
-different classes and their interactions for this section:
-
-% diagram!
-
-
+to build the trace of the program. Figure \ref{tree} provides an overview of the 
+different classes and their interactions for this section.
 
 \subsubsection{Building the AST}
 Whilst ruby has been valued in the Sonic-Pi project for its hugely forgiving
@@ -1360,6 +1016,11 @@ member field. \texttt{float} and \texttt{symbol} nodes acted in a similar
 fashion:
 
 % diagramtic example of a sym node
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.85\textwidth]{images/SymInt.jpg}
+	\caption{Node Wrapping} \label{symwrap}
+\end{figure}
 
 Statement lists are captured in the AST by nodes of type \texttt{begin} whilst
 loops and function definitions are denoted by \texttt{block} types. 
@@ -1368,6 +1029,11 @@ one describing the type of block, the second listing the arguments taken by
 the block and the final describing the root of the next statement list. 
 
 % block node diagrams
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/Block.jpg}
+	\caption{Block Node Structure} \label{blocks}
+\end{figure}
 
 Whilst in the source code the end of a block is defined using the \texttt{end}
 keyword, in the AST blocks can be viewed as self-contained trees; there is
@@ -1383,7 +1049,11 @@ distinction is important later on when we start to calculate the contribution
 of each function to the current virtual time of the program.
 
 % block detection diagrams
-
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/BlkDetection.jpg}
+	\caption{Block Detection} \label{blockdetect}
+\end{figure}
 
 
 
@@ -1411,6 +1081,17 @@ built the entry point to the analysis for this section calls on each sub
 graph to construct each session type and then the global type.
 
 % diagram here
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/session.jpg}
+	\caption{Graph UML}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/GSG.jpg}
+	\caption{Graph Structure}
+\end{figure}
 
 \subsubsection{Planning the Graph}
 As shown by the previous diagram, each \texttt{Graph} is constructed as
@@ -1457,6 +1138,11 @@ until all type block have been consumed.
 
 % diagram of internal graphs here, showing that nodes in these graphs 
 % are chronological
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/GraphOneFix.jpg}
+	\caption{Node Chronology}
+\end{figure}
 
 The reason we may process tokens in this way is demonstrated in figure().
 A Sonic Pi program will always increment its virtual time as we run through a
@@ -1511,6 +1197,11 @@ set of nodes between each \emph{time} node.
 
 % updated graph diagram here
 % highlights each vertical relation group
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/GraphTwo.jpg}
+	\caption{Fixed Node Chronology}
+\end{figure}
 
 Refering back to snippets 11/12, the program graph constructed now takes
 the form:
@@ -1699,9 +1390,10 @@ $\hphantom{tabs}$ \texttt{B:(P0P1)!.A:(P1P0)?}
 
 The accurate type for the second process would be \texttt{B:(P0P1)?.A:(P0P1)!}, 
 (or one could keep \texttt{P1} unchanged and swap the terms in the other process). 
-To handle this, the project makes use of sub-typing the \texttt{cue} type\footnote{
-As suggested by Dominic Orchard in his presentation on `Verifying and Timing
-Concurrent Instruments'}.
+To handle this, the project makes use of sub-typing the \texttt{cue} type.
+% \footnote{
+% As suggested by Dominic Orchard in his presentation on `Verifying and Timing
+% Concurrent Instruments'}
 
 	\begin{minipage}{0.5\textwidth}
 
@@ -1735,19 +1427,37 @@ Concurrent Instruments'}.
 \end{multicols}
 
 The formal outline for this feature is:
-
+\\
 \begin{lstlisting}
-    A!.P <: P.A!
+     A!.P <: P.A!
 \end{lstlisting}
 
 Given this we may say that:
-
+\\
 \begin{lstlisting}
      A:(P0P1)!.B:(P0P1)? <: B:(P0P1)?.A:(P0P1)!
      B:(P0P1)!.A:(P1P0)? = dual(B:(P0P1)?.A:(P0P1)!)
 
     $\therefore$ B:(P0P1)!.A:(P1P0)? $\cong$ dual(A:(P0P1)!.B:(P0P1)?)
 \end{lstlisting}
+
+Sub-typing is a useful relation to define within session types, see 
+\cite{HYC08, MY15, MYH09}, and is based on the notion that correctness will 
+always be maintained so long as input order is not disrupted in the message 
+queue. Here, our subtype is based on operations occuring at the same `virtual 
+time', so we may consider operation ordering to be maintained in this instance. 
+
+\subsection{Integration}
+
+% basic outline of sonic pi
+% The basic architecture of Sonic Pi can be broken into the server side of the application and the gui. The gui brings a hard dependency on the Qt framework, implemented in C++, whilst the server application is developed with ruby. 
+% In order to generate and manipulate sounds, Sonic Pi is implemented in terms f the SuperCollider synthesis server which provides the ability to define arbitiary synthesiers and trigger and manipulate them in real time\cite{AB13}
+% The main entry point for Sonic Pi lies in the spider_eval method of the spider class
+% defined in the server modules. It is here we intercept the currently played pieces of music and run our own analysis modules.
+
+% once the hookup is done write out the code examples of how messages are passed along
+% maybe make a basic diagram of Sonic Pi interactions with/without our project
+
 \newpage
 
 \section{Evaluation}
@@ -1819,6 +1529,9 @@ of the program into the construction of the session graph.
 
 \bibitem{rp}
   \emph{http://www.raspberrypi.org/about/}
+
+\bibitem{micro}
+  \emph{http://news.microsoft.com/apac/2015/03/23/three-out-of-four-students-in-asia-pacific-want-coding-as-a-core-subject-in-school-reveals-microsoft-study/}
 
 \bibitem{AB13}
   Aaron, S., and Blackwell, A.F.,
@@ -1950,6 +1663,23 @@ of the program into the construction of the session graph.
   Tech. Report, Microsoft,
   (2014)
 
+\bibitem{MY15}
+  Mostrous, D., Yoshida, N., 
+  \emph{Session typing and asynchronous subtyping for the higher-order pi-calculus}, 
+  INFORMATION AND COMPUTATION, Vol: 241, 
+  Pages: 227-263,
+  (2015)
+
+\bibitem{MYH09}
+  Mostrous, D., Yoshida, N., Honda, K., 
+  \emph{Global principal typing in partially
+  commutative asynchronous sessions},
+  in: ESOP’09, volume 5502 of
+  LNCS, 
+  Springer-Verlag, 
+  pp. 316–332,
+  (2009)
+
 \bibitem{NY14}
   Ng, N., and Yoshida, N.,
   \emph{Pabble: Parameterised Scribble for Parallel Programming},
@@ -1970,6 +1700,15 @@ of the program into the construction of the session graph.
   ACM Sigplan Notcies 45,
   no. 10, 822-834,
   (2010)
+
+\bibitem{T95}
+  Thomasian, A.,
+  \emph{Two-phase Locking Performance and Its Thrashing Behaviour},
+  Performance of Concurrency Control Mechanisms in Centralized Database Systems
+  Prentice-Hall, Inc.,
+  Upper Saddle River, NJ, USA,
+  pp. 166-214,
+  (1995)
 
 \bibitem{W10}
   Woolford, K., Blackwell, A.F., Norman, S.J., and Chevalier, C.,

@@ -8,17 +8,30 @@ Builder::Builder()
 	Builder::tree = new ast::NodeTree();
 	visitor = new ast::BasicVisitor();
 	ifChildCount = 0;
+	std::cout << "Verify Builder Constructed" << "\n";
 }
 
 Builder::~Builder()
 {
 	delete Builder::tree;
 	delete visitor;
+	std::cout << "Verify Builder DeConstructed" << "\n";
+}
+
+int Builder::returnTest()
+{
+	return Builder::tree->trace()->totalVT();
+}
+
+std::string Builder::returnTestTwo()
+{
+	return "test";//Builder::tree->trace()->sessionTypes[0];
 }
 
 ast::BodyNode* Builder::makeNode(Rice::Symbol token, int index, 
 		int parent, int line, int statement, int blkDepth)
 {
+	std::cout << "made a node, honest" << "\n";
 	return new ast::BodyNode(token.str(), index, parent, line, statement, blkDepth);
 }
 

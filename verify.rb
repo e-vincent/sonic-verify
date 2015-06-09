@@ -132,4 +132,19 @@ analyser = TimeMarker.new
 planner = Planner.new
 planner.setUp()
 
+int = builder.returnTest()
+string = builder.returnTestTwo();
+
+hash = { "totalVT" => int, "session" => string }
+hash.each do |val|
+	p val
+end
+
+info = InfoFetcher.new
+#p InfoFetcher.um()
+
+# ???
+#setter = info.programVT()
+#p InfoFetcher.programVT()
+
 file.close

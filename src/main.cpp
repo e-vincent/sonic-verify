@@ -14,7 +14,15 @@ void Init_verify()
 		.define_method("addSymbol", &Builder::addSymbol)
 		.define_method("addIf", &Builder::addIf)
 		.define_method("setTreeSize", &Builder::setTreeSize)
-		.define_method("exitFuncs", &Builder::exitFuncs);
+		.define_method("exitFuncs", &Builder::exitFuncs)
+		.define_method("returnTest", &Builder::returnTest)
+		.define_method("returnTestTwo", &Builder::returnTestTwo);
+
+	Rice::Data_Type<InfoFetcher> rb_cInfoFetcher =
+		Rice::define_class<InfoFetcher>("InfoFetcher")
+		.define_constructor(Rice::Constructor<InfoFetcher>())
+		.define_method("um", &InfoFetcher::um);
+		// .define_method("programVT", &analysis::InfoFetcher::programVT);
 
 	Rice::Data_Type<analysis::TimeMarker> rb_cTimeMarker =
 		Rice::define_class<analysis::TimeMarker>("TimeMarker")

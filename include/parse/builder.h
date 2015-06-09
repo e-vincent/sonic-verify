@@ -29,9 +29,13 @@ private:
 public:
 	static ast::NodeTree* tree;
 	ast::BasicVisitor* visitor;
+	std::string outputs[2];
 
 	Builder();
 	~Builder();
+
+	int returnTest();
+	std::string returnTestTwo();
 
 	ast::BodyNode* makeNode(Rice::Symbol token, int index, int parent, int line, int statement, int blkDepth);
 	ast::IntNode* makeInt(int num, int index, int parent, int line, int statement, int blkDepth);

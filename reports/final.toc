@@ -1,46 +1,38 @@
-\contentsline {section}{\numberline {1}Introduction}{3}
-\contentsline {subsection}{\numberline {1.1}Motivation}{3}
-\contentsline {subsection}{\numberline {1.2}Objectives}{3}
-\contentsline {subsection}{\numberline {1.3}Report Structure}{4}
-\contentsline {section}{\numberline {2}Background}{5}
-\contentsline {subsection}{\numberline {2.1}Computing in Schools}{5}
-\contentsline {subsection}{\numberline {2.2}Sonic Pi}{5}
-\contentsline {subsubsection}{\numberline {2.2.1}Raspberry Pi}{6}
-\contentsline {subsubsection}{\numberline {2.2.2}Sonic Pi V1.0}{6}
-\contentsline {subsubsection}{\numberline {2.2.3}Sonic Pi V2.0}{8}
-\contentsline {paragraph}{Timing Sleep}{8}
-\contentsline {paragraph}{Threading}{10}
-\contentsline {paragraph}{The IDE}{13}
-\contentsline {subsection}{\numberline {2.3}Live Programming}{14}
-\contentsline {subsection}{\numberline {2.4}Session Types}{15}
-\contentsline {subsubsection}{\numberline {2.4.1}Binary Session Types}{16}
-\contentsline {paragraph}{Syntax Summary}{16}
-\contentsline {paragraph}{Operational Semantics}{17}
-\contentsline {paragraph}{Basic Concepts}{17}
-\contentsline {paragraph}{Example Situation}{18}
-\contentsline {subsubsection}{\numberline {2.4.2}Multi-Party Session Types}{19}
-\contentsline {paragraph}{Extended Syntax}{20}
-\contentsline {paragraph}{Extended Operational Semantics}{20}
-\contentsline {paragraph}{Extended Concepts}{21}
-\contentsline {paragraph}{Example Situation}{22}
-\contentsline {section}{\numberline {3}Related Work}{24}
-\contentsline {section}{\numberline {4}Design \& Technical Implementation}{26}
-\contentsline {subsection}{\numberline {4.1}Integration}{26}
-\contentsline {subsection}{\numberline {4.2}Timing Tree}{26}
-\contentsline {subsubsection}{\numberline {4.2.1}Building the AST}{26}
-\contentsline {subsubsection}{\numberline {4.2.2}\texttt {pTrace}}{27}
-\contentsline {subsection}{\numberline {4.3}Session Graph}{27}
-\contentsline {subsubsection}{\numberline {4.3.1}Planning the Graph}{27}
-\contentsline {paragraph}{Initial Design}{28}
-\contentsline {paragraph}{Keeping Time}{29}
-\contentsline {subsubsection}{\numberline {4.3.2}Global Construction}{30}
-\contentsline {paragraph}{Sub-Typing}{32}
-\contentsline {section}{\numberline {5}Evaluation}{34}
-\contentsline {subsection}{\numberline {5.1}Ruby/C++}{34}
-\contentsline {subsection}{\numberline {5.2}Visual Adaptation}{34}
-\contentsline {section}{\numberline {6}Conclusion}{35}
-\contentsline {subsection}{\numberline {6.1}Future Work}{35}
-\contentsline {paragraph}{Function Parametres}{35}
-\contentsline {paragraph}{Branching Session Types}{35}
-\contentsline {paragraph}{Detailed Time Nodes}{35}
-\contentsline {subsection}{\numberline {6.2}Achievement Summary}{35}
+\contentsline {section}{\numberline {1}Introduction}{8}
+\contentsline {subsection}{\numberline {1.1}Motivation}{8}
+\contentsline {subsection}{\numberline {1.2}Objectives}{9}
+\contentsline {subsection}{\numberline {1.3}Contributions}{9}
+\contentsline {subsection}{\numberline {1.4}Report Structure}{10}
+\contentsline {section}{\numberline {2}Background}{11}
+\contentsline {subsection}{\numberline {2.1}Computing in Schools}{11}
+\contentsline {subsection}{\numberline {2.2}Sonic Pi}{11}
+\contentsline {subsubsection}{\numberline {2.2.1}Raspberry Pi}{12}
+\contentsline {subsubsection}{\numberline {2.2.2}Sonic Pi V1.0}{12}
+\contentsline {subsubsection}{\numberline {2.2.3}Sonic Pi V2.0}{14}
+\contentsline {paragraph}{Timing Sleep}{14}
+\contentsline {paragraph}{Threading}{16}
+\contentsline {paragraph}{The IDE}{18}
+\contentsline {subsection}{\numberline {2.3}Live Programming}{20}
+\contentsline {subsection}{\numberline {2.4}Session Types}{21}
+\contentsline {subsubsection}{\numberline {2.4.1}Multi-Party Session Types}{22}
+\contentsline {section}{\numberline {3}Related Work}{23}
+\contentsline {section}{\numberline {4}Design \& Technical Implementation}{25}
+\contentsline {subsection}{\numberline {4.1}Timing Tree}{26}
+\contentsline {subsubsection}{\numberline {4.1.1}Building the AST}{27}
+\contentsline {subsubsection}{\numberline {4.1.2}\texttt {pTrace}}{28}
+\contentsline {subsection}{\numberline {4.2}Session Graph}{28}
+\contentsline {subsubsection}{\numberline {4.2.1}Planning the Graph}{29}
+\contentsline {paragraph}{Initial Design}{29}
+\contentsline {paragraph}{Keeping Time}{32}
+\contentsline {subsubsection}{\numberline {4.2.2}Global Construction}{34}
+\contentsline {paragraph}{Sub-Typing}{36}
+\contentsline {subsection}{\numberline {4.3}Integration}{37}
+\contentsline {section}{\numberline {5}Evaluation}{38}
+\contentsline {subsection}{\numberline {5.1}Ruby/C++}{38}
+\contentsline {subsection}{\numberline {5.2}Visual Adaptation}{38}
+\contentsline {section}{\numberline {6}Conclusion}{39}
+\contentsline {subsection}{\numberline {6.1}Future Work}{39}
+\contentsline {paragraph}{Function Parametres}{39}
+\contentsline {paragraph}{Branching Session Types}{39}
+\contentsline {paragraph}{Detailed Time Nodes}{39}
+\contentsline {subsection}{\numberline {6.2}Achievement Summary}{39}
