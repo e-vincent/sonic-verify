@@ -20,38 +20,39 @@
 \contentsline {subsection}{\numberline {4.1}Timing Tree}{26}
 \contentsline {subsubsection}{\numberline {4.1.1}Building the AST}{27}
 \contentsline {subsubsection}{\numberline {4.1.2}\texttt {pTrace}}{28}
-\contentsline {subsection}{\numberline {4.2}Session Graph}{29}
-\contentsline {subsubsection}{\numberline {4.2.1}Planning the Graph}{30}
-\contentsline {paragraph}{Initial Design}{30}
-\contentsline {paragraph}{Keeping Time}{34}
-\contentsline {subsubsection}{\numberline {4.2.2}Global Construction}{35}
-\contentsline {paragraph}{Sub-Typing}{39}
-\contentsline {subsection}{\numberline {4.3}Integration}{39}
-\contentsline {section}{\numberline {5}Evaluation}{40}
-\contentsline {subsection}{\numberline {5.1}Ruby/C++11 \& Performance}{40}
-\contentsline {subsection}{\numberline {5.2}Correctness}{41}
-\contentsline {subsubsection}{\numberline {5.2.1}Chords}{41}
-\contentsline {subsubsection}{\numberline {5.2.2}Sequences}{42}
-\contentsline {subsubsection}{\numberline {5.2.3}Loops}{42}
-\contentsline {subsubsection}{\numberline {5.2.4}Threads}{43}
-\contentsline {subsubsection}{\numberline {5.2.5}Data Structures}{44}
-\contentsline {paragraph}{Lists}{44}
-\contentsline {paragraph}{Chords}{44}
-\contentsline {paragraph}{Scales}{44}
-\contentsline {paragraph}{Rings}{44}
-\contentsline {subsubsection}{\numberline {5.2.6}Dead Code}{45}
-\contentsline {subsubsection}{\numberline {5.2.7}Function Calls}{45}
-\contentsline {paragraph}{Function Definition}{45}
-\contentsline {paragraph}{Function Detection}{46}
-\contentsline {paragraph}{Parameterized Functions}{46}
-\contentsline {subsubsection}{\numberline {5.2.8}Conditionals}{47}
-\contentsline {subsubsection}{\numberline {5.2.9}\texttt {;} Separation}{47}
-\contentsline {subsubsection}{\numberline {5.2.10}Musical Score}{48}
-\contentsline {subsection}{\numberline {5.3}Visual Adaptation}{49}
-\contentsline {section}{\numberline {6}Conclusion}{50}
-\contentsline {subsection}{\numberline {6.1}Future Work}{50}
-\contentsline {paragraph}{Function Parametres}{50}
-\contentsline {paragraph}{Branching Session Types}{50}
-\contentsline {paragraph}{Detailed Time Nodes}{50}
-\contentsline {paragraph}{Minecraft API}{50}
-\contentsline {subsection}{\numberline {6.2}Achievement Summary}{50}
+\contentsline {paragraph}{Functions}{30}
+\contentsline {subsection}{\numberline {4.2}Session Graph}{32}
+\contentsline {subsubsection}{\numberline {4.2.1}Planning the Graph}{33}
+\contentsline {paragraph}{Initial Design}{33}
+\contentsline {paragraph}{Keeping Time}{37}
+\contentsline {subsubsection}{\numberline {4.2.2}Global Construction}{38}
+\contentsline {paragraph}{Sub-Typing}{42}
+\contentsline {subsection}{\numberline {4.3}Integration}{42}
+\contentsline {section}{\numberline {5}Evaluation}{43}
+\contentsline {subsection}{\numberline {5.1}Ruby/C++11 \& Performance}{43}
+\contentsline {subsection}{\numberline {5.2}Correctness}{44}
+\contentsline {subsubsection}{\numberline {5.2.1}Chords}{44}
+\contentsline {subsubsection}{\numberline {5.2.2}Sequences}{45}
+\contentsline {subsubsection}{\numberline {5.2.3}Loops}{45}
+\contentsline {subsubsection}{\numberline {5.2.4}Threads}{46}
+\contentsline {subsubsection}{\numberline {5.2.5}Data Structures}{47}
+\contentsline {paragraph}{Lists}{47}
+\contentsline {paragraph}{Chords}{47}
+\contentsline {paragraph}{Scales}{47}
+\contentsline {paragraph}{Rings}{47}
+\contentsline {subsubsection}{\numberline {5.2.6}Dead Code}{48}
+\contentsline {subsubsection}{\numberline {5.2.7}Function Calls}{48}
+\contentsline {paragraph}{Function Definition}{48}
+\contentsline {paragraph}{Function Detection}{49}
+\contentsline {paragraph}{Parameterized Functions}{49}
+\contentsline {subsubsection}{\numberline {5.2.8}Conditionals}{50}
+\contentsline {subsubsection}{\numberline {5.2.9}\texttt {;} Separation}{50}
+\contentsline {subsubsection}{\numberline {5.2.10}Musical Score}{51}
+\contentsline {subsection}{\numberline {5.3}Visual Adaptation}{52}
+\contentsline {section}{\numberline {6}Conclusion}{53}
+\contentsline {subsection}{\numberline {6.1}Future Work}{53}
+\contentsline {paragraph}{Function Parametres}{53}
+\contentsline {paragraph}{Branching Session Types}{53}
+\contentsline {paragraph}{Detailed Time Nodes}{53}
+\contentsline {paragraph}{Minecraft API}{53}
+\contentsline {subsection}{\numberline {6.2}Achievement Summary}{53}

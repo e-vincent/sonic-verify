@@ -48,7 +48,7 @@
 	basicstyle   = \ttfamily\color{black},
 	keywordstyle = \ttfamily\color{blue},
 	morekeywords = {
-		define, times, load_samples, each
+		define, load_samples, each
 	},
 	morekeywords = {[2]{
 		play, sleep, cue, sync,
@@ -58,7 +58,7 @@
 		rate
 	}},
 	morekeywords = {[3]{
-		in_thread, live_loop, loop,
+		in_thread, live_loop, loop, times
 	}},
 	keywordstyle = {[2]{\color{magenta}}},
 	keywordstyle = {[3]{\color{ForestGreen}}},
@@ -983,7 +983,11 @@ computer's existing model of time; i.e. they should manage time in a way that
 draws analogy with memory management. 
 
 Live Programming is not purely limited to musical languages and has similar 
-applications is such areas as Logic, Dataflow and Artificial Intelligence.
+applications is such areas as Logic, Dataflow and Artificial Intelligence in
+terms of temporal reasoning. We do not list any such examples here as this is
+not within the scope of this project\footnote{Interested parties are encouraged
+to read \cite{AOB14} as they do detail some related lanuages in their closing 
+sections.}.
 
 As a demonstration for the potential of the application of Session Types 
 within applications we breifly mention the protocol language Scribble 
@@ -1106,7 +1110,7 @@ analysis.
 The syntax of Sonic Pi V2.0 can be outlined simply.
 \\
 \begin{lstlisting}
-	P ::= P; A | $\emptyset$
+	P ::= P; S | $\emptyset$
 	S ::= E | $v$ = E
 	E ::= sleep $\mathbb{R}_{{\geqslant}0}$ | A$^{i}$ | $v$
 \end{lstlisting}
@@ -1117,6 +1121,166 @@ to variables), and \texttt{E} defines expressions. \texttt{A$^{i}$} is used to
 refer to all those operations that will not advance time, e.g. the 
 \texttt{play} operation. In defining the syntax this way we are able to abstract 
 over the operations that do not modify virtual time.
+
+In distinguishing the real time elapsed by the program and the virtual time elapsed 
+we write [\texttt{P}]$_{t}$ for the former and [\texttt{P}]$_{v}$ for the latter. 
+Both of these abstract functions return time values and so are positive, 
+real-number values.
+
+\begin{blockquote}
+	Virtual time is specified for Sonic Pi using the following cases:
+
+	\begin{lstlisting}
+     $\hphantom{..}$   [P; $v$ = E]$_{v}$ = [P]$_{v}$ + [E]$_{v}$
+               [$\emptyset$]$_{v}$ = 0
+         [sleep t]$_{v}$ = t
+            $\hphantom{.....}$   [$v$]$_{v}$ = 0
+            $\hphantom{...}$ [A$^{i}$]$_{v}$ = 0
+	\end{lstlisting}
+\end{blockquote}
+
+% next go into how the trace is set up
+% relate this breakdown of syntax into statements to how we store each statement
+We action this specification by parsing our AST on a per-statement basis. Each 
+\texttt{NodeTree} holds a reference to a \texttt{pTrace}, the data structure we 
+use to store all of the important analysis results for the current program. The 
+main fields of interest are a \texttt{std::vector} of \texttt{TData} pointers, a
+\texttt{std::vector} of the names of functions defined and a \texttt{std::map} of 
+function names to their virtual time contribution. Initially \texttt{pTrace} only
+held a vector of integers, representing the contributing time, but this proved to 
+be too little information on each statement. 
+
+The program fills the information in \texttt{pTrace} based on the specification 
+above. When the statement is a \texttt{sleep t} statement, it marks that the 
+contributing virtual time, \texttt{conVT}, is of length \texttt{t}. Most other
+statements are given a \texttt{conVT} of zero. To be able to report the total
+virtual time of a run we also calculate the cumulative virtual time, \texttt{cumVT},
+as we process the nodes. This is formalised by the sequence rule in our specification.
+
+To start with a simple example, Snippet \ref{simpleLoop} shows the code for the
+following simple trace.
+
+\begin{multicols}{2}
+	\begin{minipage}{0.4\textwidth}
+		\begin{lstlisting}[style = sonicpi]
+
+    loop do    # 1
+      play 60  # 2
+      sleep 2  # 3
+      play 64  # 4
+    end
+
+		\end{lstlisting}
+		\captionof{lstlisting}{Simple Loop} \label{simpleLoop}
+	\end{minipage}
+
+	\begin{minipage}{0.4\textwidth}
+	\begin{lstlisting}
+== Trace
+[0] -                 
+[1] conVT: 0, cumVT: 0, 
+    isFunc: false, inFunc: false
+[2] conVT: 0, cumVT: 0, 
+    isFunc: false, inFunc: false
+[3] conVT: 2, cumVT: 2, 
+    isFunc: false, inFunc: false
+[4] conVt: 0, cumVT: 2, 
+    isFunc: false, inFunc: false
+	\end{lstlisting}
+	\end{minipage}
+
+\end{multicols}
+
+The information for each statement is mapped to the index of the same statement 
+count. Index 0 is never filled as this is always assigned to the root node, due
+to how we parse the tree information, and because it is natural for novice 
+programmers to index from 1 rather than 0. Given this, we always skip handling
+the first index of our trace because it is always a zero slot. Snippet 
+\ref{simpleLoop} demonstrates quite neatly how simple it can be to collect the
+cumulative virtual time as we iterate through the program, with it intially
+seeming as simple as:
+\\
+\begin{lstlisting}
+     [i].cumVT = [i].conVT + [i - 1].cumVT
+\end{lstlisting}
+
+\paragraph{Functions}
+When we start to handle functions, this simple view of virtual time is not
+quite robust enough. An example is given in Snippet \ref{doubleFunc} below.
+
+It is entirely reasonable that someone might define multiple functions in this 
+way when coding in a live arena. Even if it might be uncommon, it is a valid
+program, making it important we can handle this type of situation. First we'll
+provide the trace in full and then we will break down the approach and relevant 
+theory.
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+        define :first do       # 1
+            play 60            # 2
+        end
+        
+        first                  # 3
+        second                 # 4
+        play 60                # 5
+
+        define :second do      # 6
+            sleep 1            # 7
+        end
+	\end{lstlisting}
+	\captionof{lstlisting}{Surrounding Functions} \label{doubleFunc}
+\end{minipage}
+\\
+\begin{lstlisting}
+    == Trace
+    [0] -
+    [1] conVT: 0, cumVT: 0, isFunc: false, inFunc: true
+    [2] conVT: 0, cumVT: 0, isFunc: false, inFunc: true
+    [3] conVT: 0, cumVT: 0, isFunc: true,  inFunc: false
+    [4] conVT: 1, cumVT: 1, isFunc: true,  inFunc: false
+    [5] conVT: 0, cumVT: 1, isFunc: false, inFunc: false
+    [6] conVT: 0, cumVT: 0, isFunc: false, inFunc: true
+    [7] conVT: 1, cumVT: 1, isFunc: false, inFunc: true
+\end{lstlisting}
+
+The issues that Snippet \ref{doubleFunc} identifies is how to insert the correct
+amount of contributing virtual time into the trace when you might not have 
+encountered the function being called. The simple way to handle this is by processing
+the data in two passes. On the first pass of a program we collect information
+such as which lines are function calls and what all of our function definitions
+and times are. It is not printed in these traces but one of the extra things that
+\texttt{TData} will hold is, if the current line is a function call, which function
+does it call.
+
+The trace after the first pass of this program looks as follows:
+\\
+\begin{lstlisting}
+    == Trace
+    [0] -
+    [1] conVT:  0, cumVT:  0, isFunc: false, inFunc: true
+    [2] conVT:  0, cumVT:  0, isFunc: false, inFunc: true
+    [3] conVT: -1, cumVT: -1, isFunc: true,  inFunc: false
+    [4] conVT: -1, cumVT: -1, isFunc: true,  inFunc: false
+    [5] conVT:  0, cumVT: -2, isFunc: false, inFunc: false
+    [6] conVT:  0, cumVT:  0, isFunc: false, inFunc: true
+    [7] conVT:  1, cumVT:  1, isFunc: false, inFunc: true
+\end{lstlisting}
+
+Once this is processed it is again a simple case of adding up the cumulative virtual
+time as we traverse the trace. \texttt{-1} is reserved as a keycode in tandem with
+the \texttt{isFunc} marker; if a function has \texttt{conVT = -1} it means this
+is a function call and will be processed in a later pass.
+
+The key difference is not to add together times from different blocks. The 
+\texttt{inFunc} note helps with this, as we can detect when we are in a new block 
+of the trace by what value that has. Notice that, in the above trace, index 6 
+has a fresh \texttt{cumVT} value when compared with index 5.
+
+
+
+% then talk about theory of how realtime >= virtualtime
+% leads into discussion on how we track the cumulative virtual time
+% and comment on how a developer can use this to decide how long a program is running for
 
 
 
@@ -1163,7 +1327,7 @@ In defining the session types we can consider a modified version of the syntax
 of Sonic Pi V2.0 defined earlier.
 \\
 \begin{lstlisting}
-	P ::= P; A | $\emptyset$
+	P ::= P; S | $\emptyset$
 	S ::= E  | $v$ = E
 	E ::= sleep $\mathbb{R}_{{\geqslant}0}$ | cue $v$ | sync $v$ 
 	    | A$^{i}$ | $v$
@@ -1737,7 +1901,9 @@ result and then our actual analysis result.
 All codes written here can be repeated with notes in MIDI format (\texttt{:C4}, 
 for example) and will produce the same results as the integer format presented.
 Session analysis results are only presented when relevant to the code being
-discussed, as the library is quite efficient at setting empty types.
+discussed, as the library is quite efficient at setting empty types. Where functions
+are not being tested, trace information such as whether the statement is a function 
+call or not is ommitted for brevity.
 
 \subsubsection{Chords}
 

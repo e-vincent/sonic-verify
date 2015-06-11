@@ -5,13 +5,13 @@ path = "src/assets/sp/"
 
  ## Session ##
 #filename = path + "session/sync_many.txt"
-filename = path + "session/no_deadlock_sub_type.txt"
+#filename = path + "session/no_deadlock_sub_type.txt"
 #filename = path + "session/weird_sync.txt"
 #filename = path + "session/double_symbol.txt"
 #filename = path + "session/interaction_three.txt"
 
  ## Timing ##
-#filename = path + "timing/function_sequential.txt"
+filename = path + "timing/function_sequential.txt"
 #filename = path + "timing/sequence_loop.txt"
 #filename = path + "timing/simple_loop.txt"
 #filename = path + "timing/prog_function.txt"
