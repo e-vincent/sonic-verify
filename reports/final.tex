@@ -1,7 +1,6 @@
-\documentclass[11pt, abstracton]{scrartcl}
+\documentclass[11pt, abstracton, twoside]{scrartcl}
 \usepackage{a4, fullpage}
-
-\usepackage{color, xcolor}
+\usepackage[usenames,dvipsnames]{color, xcolor}
 \usepackage{listings, caption, graphicx}
 \usepackage{multicol, titlesec}
 \usepackage{fancyvrb}
@@ -9,6 +8,14 @@
 \usepackage{amsmath, amssymb}
 \usepackage{afterpage}
 \usepackage{lipsum}
+\usepackage[automark]{scrpage2}
+
+\pagestyle{scrheadings}
+\clearscrheadfoot
+\setheadsepline{0.5pt}
+
+\ihead{\headmark}{}
+\ofoot[\pagemark]{\pagemark}
 
 \titleformat
 	{\paragraph}
@@ -32,11 +39,30 @@
 	format = myformat
 }
 
-\lstloadlanguages{ruby}
 \lstset{
+	basicstyle   = \ttfamily\color{black}	
+}
+
+\lstdefinestyle{sonicpi}{
+	language = ruby,
 	basicstyle   = \ttfamily\color{black},
-	commentstyle = \ttfamily\color{red},
 	keywordstyle = \ttfamily\color{blue},
+	morekeywords = {
+		define, times, load_samples, each
+	},
+	morekeywords = {[2]{
+		play, sleep, cue, sync,
+		release, sample, choose, use_synth, cutoff, rrand, chord,
+		ring, scale, puts, use_synth_defaults, amp, attack,
+		sustain, note, octave, mod_phase, mod_invert_wave, mod_range,
+		rate
+	}},
+	morekeywords = {[3]{
+		in_thread, live_loop, loop,
+	}},
+	keywordstyle = {[2]{\color{magenta}}},
+	keywordstyle = {[3]{\color{ForestGreen}}},
+	commentstyle = \ttfamily\color{Gray},
 	stringstyle  = \color{orange}
 }
 
@@ -72,6 +98,7 @@
            {ε}{$\varepsilon$}{1}
 }
 
+\setlength{\headsep}{0.5in}
 \setlength{\parskip}{0.4cm}
 \setlength{\parindent}{0cm}
 
@@ -81,28 +108,32 @@
 \subtitle{Final Report}
 \author{Eleanor Vincent}
 \date{\today}
-\maketitle
-\afterpage{\null\newpage}
+\maketitle{\thispagestyle{empty}}
+\afterpage{\thispagestyle{empty}\null\newpage}
 \newpage
 
+\thispagestyle{empty}
 \begin{abstract}
 \noindent\lipsum[1]
 \end{abstract}
-\afterpage{\null\newpage}
+\afterpage{\thispagestyle{empty}\null\newpage}
 \newpage
 
 \renewcommand{\abstractname}{Acknowledgements}
 
+\thispagestyle{empty}
 \begin{abstract}
 \noindent\lipsum[1]
 \end{abstract}
-\afterpage{\null\newpage}
+\afterpage{\thispagestyle{empty}\null\newpage}
 \newpage
 
+\thispagestyle{empty}
 \tableofcontents
 \newpage
 
 \section{Introduction}
+\thispagestyle{empty}
 
 \subsection{Motivation}
 % need more on the concurrency verification motivation!!
@@ -263,6 +294,7 @@ The remainder of this report is broken down as follows:
 \newpage
 
 \section{Background}
+\thispagestyle{empty}
 In this section we begin with a short history of Computing in Schools followed 
 by explaining the ideas and features of Sonic Pi, the live coding IDE that forms 
 the basis of this project. We then move on to explain the subject of both Live 
@@ -359,7 +391,7 @@ to defend as a language choice.
 
 \begin{minipage}{0.5\textwidth}
 	\begin{minipage}[t]{\textwidth}
-		\begin{lstlisting}[language = ruby]
+		\begin{lstlisting}[style = sonicpi]
 	play 60
 	play 61
 	play 62
@@ -368,7 +400,7 @@ to defend as a language choice.
 	\end{minipage}
 
 	\begin{minipage}[t]{\textwidth}
-		\begin{lstlisting}[language = ruby]
+		\begin{lstlisting}[style = sonicpi]
 	play 60
 	sleep 0.5
 	play 61
@@ -428,7 +460,7 @@ drift apart very quickly.
 	\begin{minipage}{0.5\textwidth}
 
 		\begin{minipage}{\textwidth}
-			\begin{lstlisting}[language = ruby]
+			\begin{lstlisting}[style = sonicpi]
 loop do
     play 60
     sample :drum_heavy_kick
@@ -439,7 +471,7 @@ end
 		\end{minipage}
 
 		\begin{minipage}{\textwidth}
-			\begin{lstlisting}[language = ruby]
+			\begin{lstlisting}[style = sonicpi]
 in_thread
     loop do
         play 60
@@ -498,7 +530,7 @@ ordered effects. It also demonstrates further syntactic abilities of V2.0 as
 we are now treating the code snippets as V2.0 programs.
 
 \begin{minipage}{\textwidth}
-	\begin{lstlisting}[language = ruby]
+	\begin{lstlisting}[style = sonicpi]
 		  play :C ; play :E ; play :G
 		  sleep 1
 		  play :F ; play :A ; play :C
@@ -597,7 +629,7 @@ itself. There are no particular synchronisation primitives defined over these
 correctly.
 
 \begin{minipage}{\textwidth}
-	\begin{lstlisting}[language = ruby]
+	\begin{lstlisting}[style = sonicpi]
     in_thread(name: :bass) do
         loop do
           use_synth :prophet
@@ -617,7 +649,7 @@ correctly.
 \end{minipage}
 
 \begin{minipage}{\textwidth}
-	\begin{lstlisting}[language = ruby]
+	\begin{lstlisting}[style = sonicpi]
     live_loop :foo do
         play :c1, release: 8, cutoff: rrand(70, 130)
         sleep 8
@@ -663,7 +695,7 @@ are blocked at the same time, neither loop will ever trigger another \texttt{cue
 	\begin{minipage}{0.5\textwidth}
 
 		\begin{minipage}{\textwidth}
-			\begin{lstlisting}[language = ruby]
+			\begin{lstlisting}[style = sonicpi]
 live_loop :foo do
     play :e4, release: 0.5
     sleep 0.4
@@ -677,7 +709,7 @@ end
 			\captionof{lstlisting}{Out of Sync Live Loops} \label{outofsync}
 		\end{minipage}
 		\begin{minipage}{\textwidth}
-			\begin{lstlisting}[language = ruby]
+			\begin{lstlisting}[style = sonicpi]
 live_loop :foo do
     play :e4, release: 0.5
     sleep 0.5
@@ -696,7 +728,7 @@ end
 \end{multicols}
 
 \begin{minipage}{\textwidth}
-	\begin{lstlisting}[language = ruby]
+	\begin{lstlisting}[style = sonicpi]
 	live_loop :foo do
 	    play :e4, release: 0.5
 	    sleep 0.5
@@ -884,6 +916,7 @@ again ensure the composability of the interactions\cite{HYC08}.
 \newpage
 
 \section{Related Work}
+\thispagestyle{empty}
 %make more of a subsection thing? more discussion about tools?
 This section discusses much of the work discovered during the intial research 
 of the project. There are many interesting live programming environments in
@@ -963,6 +996,7 @@ binary session types discussed earlier.
 \newpage
 
 \section{Design \& Technical Implementation}
+\thispagestyle{empty}
 This chapter of the report focuses on the high level design of the project.
 We start with a short discussion on which languages we have used and why, before
 moving into the main body. This chapter is split into two core parts, one 
@@ -1061,6 +1095,29 @@ of each function to the current virtual time of the program.
 % building of AST to traverse for information
 
 \subsubsection{\texttt{pTrace}}
+In describing the timing effects system we have implemented it is first necessary
+to formalise the concept of the time system that Sonic Pi operates in. In providing
+the abstract interpretation of a `time system' it becomes possible to prove the
+`time safety' of the program by proving the semantics sound with respect to this 
+system \cite{AOB14}. This enables developers to reason about their programs timing 
+intuitively and allows us to reason about the safety of the program via static 
+analysis.
+
+The syntax of Sonic Pi V2.0 can be outlined simply.
+\\
+\begin{lstlisting}
+	P ::= P; A | $\emptyset$
+	S ::= E | $v$ = E
+	E ::= sleep $\mathbb{R}_{{\geqslant}0}$ | A$^{i}$ | $v$
+\end{lstlisting}
+
+\texttt{P} represents a full program, 
+\texttt{S} are statements (either self-contained expressions or pure bindings 
+to variables), and \texttt{E} defines expressions. \texttt{A$^{i}$} is used to 
+refer to all those operations that will not advance time, e.g. the 
+\texttt{play} operation. In defining the syntax this way we are able to abstract 
+over the operations that do not modify virtual time.
+
 
 
 % why is a second pass for round up information fine?
@@ -1084,17 +1141,17 @@ graph to construct each session type and then the global type.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{images/session.jpg}
-	\caption{Graph UML}
+	\caption{Graph UML} \label{graphUML}
 \end{figure}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{images/GSG.jpg}
-	\caption{Graph Structure}
+	\caption{Graph Structure} \label{graphStructure}
 \end{figure}
 
 \subsubsection{Planning the Graph}
-As shown by the previous diagram, each \texttt{Graph} is constructed as
+As shown by the Figure \ref{graphStructure}, each \texttt{Graph} is constructed as
 a list of \texttt{SubGraph}s where each \texttt{SubGraph} represents
 one process within the program. The idea behind this is to maintain
 the chronology of the nodes in each process and to enable easy analysis
@@ -1102,9 +1159,25 @@ of the program on a per-process level. \texttt{SubGraph} handles the constructio
 of local types while the \texttt{Graph} class handles the global type.
 
 \paragraph{Initial Design}
+In defining the session types we can consider a modified version of the syntax 
+of Sonic Pi V2.0 defined earlier.
+\\
+\begin{lstlisting}
+	P ::= P; A | $\emptyset$
+	S ::= E  | $v$ = E
+	E ::= sleep $\mathbb{R}_{{\geqslant}0}$ | cue $v$ | sync $v$ 
+	    | A$^{i}$ | $v$
+\end{lstlisting}
+
+We expand the syntax to define \texttt{cue} and \texttt{sync} which operate on
+some variable name, $v$. We maintain our definition of \texttt{sleep} in this syntax 
+as it is a useful tool in our reasoning. \texttt{A$_{i}$} is thus the set of all 
+operations that either do not advance time or do not consist of some communication
+primitive. In this way we can abstract over the operations that do not contribute 
+to communications.
 
 \begin{minipage}{\textwidth}
-	\begin{lstlisting}[language = ruby]
+	\begin{lstlisting}[style = sonicpi]
            # P0                        # P1
            in_thread do                in_thread do 
              loop do                     loop do
@@ -1115,18 +1188,98 @@ of local types while the \texttt{Graph} class handles the global type.
              end                         end
            end                         end
 	\end{lstlisting}
-	\captionof{lstlisting}{Forming Types}
+	\captionof{lstlisting}{Forming Types} \label{formTypes}
 \end{minipage}
 
-Initially when forming the types of threads, the program of snippet 11
-would produce a type of the form:
+For the following section, the base set of syntax we use to describe our session
+types are as follows\footnote{Other sets used are \emph{constants}, 
+\emph{expressions}, and \emph{process variables} but we do not need to consider 
+these for the language constructs discussed in this report.}:
+
+\begin{itemize}[noitemsep]
+  \item[] \emph{names}: ranged over by \emph{a,b...}
+  \item[] \emph{channels}: ranged over by \emph{k, k'...}
+  \item[] \emph{variables}: ranged over by \emph{x, y...}
+  \item[] \emph{labels}: ranged over by \emph{l,l'...}
+\end{itemize}
+
+The final set of interest is that of \emph{Processes}, ranged over 
+by \texttt{P, Q...}. For this discussion we define the following aspects 
+of the \emph{Process} grammar:
 \\
 \begin{lstlisting}
-  P0 :=  B:P0P1!.A:P1P0?
-  P1 :=  A:P1P0!.B:P0P1?
+    P ::= k![$\tilde{e}$]. P                    data sending
+        | k?($\tilde{x}$) in P                  data reception
+        | def D in P                 recursion
+\end{lstlisting}
+\begin{lstlisting}
+    D ::= X$_1$($\tilde{x}_1\tilde{k}_1$) = P1 and ...           declaration for recursion
+                and X$_n$($\tilde{x}_n\tilde{k}_n$) = P$_n$ 
 \end{lstlisting}
 
-For the global type, a message can defined a passing from process \texttt{P0}
+``$|$'' is the weakest association; the others listed have the same association. 
+Parenthesis denote binders which bind the corresponding free occurrences. We use 
+standard simulataneous substitution, written $ $. The sets of free 
+names/channels/variables of, for example program \texttt{P}, are written as 
+\texttt{fn(P)}, \texttt{fc(P)}, and \texttt{fv(P)} respectively. Processes without 
+free variables or free channels are called programs.
+
+This project uses the multi-party session typing paradigm, which presents a slight
+improvement to this syntax, allowing our communication to occur between more
+than two \emph{participants}. \emph{Participants} are the set ranged over by 
+\emph{p, q,...}
+\\
+\begin{lstlisting}
+    P ::= c!<p,e>.P             value sending
+        | c?(p,x).P             value reception
+\end{lstlisting}
+
+With this we can now state which of our participants we are sending our message
+to and on which channel. With this we are now able to begin typing our programs.
+
+When forming the types of threads, the program of Snippet \ref{formTypes}
+would produce types of the form:
+\\
+\begin{lstlisting}
+    P0 :=  B:(P0P1)!.A:(P1P0)?
+    P1 :=  A:(P1P0)!.B:(P0P1)?
+\end{lstlisting}
+
+`.' is defined as composition, enabling us to string together our types as
+a simple sequence.
+
+This is the manner in which the library chooses to define the types as this
+results in a simpler string to parse. In these types, \texttt{A} and \texttt{B} 
+are acting as the names of the channel being used to send and receive data.
+The first \texttt{P} instance enclosed in each parenthesis is the sender, the 
+second is the receiver. In printing the types in this manner we are able to 
+store each type in the \texttt{SubGraph} it belongs to and comparison of types
+can be decided quickly with index access to the first and last chars, rather than
+another position in the string.
+
+To begin illustrating global types by example, we present the standard 
+two-buyers-protocol.
+
+First \texttt{B1} sends a title to \texttt{S} and in responce \texttt{S}
+sends a quote to both \texttt{B1} and \texttt{B2}. \texttt{B1} will then
+suggests what contribution it can make to \texttt{B2} who will either
+accept this amount and coordinate the purchase with \texttt{S}, or it will
+abort the discussion. Decomposing this into three binary session types
+could be logically very difficult, and most likely we would lose some of
+the essential sequencing information in the process. Instead, let us transform
+this scenario into the following global type. Global types are presented as
+numbers, so a clear key is also provided:
+\\
+\begin{lstlisting}
+    1)  1 $\rightarrow$ 3 : $\langle$string$\rangle$                         B1 = 1
+    2)  3 $\rightarrow$ 1 : $\langle$int$\rangle$                            B2 = 2
+    3)  3 $\rightarrow$ 2 : $\langle$int$\rangle$                             S = 3
+    4)  1 $\rightarrow$ 2 : $\langle$int$\rangle$
+    5)  2 $\rightarrow$ 3 : { ok: 2 $\rightarrow$ 3 : $\langle$string$\rangle$. 3 $\rightarrow$ 2 : $\langle$date$\rangle$. end,
+                quit: end }
+\end{lstlisting}
+
+In our analysis, a message can defined a passing from process \texttt{P0}
 to process \texttt{P1}, written \texttt{P0->P1}, if the types in processes 
 \texttt{P0} and \texttt{P1} dual each other. The algorithm we have for processing
 each type starts in the first type of each block and stores each token. If
@@ -1141,34 +1294,33 @@ until all type block have been consumed.
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{images/GraphOneFix.jpg}
-	\caption{Node Chronology}
+	\caption{Node Chronology} \label{nodegraphone}
 \end{figure}
 
-The reason we may process tokens in this way is demonstrated in figure().
-A Sonic Pi program will always increment its virtual time as we run through a
-program. \texttt{SubGraph}s are written in the order they are defined in 
-the source by line number. Given this, within a \texttt{SubGraph} if
-\texttt{n1.index < n2.index}, \texttt{n1} has resolved first. In later sections
-we will refer to this as the `horizontal' relationship between nodes. In 
-two concurrent \texttt{SubGraph}s, \texttt{n.index < m.index} and \texttt{n} 
-will be resolved first by the interpreter but they may have the same virtual 
-time within the program, thus they are compared to each other as well as 
-those tokens processed one previously. We will refer to this as the `vertical'
-relationship between nodes. The terms are purely a useful reference to the
-diagram presented in figure() rather than a physical property of the nodes
-or source lines.
+The reason we may process tokens in this way is demonstrated in Figure 
+\ref{nodegraphone}. A Sonic Pi program will always increment its virtual 
+time as we run through a program. \texttt{SubGraph}s are written in the order 
+they are defined in the source by line number. Given this, within a 
+\texttt{SubGraph} if \texttt{n1.index < n2.index}, \texttt{n1} has resolved 
+first. In later sections we will refer to this as the `horizontal' relationship 
+between nodes. In two concurrent \texttt{SubGraph}s, \texttt{n.index < m.index} 
+and \texttt{n} will be resolved first by the interpreter but they may have the 
+same virtual time within the program, thus they are compared to each other as 
+well as those tokens processed one previously. We will refer to this as the 
+`vertical' relationship between nodes and is demonstrated in Figure 
+\ref{nodegraphone} by the blue bar linking the different groups together.
 
 There is a small limitation in this design as it will allow certain untypable
 programs to be typed.
 
-An example of instance one can be shown with snippet 10 presented earlier, 
-reproduced below for clarity. As it is, this will produce the same session
-graph as the previous code snippet, which produces a feesable global type.
+An example of this can be shown with the deadlocking code from previously,
+shown again in Snippet \ref{typelock}. As it is, this will produce the same session
+graph as Snippet \ref{formTypes}, which produces a feesable global type.
 The actual result for this should be untypable as both loops will become stuck
 at each \texttt{sync} node. 
 
 \begin{minipage}{\textwidth}
-	\begin{lstlisting}[language = ruby]
+	\begin{lstlisting}[style = sonicpi]
 	live_loop :foo do
 	    play :e4, release: 0.5
 	    sleep 0.5
@@ -1181,7 +1333,7 @@ at each \texttt{sync} node.
 	    sync :foo
 	end
 	\end{lstlisting}
-	\captionof{lstlisting}{Deadlock - types under this approach}
+	\captionof{lstlisting}{Deadlock - Types Under This Approach} \label{typelock}
 \end{minipage}
 
 \paragraph{Keeping Time}
@@ -1203,19 +1355,19 @@ set of nodes between each \emph{time} node.
 	\caption{Fixed Node Chronology}
 \end{figure}
 
-Refering back to snippets 11/12, the program graph constructed now takes
+Refering back to Snippet \ref{formTypes}, the program graph constructed now takes
 the form:
 \\
 \begin{lstlisting}
-  P0 :=  B:P0P1!.A:P1P0?.time
-  P1 :=  A:P1P0!.time.B:P0P1?.time
+  P0 :=  B:(P0P1)!.A:(P1P0)?.time
+  P1 :=  A:(P1P0)!.time.B:(P0P1)?.time
 \end{lstlisting}
 
 More importantly the program from snippet 12 will look as follows:
 \\
 \begin{lstlisting}
-  foo := foo:P0P1!.time.bar:P1P0?
-  bar := bar:P1P0!.time.foo:P0P1?
+  foo := foo:(P0P1)!.time.bar:(P1P0)?
+  bar := bar:(P1P0)!.time.foo:(P0P1)?
 \end{lstlisting}
 
 As before we process each block one `vertical' relation at a time. We take
@@ -1242,10 +1394,47 @@ individual process types from that. With this one can then write each process,
 ensuring that all communication protocols remain consistent as development 
 proceeds. Projection is a simple and decidable approach to session times.
 
+The global types describe the various actions of a participant \texttt{p} sending
+either a value of a given Sort, a channel of a given Type, or some label to the
+partcipant \texttt{q} and then interaction continues according to the following
+global type \texttt{G}. The grammar we are interested in here is as follows:
+\\
+\begin{lstlisting}
+    G ::= p $\rightarrow$ q : $\langle$S$\rangle$.G
+        | p $\rightarrow$ q : $\langle$T$\rangle$.G
+        | $\texttt{\textbf{t}}$
+        | end
+\end{lstlisting}
+
+To understand how we build a global type from decomposed local types, we first 
+present the simpler operation of \emph{projection}. The global type is the
+description of the program as the whole. It shows which participants 
+communication with which and what data they pass between each other. The decomposed
+local type describes the interaction that specific process is aware of. The 
+definition of \emph{projection} follows:
+
+\begin{blockquote}
+  \textbf{Definition 1:} \emph{The projection of a global type \texttt{G} onto 
+  a particiapnt \texttt{q} is defined by induction on \texttt{G}}:
+\end{blockquote}
+\begin{align*}
+  (\texttt{p} \rightarrow \texttt{p'}:\texttt{<U>}.\texttt{$G$'}) \upharpoonright \texttt{q = }  
+  \begin{cases}
+\hspace{5pt} !\langle \texttt{p',U} \rangle (\texttt{$G$'}\upharpoonright \texttt{q}) \hspace{22pt}if \hspace{5pt} \texttt{q = p} \\
+\hspace{5pt} ?(\texttt{p',U}) (\texttt{$G$'}\upharpoonright \texttt{q}) \hspace{20pt}if \hspace{5pt} \texttt{q = p'} \\
+\hspace{5pt} \texttt{$G'$}\upharpoonright \texttt{q} \hspace{65pt} otherwise
+  \end{cases}
+\end{align*}
+\begin{align*}
+  \texttt{t} \upharpoonright \texttt{q = t} 
+  \hspace{40pt} \texttt{end} \upharpoonright \texttt{q = end}
+\end{align*}
+
 This approach is not so feesable in this instance as we have already been 
 presented with the full source. Instead we are required to build the global
 type from the individual process types provided, the aim being to verify
-the communication of the program through this process. Whilst notably more
+the communication of the program through this process. This consists largely of 
+matching operations on the channels they operate on. Whilst notably more
 difficult, this approach is also, thankfully, proveably decidable. There is
 no situation where any algorithmic approach to the problem will not terminate
 with some answer. In the cases where our program's global type is not
@@ -1266,8 +1455,20 @@ perfectly valid, and sometimes useful, situations to occur in Sonic Pi.
 The first such situation we consider is when we have several \texttt{cue}
 signals with the potential to trigger one \texttt{sync}.
 
+
+
+In this scenario the \texttt{sync} in \texttt{P1} may be triggered by either
+of the \texttt{cue}s present in the other two threads. Whilst unusual,
+it is not unreasonable to suggest this is a valid program. It may be that the
+developer has set up the rest of the program code so that threads \texttt{P1} 
+and \texttt{P2} alternate for each loop that \texttt{P1} performs. The use
+of this in a musical sense could be an interesting drum riff to underpin the
+song, or some decorative melodies. To capture this information Sonic Pi 
+proposes an `\emph{or}' type, denoted by \texttt{||}. 
+
+
 \begin{minipage}{\textwidth}
-	\begin{lstlisting}[language = ruby]
+	\begin{lstlisting}[style = sonicpi]
     # P0                # P1                # P2
     in_thread do        in_thread do        in_thread do
       loop do             loop do             loop do
@@ -1279,14 +1480,8 @@ signals with the potential to trigger one \texttt{sync}.
 	\captionof{lstlisting}{One \texttt{sync}, multiple \texttt{cue}}
 \end{minipage}
 
-In this scenario the \texttt{sync} in \texttt{P1} may be triggered by either
-of the \texttt{cue}s present in the other two threads. Whilst unusual,
-it is not unreasonable to suggest this is a valid program. It may be that the
-developer has set up the rest of the program code so that threads \texttt{P1} 
-and \texttt{P2} alternate for each loop that \texttt{P1} performs. The use
-of this in a musical sense could be an interesting drum riff to underpin the
-song, or some decorative melodies. To capture this information Sonic Pi 
-proposes an `\emph{or}' type, denoted by \texttt{||}. Given this notation the
+
+Given this notation the
 decomposed types for this set of threads is:
 \\
 \begin{lstlisting}
@@ -1299,6 +1494,8 @@ Notice in this instance we are referring only to the `strict' types of each
 process, rather than our graphical representation of the process, so the
 \texttt{time} elements discussed in the previous section have been ommitted 
 for this discussion.
+
+
 
 In terms of processing the global type, when each of these types line up
 into the same `vertical' relationship, the type constructed has the form 
@@ -1317,7 +1514,7 @@ may have multiple melodies playing concurrently that should all sync onto the
 same drum beat.
 
 \begin{minipage}{\textwidth}
-	\begin{lstlisting}[language = ruby]
+	\begin{lstlisting}[style = sonicpi]
     # P0                # P1                # P2
     in_thread do        in_thread do        in_thread do
       loop do             loop do             loop do
@@ -1366,6 +1563,7 @@ this projects presents an interesting evolution of session types for this field.
 We have implemented multiple modes that our project can operate under to reflect
 this, so developers can choose to analysis under `strict' typing or under the
 `Sonic Pi' typing outlined here.
+\newpage
 
 \paragraph{Sub-Typing}
 \begin{multicols}{2}
@@ -1391,14 +1589,11 @@ $\hphantom{tabs}$ \texttt{B:(P0P1)!.A:(P1P0)?}
 The accurate type for the second process would be \texttt{B:(P0P1)?.A:(P0P1)!}, 
 (or one could keep \texttt{P1} unchanged and swap the terms in the other process). 
 To handle this, the project makes use of sub-typing the \texttt{cue} type.
-% \footnote{
-% As suggested by Dominic Orchard in his presentation on `Verifying and Timing
-% Concurrent Instruments'}
 
 	\begin{minipage}{0.5\textwidth}
 
 		\begin{minipage}{\textwidth}
-			\begin{lstlisting}[language=ruby]
+			\begin{lstlisting}[style = sonicpi]
 	# P0 
 	in_thread do
 	  loop do   
@@ -1461,7 +1656,63 @@ time', so we may consider operation ordering to be maintained in this instance.
 \newpage
 
 \section{Evaluation}
-\subsection{Ruby/C++}
+\thispagestyle{empty}
+\subsection{Ruby/C++11 \& Performance}
+In evaluating our project it is necessary to question whether the tools used were
+in fact the right ones for the given task. We have implemented an analysis library
+in C++11 which successfully hooks into the existing Ruby modules. This library
+could easily have been written in Ruby, saving the need for the extra steps
+of converting the data from one type to another. The reason for our
+use of C++11 is to take advantage of the speed of the language. The tool used for
+for the data transfer here is Ruby Rice, a type-safe and exception-safe interface
+between C++ and Ruby's C API\footnote{As found at https://github.com/jasonroelofs/rice}.
+Other similar tools for this are Ruby Inline and Ruby's FFI tool. Below is a table
+of their relative performances based on some short implementations of fibonacci, 
+factorial and pow methods.
+
+\begin{table}[h]
+	\centering
+	\caption{Ruby Interfacing Performances \cite{amber}} \label{ruby}
+	\label{my-label}
+	\begin{tabular}{llll}
+	          & Ruby Inline & Ruby Rice   & Ruby FFI  \\ \hline
+	factorial & 0.026175138 & 0.197720523 & 0.014882004  \\
+	fibonacci & 0.026792521 & 0.202714029 & 0.018928646  \\
+	pow       & 0.03252452  & 0.211258897 & 0.023082315
+	\end{tabular}
+\end{table}
+
+Disappointingly, Ruby Rice performs the slowest of this tools in this scenario. 
+On standard desktop environments this amount is little cause for concern as both
+the Sonic Pi IDE and the extention library run smoothly with no trouble. The average
+processing time for this project on [desktop specs] is [time here]. This being said,
+it is important to remember that these results are based on very simple mathematical 
+methods, not something you would likely use embedded C for in a real project.
+
+The crucial question is how well this runs on an actually Raspberry Pi as this is
+the target device for the language. When run on a recent Raspberry Pi 2, average
+performance is [time here].
+
+While these results are strong it doesn't go the full distance in answering if the
+library was better served implemented in Ruby or C++11. The library as it is, is able
+to take advantage of many useful features of C++11; notably the host of available
+data structures for each task. That said, whilst Ruby only has Array and Hash 
+structures avaiable to it, Ruby does still have the concept of classes and modules 
+meaning our current class setup is largely portable to a Ruby environment. 
+Unfortunately there has not been time thus far to test how fast a Ruby implementation
+is compared to the current project state.
+
+Another reason for the use of C++ was the hopes to make greater use of the boost
+graph library\footnote{http://www.boost.org/doc/libs/1\_58\_0/libs/graph/doc/}. 
+In implementing the graph analysis with this it would have been useful to have
+immediate access to such things as the iterators and many different graph algorithms
+(djisktra, etc...) that bgl implements. Currently the \texttt{SubGraph} structure
+we have does not translate well into bgl. It is possible to compile this 
+implementation but data is tricky to initialise and access later on. In the interest
+of time this idea was shelved and a much simpler graph structure was put in place.
+Despite the large code dependancy bgl can introduce, it may be interesting to
+revisit the idea in the future, should the search-algorithms it has ready-implemented
+become required.
 
 % comments on the three different methods available?
 
@@ -1469,9 +1720,383 @@ time', so we may consider operation ordering to be maintained in this instance.
 
 % mention other ruby parser options -> maybe find some benchmark stats
 
+% -> attempt at boost library and why that was dropped?
+
+
+\subsection{Correctness}
+To confirm the correctness of our approach we have built a systematic testing
+environment. It is important when building verification tools to have a series
+of programs to test results with and ensure any interesting edge cases of behaviour
+can be detected and dealt with. In this system we been with a series of simple
+programs, testing simple chords and sequencing, single function detection, etc...,
+before moving into more complex programs. At the later end of the suite we test
+on a full musical piece, taken from the samples provided in the Sonic Pi IDE. In
+presenting these results, we provide the source for the program, an expected trace
+result and then our actual analysis result.
+
+All codes written here can be repeated with notes in MIDI format (\texttt{:C4}, 
+for example) and will produce the same results as the integer format presented.
+Session analysis results are only presented when relevant to the code being
+discussed, as the library is quite efficient at setting empty types.
+
+\subsubsection{Chords}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      play 60
+      play 62
+      play 64
+	\end{lstlisting}
+	\captionof*{lstlisting}{Chord Test Code}
+\end{minipage}
+
+\begin{lstlisting}
+      == Expected Trace               == Actual Trace
+      [0] -                           [0] -
+      [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+      [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
+      [3] conVT: 0, cumVT: 0          [3] conVT: 0, cumVT: 0
+\end{lstlisting}
+
+\subsubsection{Sequences}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      play 60
+      sleep 1
+      play 62
+      sleep 1
+      play 64
+	\end{lstlisting}
+	\captionof*{lstlisting}{Sequence Test Code}
+\end{minipage}
+
+\begin{lstlisting}
+      == Expected Trace               == Actual Trace
+      [0] -                           [0] -
+      [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+      [2] conVT: 1, cumVT: 1          [2] conVT: 1, cumVT: 1
+      [3] conVT: 0, cumVT: 1          [3] conVT: 0, cumVT: 1
+      [4] conVT: 1, cumVT: 2          [4] conVT: 1, cumVT: 2
+      [5] conVT: 0, cumVT: 2          [5] conVT: 0, cumVT: 2
+\end{lstlisting}
+
+\subsubsection{Loops}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      loop do
+        play 60
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Loop Test Code}
+\end{minipage}
+
+\begin{lstlisting}
+      == Expected Trace               == Actual Trace
+      [0] -                           [0] -
+      [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+      [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
+      [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
+\end{lstlisting}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      loop do
+        play 60
+        sleep 1
+        loop do
+          play 64
+          sleep 1
+        end
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Nested Loop Test Code}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      5.times do
+        play 60
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{`Timed' Loop Test Code}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      5.times do
+        play 60
+        sleep 1
+        5.times do
+          play 64
+          sleep 1
+        end
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Nested `Timed' Loop Test Code}
+\end{minipage}
+
+There is also the ability to make a parameterized loop with \texttt{n.times},
+where \texttt{n} has been passed to the function the loop is contained in. This
+test is not included here for brevity, as the results are similar those presented
+here. The reason for this is whilst the library can see the symbols easily,
+the code is currently not processing it. For this reason, parameterized code
+is processed as if they were unparameterized. In the case of loops, this means
+all loops are handled once and VT is printed as though each loop only occured once.
+
+\subsubsection{Threads}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      in_thread :foo do
+        play 60
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Thread Test Code}
+\end{minipage}
+\begin{lstlisting}
+      == Expected Trace               == Actual Trace
+      [0] -                           [0] -
+      [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+      [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
+      [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
+\end{lstlisting}
+
+\subsubsection{Data Structures}
+\paragraph{Lists}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      play [60, 62, 64]
+	\end{lstlisting}
+	\captionof*{lstlisting}{List Test Code}
+\end{minipage}
+
+\paragraph{Chords}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      chord(:E3, :minor)
+	\end{lstlisting}
+	\captionof*{lstlisting}{Chord(DS) Test Code}
+\end{minipage}
+
+\paragraph{Scales}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      scale(:E3, :minor)
+	\end{lstlisting}
+	\captionof*{lstlisting}{Scale Test Code}
+\end{minipage}
+
+\paragraph{Rings}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      (ring 52, 55, 59)
+	\end{lstlisting}
+	\captionof*{lstlisting}{Ring V1 Test Code}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      [52, 55, 59].ring
+	\end{lstlisting}
+	\captionof*{lstlisting}{Ring V2 Test Code}
+\end{minipage}
+
+Other data structure functions (\texttt{range}, \texttt{bools}, \texttt{knit},
+and \texttt{spread}) will have similar results to these.
+
+\subsubsection{Dead Code}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      loop do
+        play 60
+        sleep 1
+      end
+
+      loop do
+        play 60
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Dead Code V1 Test Code}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      loop do
+        play 60
+        sleep 1
+        loop do
+          play 64
+          sleep 1
+        end
+        play 66
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Dead Code V2 Test Code}
+\end{minipage}
+
+\subsubsection{Function Calls}
+\paragraph{Function Definition}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      define :func do
+        play 55
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Function Definition Test Code}
+\end{minipage}
+
+\paragraph{Function Detection}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      define :func do
+        play 55
+        sleep 1
+      end
+
+      func
+	\end{lstlisting}
+	\captionof*{lstlisting}{Function Detection Test Code}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      define :foo do
+        play 55
+        sleep 1
+      end
+
+      play 60
+      foo
+      bar
+
+      define :bar do
+        play 75
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Multiple Function Detection Test Code}
+\end{minipage}
+
+\paragraph{Parameterized Functions}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      define :func do |n|
+        play n
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Parametre V1 Test Code}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      define :func do |n|
+        play 60
+        sleep n
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Parametre V1 Test Code}
+\end{minipage}
+
+\subsubsection{Conditionals}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      if cond then
+        sleep 1
+      else
+        sleep 0.5
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Conditional Test Code}
+\end{minipage}
+\begin{lstlisting}
+      == Expected Trace               == Actual Trace
+      [0] -                           [0] -
+      [1] conVT: -, cumVT: 0          [1] conVT: 0, cumVT: 0
+      [2] conVT: -, cumVT: 0          [2] conVT: 0, cumVT: 0
+      [3] conVT: -, cumVT: 1          [3] conVT: 1, cumVT: 1
+      [4] conVT: -, cumVT: 1          [4] conVT: 1, cumVT: 1
+\end{lstlisting}
+
+Given the nature of our implementation (as described in Section 4), this has the
+same output regardless of the conditional's expression.
+
+\subsubsection{\texttt{;} Separation}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      play 60 ; play 62 ; play 64 ; sleep 1
+      play 63 ; play 65 ; play 66 ; sleep 0.5
+	\end{lstlisting}
+	\captionof{lstlisting}{Multiple Statements on Single Line Test Code}
+\end{minipage}
+
+\subsubsection{Musical Score}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      load_samples [:drum_heavy_kick, :drum_snare_soft]
+
+      define :drums do
+        cue :slow_drums
+        6.times do
+          sample :drum_heavy_kick, rate: 0.8
+          sleep 0.5
+        end
+        cue :fast_drums
+        8.times do
+          sample :drum_heavy_kick, rate: 0.8
+          sleep 0.125
+        end
+      end
+      
+      define :snare do
+        cue :snare
+        sample :drum_snare_soft
+        sleep 1
+      end
+      
+      define :synths do
+        puts "how does it feel?"
+        use_synth :mod_saw
+        use_synth_defaults amp: 0.5, attack: 0, sustain: 1, 
+                           release: 0.25, cutoff: 90, mod_range: 12, 
+                           mod_phase: 0.5, mod_invert_wave: 1
+        notes = [:F, :C, :D, :D, :G, :C, :D, :D]
+        notes.each do |n|
+          play note(n, octave: 1)
+          play note(n, octave: 2)
+          sleep 1
+        end
+      end
+    \end{lstlisting}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      in_thread(name: :synths) do
+        sleep 6
+        loop{synths}
+      end
+      
+      in_thread(name: :drums) do
+        loop{drums}
+      end
+      
+      in_thread(name: :snare) do
+        sleep 12.5
+        loop{snare}
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Monday Blues - Coded by Sam Aaron, as found in Sonic 
+	Pi IDE Samples}
+\end{minipage}
+
 \subsection{Visual Adaptation}
 % some self evaluation here?
-% -> attempt at boost library and why that was dropped?
 
 % ease of use when put into sonic-pi
 % use of information
@@ -1480,6 +2105,7 @@ time', so we may consider operation ordering to be maintained in this instance.
 \newpage
 
 \section{Conclusion}
+\thispagestyle{empty}
 In this chapter we bring the project to a close by first discussing various 
 improvements for the project, and other features that we might implement 
 in the future, before concluding with a summary of achievements. 
@@ -1515,11 +2141,14 @@ leading to an inaccurate type analysis. In the future we could investigate
 incorporating more of the information calculated in the timing affects portion
 of the program into the construction of the session graph.
 
+\paragraph{Minecraft API}
+
 \subsection{Achievement Summary}
 \newpage
 
 
 \begin{thebibliography}{9}
+\thispagestyle{empty}
 
 \bibitem{naec}
   \emph{http://www.naec.org.uk/events}
@@ -1532,6 +2161,10 @@ of the program into the construction of the session graph.
 
 \bibitem{micro}
   \emph{http://news.microsoft.com/apac/2015/03/23/three-out-of-four-students-in-asia-pacific-want-coding-as-a-core-subject-in-school-reveals-microsoft-study/}
+  % (Visited on 8/6/2015)
+
+\bibitem{amber}
+  \emph{https://www.amberbit.com/blog/2014/6/12/calling-c-cpp-from-ruby/}
 
 \bibitem{AB13}
   Aaron, S., and Blackwell, A.F.,

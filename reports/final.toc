@@ -20,19 +20,38 @@
 \contentsline {subsection}{\numberline {4.1}Timing Tree}{26}
 \contentsline {subsubsection}{\numberline {4.1.1}Building the AST}{27}
 \contentsline {subsubsection}{\numberline {4.1.2}\texttt {pTrace}}{28}
-\contentsline {subsection}{\numberline {4.2}Session Graph}{28}
-\contentsline {subsubsection}{\numberline {4.2.1}Planning the Graph}{29}
-\contentsline {paragraph}{Initial Design}{29}
-\contentsline {paragraph}{Keeping Time}{32}
-\contentsline {subsubsection}{\numberline {4.2.2}Global Construction}{34}
-\contentsline {paragraph}{Sub-Typing}{36}
-\contentsline {subsection}{\numberline {4.3}Integration}{37}
-\contentsline {section}{\numberline {5}Evaluation}{38}
-\contentsline {subsection}{\numberline {5.1}Ruby/C++}{38}
-\contentsline {subsection}{\numberline {5.2}Visual Adaptation}{38}
-\contentsline {section}{\numberline {6}Conclusion}{39}
-\contentsline {subsection}{\numberline {6.1}Future Work}{39}
-\contentsline {paragraph}{Function Parametres}{39}
-\contentsline {paragraph}{Branching Session Types}{39}
-\contentsline {paragraph}{Detailed Time Nodes}{39}
-\contentsline {subsection}{\numberline {6.2}Achievement Summary}{39}
+\contentsline {subsection}{\numberline {4.2}Session Graph}{29}
+\contentsline {subsubsection}{\numberline {4.2.1}Planning the Graph}{30}
+\contentsline {paragraph}{Initial Design}{30}
+\contentsline {paragraph}{Keeping Time}{34}
+\contentsline {subsubsection}{\numberline {4.2.2}Global Construction}{35}
+\contentsline {paragraph}{Sub-Typing}{39}
+\contentsline {subsection}{\numberline {4.3}Integration}{39}
+\contentsline {section}{\numberline {5}Evaluation}{40}
+\contentsline {subsection}{\numberline {5.1}Ruby/C++11 \& Performance}{40}
+\contentsline {subsection}{\numberline {5.2}Correctness}{41}
+\contentsline {subsubsection}{\numberline {5.2.1}Chords}{41}
+\contentsline {subsubsection}{\numberline {5.2.2}Sequences}{42}
+\contentsline {subsubsection}{\numberline {5.2.3}Loops}{42}
+\contentsline {subsubsection}{\numberline {5.2.4}Threads}{43}
+\contentsline {subsubsection}{\numberline {5.2.5}Data Structures}{44}
+\contentsline {paragraph}{Lists}{44}
+\contentsline {paragraph}{Chords}{44}
+\contentsline {paragraph}{Scales}{44}
+\contentsline {paragraph}{Rings}{44}
+\contentsline {subsubsection}{\numberline {5.2.6}Dead Code}{45}
+\contentsline {subsubsection}{\numberline {5.2.7}Function Calls}{45}
+\contentsline {paragraph}{Function Definition}{45}
+\contentsline {paragraph}{Function Detection}{46}
+\contentsline {paragraph}{Parameterized Functions}{46}
+\contentsline {subsubsection}{\numberline {5.2.8}Conditionals}{47}
+\contentsline {subsubsection}{\numberline {5.2.9}\texttt {;} Separation}{47}
+\contentsline {subsubsection}{\numberline {5.2.10}Musical Score}{48}
+\contentsline {subsection}{\numberline {5.3}Visual Adaptation}{49}
+\contentsline {section}{\numberline {6}Conclusion}{50}
+\contentsline {subsection}{\numberline {6.1}Future Work}{50}
+\contentsline {paragraph}{Function Parametres}{50}
+\contentsline {paragraph}{Branching Session Types}{50}
+\contentsline {paragraph}{Detailed Time Nodes}{50}
+\contentsline {paragraph}{Minecraft API}{50}
+\contentsline {subsection}{\numberline {6.2}Achievement Summary}{50}
