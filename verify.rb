@@ -11,7 +11,8 @@ path = "src/assets/sp/"
 #filename = path + "session/interaction_three.txt"
 
  ## Timing ##
-filename = path + "timing/function_sequential.txt"
+filename = path + "timing/conditional.txt"
+#filename = path + "timing/function_sequential.txt"
 #filename = path + "timing/sequence_loop.txt"
 #filename = path + "timing/simple_loop.txt"
 #filename = path + "timing/prog_function.txt"

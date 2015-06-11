@@ -1217,7 +1217,7 @@ theory.
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
         define :first do       # 1
-            play 60            # 2
+          play 60              # 2
         end
         
         first                  # 3
@@ -1225,7 +1225,7 @@ theory.
         play 60                # 5
 
         define :second do      # 6
-            sleep 1            # 7
+          sleep 1              # 7
         end
 	\end{lstlisting}
 	\captionof{lstlisting}{Surrounding Functions} \label{doubleFunc}
@@ -1276,15 +1276,17 @@ The key difference is not to add together times from different blocks. The
 of the trace by what value that has. Notice that, in the above trace, index 6 
 has a fresh \texttt{cumVT} value when compared with index 5.
 
+\paragraph{Conditionals}
+Similar to functions, we require a two pass approach to handle conditionals in the 
+code. Take the following program code:
 
-
-% then talk about theory of how realtime >= virtualtime
-% leads into discussion on how we track the cumulative virtual time
-% and comment on how a developer can use this to decide how long a program is running for
-
-
-
-% why is a second pass for round up information fine?
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+        if true then
+            sleep 0.5
+	\end{lstlisting}
+	\captionof{lstlisting}{Conditional} \label{conditional}
+\end{minipage}
 
 \subsection{Session Graph}
 Session Types describe communication protocols via message passing. In Sonic Pi
