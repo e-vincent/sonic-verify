@@ -1,4 +1,4 @@
-\documentclass[11pt, abstracton, twoside]{scrartcl}
+\documentclass[11pt, abstracton, twoside, titlepage=true]{scrartcl}
 \usepackage{a4, fullpage}
 \usepackage[usenames,dvipsnames]{color, xcolor}
 \usepackage{listings, caption, graphicx}
@@ -28,6 +28,7 @@
 	{1ex plus .2ex}
 
 \renewcommand{\lstlistingname}{Snippet}
+\renewcommand{\titlehead}{\textbf}
 
 \DeclareGraphicsExtensions{.pdf,.png,.jpg}
 \DeclareCaptionFont{white}{\color{white}}
@@ -102,13 +103,22 @@
 \setlength{\parskip}{0.4cm}
 \setlength{\parindent}{0cm}
 
+\let\endtitlepage\relax
+
 \begin{document}
 
+\subject{{\large Department of Computing \\ Imperial College London} \\
+\LARGE{Individual MEng Project}}
 \title{Musical Concurrent Programming \\ With Sonic Pi}
-\subtitle{Final Report}
-\author{Eleanor Vincent}
-\date{\today}
+\author{{\LARGE Eleanor Vincent} \\ {\large Supervisor: Nobuko Yoshida}}
+\date{\today} 
+
 \maketitle{\thispagestyle{empty}}
+
+\begin{center} 
+	\includegraphics[width=0.50\textwidth]{images/crest.jpg}
+\end{center}
+
 \afterpage{\thispagestyle{empty}\null\newpage}
 \newpage
 
@@ -1269,9 +1279,12 @@ The trace after the first pass of this program looks as follows:
 Once this is processed it is again a simple case of adding up the cumulative virtual
 time as we traverse the trace. \texttt{-1} is reserved as a keycode in tandem with
 the \texttt{isFunc} marker; if a function has \texttt{conVT = -1} it means this
-is a function call and will be processed in a later pass.
+is a function call and will be processed in a later pass. It might seem like the 
+keycode is useless in this case, but as the virtual time keycode is consumed during 
+trace processing, it is useful to maintain the other boolean flag so that function 
+calls are more easily identified afterwards.
 
-The key difference is not to add together times from different blocks. The 
+The key idea is not to add together times from different blocks. The 
 \texttt{inFunc} note helps with this, as we can detect when we are in a new block 
 of the trace by what value that has. Notice that, in the above trace, index 6 
 has a fresh \texttt{cumVT} value when compared with index 5.
@@ -1282,11 +1295,79 @@ code. Take the following program code:
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
-        if true then
-            sleep 0.5
+        if true then      #1
+            sleep 0.5     #2
+        else
+            sleep 1       #3
+        end
 	\end{lstlisting}
 	\captionof{lstlisting}{Conditional} \label{conditional}
 \end{minipage}
+
+In practice it may be difficult to evaluate which branch of a conditional the
+program is going to take. Instead the approach is to find the maximum virtual time 
+of both branches and take the longest one. In terms of timing later in the program 
+this could potentially throw developers on what the actual virtual time of the 
+program will be if the \texttt{sleep} lengths differ by a sizeable margin. On the 
+other hand this is a much safer model in terms of ensuring the time saftey of the 
+program.
+
+The trace for Snippet \ref{conditional} is:
+\\
+\begin{lstlisting}
+    == First Pass Trace
+    [0] -
+    [1] conVT:  -2, cumVT: -2,   isFunc: false, inFunc: false
+    [2] conVT: 0.5, cumVT: -1.5, isFunc: false, inFunc: false
+    [3] conVT:   1, cumVT: -0.5, isFunc: false, inFunc: false
+
+    == Second Pass Trace
+    [0] -
+    [1] conVT:  1, cumVT:    1, isFunc: false, inFunc: false
+    [2] conVT: -3, cumVT: -1.5, isFunc: false, inFunc: false
+    [3] conVT: -3, cumVT: -0.5, isFunc: false, inFunc: false
+\end{lstlisting}
+
+In the first pass of the trace, we mark the location of the if with the keycode 
+-2. After this we calculate the virtual time of each branch and store the index 
+for the last state of each branch in the \texttt{IfNode} at the root of this 
+expression block. Similar to how block detection works, the end of an if-branch 
+is detected when the next index in question has the same parent index, or one 
+of greater value (or the program has finished in the case the conditonal is at 
+the end of the program). With this, the second pass is simply a case of, on reaching 
+a keycode of -2, set the result of whichever branch was longest.
+
+\paragraph{Dead Code}
+
+When calculating the virtual time of the program it is quite important not to 
+take dead code into account. Dead code can easily push the trace into incorrect 
+evaluation and make it difficult for the developer to calculate the time in their 
+program. As well as this, being able to print when code will not be reached in a 
+program is incredibly useful information for a developer to have in such an 
+environment. Dead code can also be easy to locate thanks to the form of the program.
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      loop do
+        play 60
+        sleep 1
+      end
+
+      loop do
+        play 60
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof*{lstlisting}{Dead Code} \label{dead}
+\end{minipage}
+
+We set \texttt{-3} to be the dead keycode and set all instances of \texttt{conVT} 
+to this value when the statement is registered as dead. Here the second loop is 
+obviously never going to be run, so we must remove this from consideration in our
+trace. The trace makes a note of when it has seen a loop block and sets a boolean 
+flag for dead code on hitting another loop block. Should the trace hit a 
+\texttt{in\_thread} block or a \texttt{live\_loop} block then this flag is not set 
+as these pieces of code can run in parallel.
 
 \subsection{Session Graph}
 Session Types describe communication protocols via message passing. In Sonic Pi
@@ -1303,7 +1384,6 @@ Presented next is the overall design of this section. Once the graph is
 built the entry point to the analysis for this section calls on each sub 
 graph to construct each session type and then the global type.
 
-% diagram here
 \begin{figure}[h!]
 	\centering
 	\includegraphics[width=\textwidth]{images/session.jpg}
@@ -1554,7 +1634,7 @@ on then we are able to return that this global type is not typeable.
 
 % what information was important, why did this link up with session graph?
 
-As discussed previously in section(), the usual approach to multi-party session 
+As discussed previously in Section 4.2.1, the usual approach to multi-party session 
 types is to construct the global type of your program and then project the 
 individual process types from that. With this one can then write each process, 
 ensuring that all communication protocols remain consistent as development 
@@ -1810,6 +1890,38 @@ time', so we may consider operation ordering to be maintained in this instance.
 
 \subsection{Integration}
 
+The Sonic Pi IDE has two core sections: Server and GUI. The server is written on 
+top of the SuperCollider synthesizer and implemented in Ruby whilst the GUI is 
+built on the Qt framework and thus written in C++.
+
+Integrating this library comes in two stages. Firstly delving into the server to 
+locate the area where the code is evaluated before being made into music. Sonic 
+Pi's code evaluation is handled by a \texttt{spider} module, which holds the main 
+evaluation method. This module also has the capacity to print straight into the 
+IDE's output log widget, making the first step of relaying information to the 
+screen very simple. The pseudo code for this \texttt{spider} integretion is very
+simple.
+\\
+\begin{lstlisting}[style = sonicpi]
+    def __spider_eval(code)
+        # thread setup
+        # ...
+        code = Preparse(code)
+        analysis_output = __verify_code(code)
+        __info(analysis_output)
+        # ...
+        # message handling and thread handling
+        # ...
+    end
+\end{lstlisting}
+
+Secondly, to better display the timing effects information, we choose to define 
+a new output widget in the \texttt{mainWindow} class of the gui. Qt thankfully 
+simplifies the GUI process considerably, meaning it is not too difficult to produce
+an attractive addition in keeping with the existing theme of Sonic Pi. We are 
+also able to mimic the \texttt{\_\_info} method we use to print to the output log
+to be able to print our timing information into our new widget.
+
 % basic outline of sonic pi
 % The basic architecture of Sonic Pi can be broken into the server side of the application and the gui. The gui brings a hard dependency on the Qt framework, implemented in C++, whilst the server application is developed with ruby. 
 % In order to generate and manipulate sounds, Sonic Pi is implemented in terms f the SuperCollider synthesis server which provides the ability to define arbitiary synthesiers and trigger and manipulate them in real time\cite{AB13}
@@ -1828,7 +1940,9 @@ In evaluating our project it is necessary to question whether the tools used wer
 in fact the right ones for the given task. We have implemented an analysis library
 in C++11 which successfully hooks into the existing Ruby modules. This library
 could easily have been written in Ruby, saving the need for the extra steps
-of converting the data from one type to another. The reason for our
+of converting the data from one type to another. 
+
+The reason for our
 use of C++11 is to take advantage of the speed of the language. The tool used for
 for the data transfer here is Ruby Rice, a type-safe and exception-safe interface
 between C++ and Ruby's C API\footnote{As found at https://github.com/jasonroelofs/rice}.
@@ -1839,9 +1953,11 @@ factorial and pow methods.
 \begin{table}[h]
 	\centering
 	\caption{Ruby Interfacing Performances \cite{amber}} \label{ruby}
-	\label{my-label}
+
 	\begin{tabular}{llll}
+	          \\
 	          & Ruby Inline & Ruby Rice   & Ruby FFI  \\ \hline
+	          \\
 	factorial & 0.026175138 & 0.197720523 & 0.014882004  \\
 	fibonacci & 0.026792521 & 0.202714029 & 0.018928646  \\
 	pow       & 0.03252452  & 0.211258897 & 0.023082315
@@ -1902,6 +2018,9 @@ result and then our actual analysis result.
 
 All codes written here can be repeated with notes in MIDI format (\texttt{:C4}, 
 for example) and will produce the same results as the integer format presented.
+The reason for this is that the note values are wrapped into \texttt{SymNode} types 
+in the same way the numbers are wrapped into the \texttt{IntNode} type. This means 
+the analysis approach for them is the same and the results are deterministic.
 Session analysis results are only presented when relevant to the code being
 discussed, as the library is quite efficient at setting empty types. Where functions
 are not being tested, trace information such as whether the statement is a function 
@@ -1917,13 +2036,13 @@ call or not is ommitted for brevity.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Chord Test Code}
 \end{minipage}
-
+\\
 \begin{lstlisting}
-      == Expected Trace               == Actual Trace
-      [0] -                           [0] -
-      [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
-      [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
-      [3] conVT: 0, cumVT: 0          [3] conVT: 0, cumVT: 0
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+    [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
+    [3] conVT: 0, cumVT: 0          [3] conVT: 0, cumVT: 0
 \end{lstlisting}
 
 \subsubsection{Sequences}
@@ -1937,15 +2056,15 @@ call or not is ommitted for brevity.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Sequence Test Code}
 \end{minipage}
-
+\\
 \begin{lstlisting}
-      == Expected Trace               == Actual Trace
-      [0] -                           [0] -
-      [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
-      [2] conVT: 1, cumVT: 1          [2] conVT: 1, cumVT: 1
-      [3] conVT: 0, cumVT: 1          [3] conVT: 0, cumVT: 1
-      [4] conVT: 1, cumVT: 2          [4] conVT: 1, cumVT: 2
-      [5] conVT: 0, cumVT: 2          [5] conVT: 0, cumVT: 2
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+    [2] conVT: 1, cumVT: 1          [2] conVT: 1, cumVT: 1
+    [3] conVT: 0, cumVT: 1          [3] conVT: 0, cumVT: 1
+    [4] conVT: 1, cumVT: 2          [4] conVT: 1, cumVT: 2
+    [5] conVT: 0, cumVT: 2          [5] conVT: 0, cumVT: 2
 \end{lstlisting}
 
 \subsubsection{Loops}
@@ -1958,13 +2077,13 @@ call or not is ommitted for brevity.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Loop Test Code}
 \end{minipage}
-
+\\
 \begin{lstlisting}
-      == Expected Trace               == Actual Trace
-      [0] -                           [0] -
-      [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
-      [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
-      [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+    [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
+    [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
 \end{lstlisting}
 
 \begin{minipage}{\textwidth}
@@ -1980,6 +2099,26 @@ call or not is ommitted for brevity.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Nested Loop Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT:  0, cumVT: 0         [1] conVT:  0, cumVT: 0
+    [2] conVT:  0, cumVT: 0         [2] conVT:  0, cumVT: 0
+    [3] conVT:  1, cumVT: 1         [3] conVT:  1, cumVT: 1
+    [4] conVT:  0, cumVT: 1         [4] conVT:  0, cumVT: 0
+    [5] conVT:  0, cumVT: 1         [5] conVT:  0, cumVT: 0
+    [6] conVT:  1, cumVT: 2         [6] conVT:  1, cumVT: 1
+\end{lstlisting}
+
+This has highlighted a limitation in the current iteration. The contributing time 
+detection works but the cumulation does not accurately detect nested blocks. 
+Instead it sees each new block and starts the cumulation fresh, as those they were
+sequential blocks. This shows the project is not currently making the most use out 
+of the block level data that is taken during the construction of the AST. This could 
+be fixed by testing whether a new block has a higher level than the previous token.
+In the event it does the trace can skip starting a fresh \texttt{cumVT} value, if it 
+is equal or less than then the old behaviour applies. 
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -1990,6 +2129,27 @@ call or not is ommitted for brevity.
 	\end{lstlisting}
 	\captionof*{lstlisting}{`Timed' Loop Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT: 5n, cumVT: 0         [1] conVT: -1, cumVT: -1
+    [2] conVT:  0, cumVT: 0         [2] conVT:  0, cumVT: -1
+    [3] conVT:  1, cumVT: 1         [3] conVT:  1, cumVT:  0
+\end{lstlisting}
+
+This loop structure is currently not handled correctly. Ideally, since this is set 
+to run a set number of times, once the trace has processed the loop length, there 
+should be some stored multiplier that can be used to accurately set the 
+\texttt{cumVT} value after the loop to a much higher number (in this test case, the 
+next \texttt{cumVT} would be \texttt{5} plus whatever the next \texttt{conVT} 
+evaluates to).
+
+What actually happens is \texttt{times} is registered as a function. In ruby terms,
+this is technically a function being sent the value 5 to act on. What we may do in 
+future is set another keycode (-4) which tells the second pass of the trace that 
+there is an argument to this loop that it must multiply the total loop time by and
+then use this value in subsequent trace calculations.
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2004,6 +2164,20 @@ call or not is ommitted for brevity.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Nested `Timed' Loop Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT: 5n, cumVT: 0         [1] conVT: -1, cumVT: -1
+    [2] conVT:  0, cumVT: 0         [2] conVT:  0, cumVT: -1
+    [3] conVT:  1, cumVT: 1         [3] conVT:  1, cumVT:  0
+    [4] conVT: 5n, cumVT: 1         [4] conVT: -1, cumVT: -1
+    [5] conVT:  0, cumVT: 1         [5] conVT:  0, cumVT: -1
+    [6] conVT:  1, cumVT: 2         [6] conVT:  1, cumVT:  0
+\end{lstlisting}
+
+This trace carries forward the limitations of both nested and timed traces shown 
+previously.
 
 There is also the ability to make a parameterized loop with \texttt{n.times},
 where \texttt{n} has been passed to the function the loop is contained in. This
@@ -2023,12 +2197,13 @@ all loops are handled once and VT is printed as though each loop only occured on
 	\end{lstlisting}
 	\captionof*{lstlisting}{Thread Test Code}
 \end{minipage}
+\\
 \begin{lstlisting}
-      == Expected Trace               == Actual Trace
-      [0] -                           [0] -
-      [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
-      [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
-      [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+    [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
+    [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
 \end{lstlisting}
 
 \subsubsection{Data Structures}
@@ -2040,7 +2215,12 @@ all loops are handled once and VT is printed as though each loop only occured on
 	\captionof*{lstlisting}{List Test Code}
 \end{minipage}
 
-\paragraph{Chords}
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] conVT: 0, cumVT: 0          [0] conVT: 0, cumVT: 0
+\end{lstlisting}
+
+\paragraph{Chords \& Scales}
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
       chord(:E3, :minor)
@@ -2048,13 +2228,37 @@ all loops are handled once and VT is printed as though each loop only occured on
 	\captionof*{lstlisting}{Chord(DS) Test Code}
 \end{minipage}
 
-\paragraph{Scales}
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
       scale(:E3, :minor)
 	\end{lstlisting}
 	\captionof*{lstlisting}{Scale Test Code}
 \end{minipage}
+
+Both of these structures have the trace results:
+\\
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] conVT: 0, cumVT: 0          [0] conVT: -1, cumVT: 0
+\end{lstlisting}
+
+The cumulative times are marked as zero here 
+because singular statements are not preceeded by a \texttt{begin} node. This means 
+the current information is stored in a \texttt{RootNode}, which by default is 
+not processed for information in the current iteration of the project. Running this
+again with the statements as part of a statement list give:
+\\
+\begin{lstlisting}
+== First Pass Trace               == Second Pass Trace
+[0] conVT: -1, cumVT: (prev-1)    [0] conVT: 0, cumVT: 0
+    isFunc: true, inFunc: false       isFunc: true, inFunc: false
+\end{lstlisting}
+
+This shows that \texttt{chord} and \texttt{scale} are currently being detected 
+as functions and as they are not defined in our user-function list, they are being 
+filled as a zero time statements. Whilst they technically are zero sleep function 
+calls, it raises the question as to whether we should only mark user defined 
+functions or if it is still useful to mark the statement. 
 
 \paragraph{Rings}
 \begin{minipage}{\textwidth}
@@ -2063,6 +2267,12 @@ all loops are handled once and VT is printed as though each loop only occured on
 	\end{lstlisting}
 	\captionof*{lstlisting}{Ring V1 Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] conVT: 0, cumVT: 0          [0] conVT: 0, cumVT: 0
+    [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+\end{lstlisting}
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2071,8 +2281,10 @@ all loops are handled once and VT is printed as though each loop only occured on
 	\captionof*{lstlisting}{Ring V2 Test Code}
 \end{minipage}
 
-Other data structure functions (\texttt{range}, \texttt{bools}, \texttt{knit},
-and \texttt{spread}) will have similar results to these.
+The results for this style of function call are the same as those just discussed 
+for chords and scales. Other data structure functions (\texttt{range}, 
+\texttt{bools}, \texttt{knit}, and \texttt{spread}) will have similar results to 
+these.
 
 \subsubsection{Dead Code}
 \begin{minipage}{\textwidth}
@@ -2089,6 +2301,23 @@ and \texttt{spread}) will have similar results to these.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Dead Code V1 Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT:  0, cumVT: 0         [1] conVT:  0, cumVT: 0
+    [2] conVT:  0, cumVT: 0         [2] conVT:  0, cumVT: 0
+    [3] conVT:  1, cumVT: 1         [3] conVT:  1, cumVT: 1
+    [4] conVT: -3, cumVT: 0         [4] conVT: -3, cumVT: 0
+    [5] conVT: -3, cumVT: 0         [5] conVT: -3, cumVT: 0
+    [6] conVT: -3, cumVT: 1         [6] conVT: -3, cumVT: 1
+\end{lstlisting}
+
+\texttt{-3} is the keycode used to show deadcode. The output in the IDE can use 
+this to print blank statements rather than numbers, helping the developer see
+when some code is inaccessable. This trace also shows sequential cumulation is 
+being calculated accurately as the trace does not waste time fixing the 
+\texttt{cumVT} values processed during the first pass.
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2105,6 +2334,29 @@ and \texttt{spread}) will have similar results to these.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Dead Code V2 Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT:  0, cumVT: 0         [1] conVT:  0, cumVT: 0
+    [2] conVT:  0, cumVT: 0         [2] conVT:  0, cumVT: 0
+    [3] conVT:  1, cumVT: 1         [3] conVT:  1, cumVT: 1
+    [4] conVT:  0, cumVT: 1         [4] conVT:  0, cumVT: 0
+    [5] conVT:  0, cumVT: 1         [5] conVT:  0, cumVT: 0
+    [6] conVT:  1, cumVT: 2         [6] conVT:  1, cumVT: 1
+    [7] conVT: -3, cumVT: 2         [7] conVT: -3, cumVT: 1
+    [8] conVT: -3, cumVT: 3         [8] conVT: -3, cumVT: 2
+\end{lstlisting}
+
+This also highlights the error found earlier in collecting time for nested loops, 
+but the dead code is still detected properly.
+
+The type of dead code that the trace cannot comment on is when a conditional is 
+never going to enter a certain branch. This analysis does not ever evaluate the 
+results of conditionals, so it could be that we mark the \texttt{ifNode} with the 
+virtual time of a branch it will never reach. The developer will have to notice this 
+themselves during the performance when their music always runs for a length of 
+virtual time shorter than what the analysis reports.
 
 \subsubsection{Function Calls}
 \paragraph{Function Definition}
@@ -2154,21 +2406,11 @@ and \texttt{spread}) will have similar results to these.
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
       define :func do |n|
-        play n
-        sleep 1
-      end
-	\end{lstlisting}
-	\captionof*{lstlisting}{Parametre V1 Test Code}
-\end{minipage}
-
-\begin{minipage}{\textwidth}
-	\begin{lstlisting}[style = sonicpi]
-      define :func do |n|
         play 60
         sleep n
       end
 	\end{lstlisting}
-	\captionof*{lstlisting}{Parametre V1 Test Code}
+	\captionof*{lstlisting}{Parametre Test Code}
 \end{minipage}
 
 \subsubsection{Conditionals}
@@ -2182,14 +2424,33 @@ and \texttt{spread}) will have similar results to these.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Conditional Test Code}
 \end{minipage}
+\\
 \begin{lstlisting}
-      == Expected Trace               == Actual Trace
-      [0] -                           [0] -
-      [1] conVT: -, cumVT: 0          [1] conVT: 0, cumVT: 0
-      [2] conVT: -, cumVT: 0          [2] conVT: 0, cumVT: 0
-      [3] conVT: -, cumVT: 1          [3] conVT: 1, cumVT: 1
-      [4] conVT: -, cumVT: 1          [4] conVT: 1, cumVT: 1
+    == Expected Trace               == Actual Trace
+    [0] conVT:  1, cumVT:    1      [0] conVT:  1, cumVT:    1
+    [1] conVT: -3, cumVT:   -1      [1] conVT: -3, cumVT:   -1
+    [2] conVT: -3, cumVT: -1.5      [2] conVT: -3, cumVT: -1.5
 \end{lstlisting}
+
+Conditionals presented an interesting case while collecting these test results. The
+\texttt{if} keyword actually works similar to the \texttt{block} keyword in that 
+they both mark the beginning of some statement list. This means they will always 
+come before a \texttt{begin} keyword in the tree. For the most part during a program 
+this does not cause much issue as the processing is still the same. However, in 
+this case, where we have only the conditional in our workspace, the \texttt{if} gets 
+taken in as the \texttt{RootNode} in our AST. Previously \texttt{RootNode} was 
+not involved in the processing as it was assumed there would never be anything but 
+a \texttt{begin} or a \texttt{block} keyword there. Because of this, the second 
+pass could not accurately clean the trace and our results look like this:
+\\
+\begin{lstlisting}
+    == Trace
+    [0] conVT:  -2, cumVT:   -2
+    [1] conVT:   1, cumVT:   -1
+    [2] conVT: 0.5, cumVT: -0.5
+\end{lstlisting}
+
+This has since been fixed, hence the corrected trace shown initially.
 
 Given the nature of our implementation (as described in Section 4), this has the
 same output regardless of the conditional's expression.
@@ -2201,6 +2462,55 @@ same output regardless of the conditional's expression.
       play 63 ; play 65 ; play 66 ; sleep 0.5
 	\end{lstlisting}
 	\captionof{lstlisting}{Multiple Statements on Single Line Test Code}
+\end{minipage}
+
+\subsubsection{Communications}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      live_loop :foo do
+        cue :A
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof{lstlisting}{Cue Detection Test Code}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      live_loop :foo do
+        sync :A
+        sleep 1
+      end
+	\end{lstlisting}
+	\captionof{lstlisting}{Sync Detection Test Code}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      in_thread do         in_thread do
+        loop do              loop do
+          sync :A              cue :A 
+          cue :B               sync :B
+          sleep 1              play 60
+          play 63              sleep 0.5
+        end                  end
+      end                  end
+	\end{lstlisting}
+	\captionof{lstlisting}{Global Type Test Code}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      in_thread do         in_thread do
+        loop do              loop do
+          sync :A              sync :B 
+          cue :B               cue :A 
+          sleep 1              play 60
+          play 63              sleep 0.5
+        end                  end
+      end                  end
+	\end{lstlisting}
+	\captionof{lstlisting}{Deadlock Detection Test Code}
 \end{minipage}
 
 \subsubsection{Musical Score}
@@ -2264,6 +2574,30 @@ same output regardless of the conditional's expression.
 \end{minipage}
 
 \subsection{Visual Adaptation}
+% screenshot here
+
+The visual differences to the IDE are quite minimal. One notable feature that is 
+currently missing is the ability not to load this library whilst using the IDE, a 
+useful switch to have as not all users will want to see this information all of the
+time. 
+
+For the most part test users relayed that they found the virtual time bar to the 
+left to be a handy little tool. Some noted that the printed session types in the 
+output log where well places but did not have enough experience with the material 
+to be able to get the most use out of the information. 
+
+One interesting piece of 
+feedback was the lack of ability to see the virtual time of your program before 
+running it for the first time. At the moment most of the analysis only runs 
+when playing the piece, so there is no trace to display until that point. It may 
+be that in the future the integration with the library is improved such that, 
+similarly to how a \texttt{live\_loop} can update the synth mid-performance,
+the IDE can detect a change in the workspace and run the analysis on the new source. 
+This would require a couple of improvements to the analysis itself; currently the 
+analysis runs afresh each time the code is processed. In the future it would be
+preferable to hold a trace object for each workspace and to dynamically update 
+this during the lifetime of the IDE window. 
+
 % some self evaluation here?
 
 % ease of use when put into sonic-pi
@@ -2310,8 +2644,20 @@ incorporating more of the information calculated in the timing affects portion
 of the program into the construction of the session graph.
 
 \paragraph{Minecraft API}
+Since starting this project, the Sonic Pi IDE has added a section detailing how 
+to use Sonic Pi alongside the Minecraft API. Our analysis is currently untested 
+against this API and it may prove interesting in the future to adapt the library 
+to be able to run alongside this API. 
 
 \subsection{Achievement Summary}
+We have produced a lightweight shared library that can statically analysis a 
+Sonic Pi program. This library can integrate successfully with the existing 
+Sonic Pi IDE and produces information on the timing effects of the program and 
+details the structure of the communication protocols used within the source. We 
+have also provided a small systematic testing environment within the project 
+to prove the correctness of our analysis and demonstrate the current limitations 
+of the analysis and present ideas for improvement.
+
 \newpage
 
 
