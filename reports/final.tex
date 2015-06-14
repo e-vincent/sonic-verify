@@ -124,7 +124,35 @@
 
 \thispagestyle{empty}
 \begin{abstract}
-\noindent\lipsum[1]
+We are entering into an age of computing where concurrency and 
+distribution have become some of the most pressing issues in need of address. 
+As we continue to outstrip the hardware of our machines, with the increased rate 
+of data that we process, parallelism and exploiting concurrency are the key method
+for us to handle this. An active field of theory for this is Session Types. With
+session types we can model the communication protols of a program much more 
+intuitively than is currently possible.
+
+The popularity of `live coding' is also continuing to grow. With the use of 
+programming centered on interactive improvisation it becomes crucial to improve 
+the nature of timing within the program. Timing constraints have vast implications 
+on the field of `real-time computing' where high-performance is important. By 
+mimicing the understood notion of a `type-system' and developing a formalised 
+idea of a `time-system' we can use to verify the timing structure of our programs.
+
+This report describes the improvements made to the existing Sonic Pi language; a 
+musical live coding language designed for educational use as a first language. We 
+develop existing ideas of a formal specification for the temporal behaviour of 
+Sonic Pi and present the implementation of this timing system. Alongside this 
+we apply the field of session types to the underlying communication structure of 
+Sonic Pi, formalise its ideas, and present the implementation of this typing 
+system. By running the systematic testing suite we have designed, we prove the 
+correctness of our analysis of the program against these two formalisations and 
+also comment on the overall performance of the additions. We are also careful to 
+review our success in presenting the information collected in a manner that 
+complements Sonic Pi's construction as a first programming language. Whilst some 
+features lend themselves to personal explorations, many of the timing effects 
+implemented here lend themselves to the purpose of educating young people on the 
+realms of concurrency and temporal reasoning.
 \end{abstract}
 \afterpage{\thispagestyle{empty}\null\newpage}
 \newpage
@@ -151,23 +179,24 @@
 For many years it has not been a requirement that children should learn much
 about the vast field of computing during their formative years in UK 
 Education. In 2012, the Government began to re-recognise the signifiance of 
-Computer Science and has replaced the National ICT curriculum with a revised 
+Computer Science, after the last Cirriculum Project had been shut down in 1991, 
+and has replaced the National ICT curriculum with a revised 
 Computing cirruculum. The new Computing Program of Study \cite{DfE13} aims to 
 enable pupils to understand the world of computing, giving them the ability to 
 think logically and apply the fundamental principles of the discpline to their 
 real-world environments.
 
-The movement is not purely restriced to the UK. In the US there is a similarly 
-led campaign calling to recognise the topic as relevant to all contempary 
+The movement is not purely restricted to the UK. In the US there is a similar 
+campaign calling to recognise the topic as relevant to all contempary 
 sciences. It calls ``Computational Thinking'' a universally applicable 
 attitude and skill set everyone, not just computer scientists, would be eager 
 to learn and use \cite{Wing06}. A recent Microsoft article, as part of the 
 \#WeSpeakCode campaign, claims that 75\% of students in the Asia Pacific region
 wish that programming could be offered as a core subject in their schools \cite{micro}.
 
-There is a general struggle within the humanties courses available in UK schools 
+There is a general struggle within the humanities courses available in UK schools 
 to remain relevant in light of a quickly developing technical world. Music schemes 
-within the UK frequently report to have suffered funding cuts and education is 
+within the UK frequently report having suffered funding cuts and education is 
 focused on learning a variety of specific instruments, with little focus on 
 musical technology.
 
@@ -177,18 +206,17 @@ A growing hacker and maker movement has been making programming a
 much more accessible skill \cite{BAD14}; it presents itself as a viable and 
 useful hobby amongst a vast range of ages and professions and this is as much 
 because of the availability of useful resources that would be frequently used 
-in such situations as a school classroom. There is existing research that has 
-gone into the viability of programming tools for professional artists, as 
-reported at PPIG \cite{Ch12,BC05}, and investigations into the craft practices 
-of existing professional software developers who work in professional art 
-contexts \cite{W10}.
+in such situations as a school classroom. Existing research has examined the 
+viability of programming tools for professional artists, as reported at PPIG 
+\cite{Ch12,BC05}, and the craft practices of existing professional software
+developers who work in professional art contexts \cite{W10}.
 
 At the same time as this we have entered an age where concurrency and 
 distribution have become some of the most pressing issues in computing. As we 
 begin to process hugely increased amounts of data the ideas of parallelism and 
 exploiting concurrency are becoming more and more pronounced. In this day and age
 it is almost impossible to find a person who does not own a mobile, most likely a 
-`smart' device, which relies on communicationwith other such devices to function 
+`smart' device, which relies on communication with other such devices to function 
 effectively. 
 
 Concurrency theory has been an active field of research since the 1960s, producing
@@ -2045,6 +2073,9 @@ call or not is ommitted for brevity.
     [3] conVT: 0, cumVT: 0          [3] conVT: 0, cumVT: 0
 \end{lstlisting}
 
+This trace correctly confirms that the given program does not advance virtual time 
+at any points, reporting a statement length of three.
+
 \subsubsection{Sequences}
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2067,6 +2098,10 @@ call or not is ommitted for brevity.
     [5] conVT: 0, cumVT: 2          [5] conVT: 0, cumVT: 2
 \end{lstlisting}
 
+Here we correctly identify five statements, two of which advance time. The final 
+length of virtual time is the sum of all \texttt{sleep} statements used. Here this 
+is accurate as it is a simple sequence of operations.
+
 \subsubsection{Loops}
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2085,6 +2120,10 @@ call or not is ommitted for brevity.
     [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
     [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
 \end{lstlisting}
+
+The trace identifies three statements, where on is the commencement of the loop. 
+By the end of the loop, virtual time will have advanced by one, as printed by 
+our analysis.
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2206,6 +2245,9 @@ all loops are handled once and VT is printed as though each loop only occured on
     [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
 \end{lstlisting}
 
+Similarly to the simple loop, the analysis presents that this thread has virtual time
+one by the end. 
+
 \subsubsection{Data Structures}
 \paragraph{Lists}
 \begin{minipage}{\textwidth}
@@ -2219,6 +2261,10 @@ all loops are handled once and VT is printed as though each loop only occured on
     == Expected Trace               == Actual Trace
     [0] conVT: 0, cumVT: 0          [0] conVT: 0, cumVT: 0
 \end{lstlisting}
+
+This is a single statement with a different syntax to those usually processed. The 
+trace can accurately identify this has no contribution to virtual time despite the 
+change in arguments.
 
 \paragraph{Chords \& Scales}
 \begin{minipage}{\textwidth}
@@ -2273,6 +2319,12 @@ functions or if it is still useful to mark the statement.
     [0] conVT: 0, cumVT: 0          [0] conVT: 0, cumVT: 0
     [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
 \end{lstlisting}
+
+This function call is in a similar state to the list test run previously. The 
+parenthesis cause the AST in this case to present a root \texttt{begin} node in 
+every case, rather than allowing a single statement as before. Again, the analysis 
+is able to identify this has no effect on the current virtual time and is therefore 
+correct. 
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2369,6 +2421,25 @@ virtual time shorter than what the analysis reports.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Function Definition Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+== Expected Trace                 == Actual Trace
+[0] -                             [0] -
+[1] conVT:  0, cumVT: 0,          [1] conVT:  0, cumVT: 0
+    isFunc: false, inFunc: true       isFunc: false, inFunc: true            
+[2] conVT:  0, cumVT: 0           [2] conVT:  0, cumVT: 0
+    isFunc: false, inFunc: true       isFunc: false, inFunc: true 
+[3] conVT:  1, cumVT: 1           [3] conVT:  1, cumVT: 1
+    isFunc: false, inFunc: true       isFunc: false, inFunc: true 
+
+Function: func 1                  Function: func 1
+\end{lstlisting}
+
+The analysis will print out a list of those function definiitions found during 
+the analysis. Here we have correctly identified that a function, called 
+\texttt{func} was defined at statement index 1. We can also see it has correctly 
+identified which statements where inside this function and the virtual time data 
+throughout is accurate.
 
 \paragraph{Function Detection}
 \begin{minipage}{\textwidth}
@@ -2382,10 +2453,43 @@ virtual time shorter than what the analysis reports.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Function Detection Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+== Expected Trace                 == Actual Trace
+[0] -                             [0] -
+[1] conVT:  0, cumVT: 0,          [1] conVT:  0, cumVT: 0
+    isFunc: false, inFunc: true       isFunc: false, inFunc: true            
+[2] conVT:  0, cumVT: 0           [2] conVT:  0, cumVT: 0
+    isFunc: false, inFunc: true       isFunc: false, inFunc: true 
+[3] conVT:  1, cumVT: 1           [3] conVT:  1, cumVT: 1
+    isFunc: false, inFunc: true       isFunc: false, inFunc: true 
+[4] conVT:  1, cumVT: 1           [4] conVT:  1, cumVT: 1
+    isFunc: true, inFunc: false       isFunc: true, inFunc: false 
+
+Function: func 1                  Function: func 1
+\end{lstlisting}
+
+Here we extend the previous test to acctually call the function defined. Index 
+4 is identified as the statement with a function call and the analysis correctly 
+marks this as outside of the block of the previous function. The first pass of 
+the trace was as follows:
+\\
+\begin{lstlisting}
+    == First Pass Trace
+    [0] -
+    [1] conVT:  0, cumVT: 0, isFunc: false, inFunc:  true
+    [2] conVT:  0, cumVT: 0, isFunc: false, inFunc:  true
+    [3] conVT:  1, cumVT: 1, isFunc: false, inFunc:  true
+    [4] conVT: -1, cumVT: 0, isFunc:  true, inFunc: false
+\end{lstlisting}
+
+This is provided to show the analysis correctly marked index 4 as being a function 
+call and reset the \texttt{cumVT} as it had left a function block from the previous 
+line.
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
-      define :foo do
+      define :foo do      
         play 55
         sleep 1
       end
@@ -2396,11 +2500,47 @@ virtual time shorter than what the analysis reports.
 
       define :bar do
         play 75
-        sleep 1
+        sleep 2
       end
 	\end{lstlisting}
 	\captionof*{lstlisting}{Multiple Function Detection Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+== Expected Trace                 == Actual Trace
+[0] -                             [0] -
+[1] conVT: 0, cumVT: 0,           [1] conVT: 0, cumVT: 0
+    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true            
+[2] conVT: 0, cumVT: 0            [2] conVT: 0, cumVT: 0
+    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true 
+[3] conVT: 1, cumVT: 1            [3] conVT: 1, cumVT: 1
+    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true 
+[4] conVT: 0, cumVT: 0            [4] conVT: 0, cumVT: 0
+    isFunc: false, inFunc: false      isFunc: false, inFunc: false 
+[5] conVT: 1, cumVT: 1            [5] conVT: 1, cumVT: 1
+    isFunc:  true, inFunc: false      isFunc:  true, inFunc: false 
+[6] conVT: 2, cumVT: 3            [6] conVT: 2, cumVT: 3
+    isFunc:  true, inFunc: false      isFunc:  true, inFunc: false 
+[7] conVT: 0, cumVT: 0            [7] conVT: 0, cumVT: 0
+    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true 
+[8] conVT: 0, cumVT: 0            [8] conVT: 0, cumVT: 0
+    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true 
+[9] conVT: 2, cumVT: 2            [9] conVT: 2, cumVT: 2
+    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true 
+
+Function: foo 1                   Function: foo 1
+          bar 7                             bar 7
+\end{lstlisting}
+
+This demonstrate the accuracy of the function detection, as 
+the trace is able to correctly fill the virtual times whether the function is 
+defined before or after its uses.
+\\
+\begin{lstlisting}
+    == First Pass Trace (Differences)
+    [5] conVT: -1, cumVT: -1, isFunc: true, inFunc: false 
+    [6] conVT: -1, cumVT: -2, isFunc: true, inFunc: false 
+\end{lstlisting}
 
 \paragraph{Parameterized Functions}
 \begin{minipage}{\textwidth}
@@ -2412,6 +2552,37 @@ virtual time shorter than what the analysis reports.
 	\end{lstlisting}
 	\captionof*{lstlisting}{Parametre Test Code}
 \end{minipage}
+
+This feature is not implemented correctly. To explain the flaws in the current 
+iteration we will present only the first pass information and explain why the second 
+pass cannot produce the correct result.
+\\
+\begin{lstlisting}
+    == First Pass Trace
+    [1] conVT:  0, cumVT:  0, isFunc: false, inFunc: false
+    [2] conVT: -1, cumVT: -1, isFunc: false, inFunc:  true
+    [3] conVT:  0, cumVT: -1, isFunc: false, inFunc:  true
+    [4] conVT: -1, cumVT: -2, isFunc: false, inFunc:  true
+\end{lstlisting}
+
+In this syntax the first line is processed as having a function call (for 
+the keyword \texttt{do}), keycode \texttt{-1}. This identifies a problem with the 
+way the analysis marks statements. \texttt{-1} is overloaded as the default symbol 
+recognition and a marker as a function call. To be clear when something is 
+unrecognised the default keycode should be changed. In the second pass, index 2 
+is zero'd and index 4 remains the same. This is due to the fact that some code 
+exists which resets the values for the first method call found. This is useful 
+code for sequences of method calls where the incorrect starting times would 
+sometimes garble the results, but this test highlights two things: it should not 
+actually be run if the function in question doesn't exist (so that the line 
+remains unchanged for clarity after the fact), and it does not reset properly 
+between sequences of functions.
+
+In the future the analysis will need to recognise when the \texttt{block} node's
+\texttt{arg} child has children of it's own. This marks when something has been 
+written with parametres and what those parametre symbols are. They can then be 
+stored in the scope of that block similar to how functions are stored at the global 
+level of the trace. 
 
 \subsubsection{Conditionals}
 \begin{minipage}{\textwidth}
@@ -2463,6 +2634,24 @@ same output regardless of the conditional's expression.
 	\end{lstlisting}
 	\captionof{lstlisting}{Multiple Statements on Single Line Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT:   0, cumVT:   0      [1] conVT:   0, cumVT:   0
+    [2] conVT:   0, cumVT:   0      [2] conVT:   0, cumVT:   0
+    [3] conVT:   0, cumVT:   0      [3] conVT:   0, cumVT:   0
+    [4] conVT:   1, cumVT:   1      [4] conVT:   1, cumVT:   1
+    [5] conVT:   0, cumVT:   1      [5] conVT:   0, cumVT:   1
+    [6] conVT:   0, cumVT:   1      [6] conVT:   0, cumVT:   1
+    [7] conVT:   0, cumVT:   1      [7] conVT:   0, cumVT:   1
+    [8] conVT: 0.5, cumVT: 1.5      [8] conVT: 0.5, cumVT: 1.5
+\end{lstlisting}
+
+To further demonstrate the ability to process multiple statements on one line,
+and that the analysis will work whether statements are comma separated or not. The
+analysis recognises floats and successfully as ints and time advancement is summed
+correctly throughout the whole trace.
 
 \subsubsection{Communications}
 \begin{minipage}{\textwidth}
@@ -2474,6 +2663,23 @@ same output regardless of the conditional's expression.
 	\end{lstlisting}
 	\captionof{lstlisting}{Cue Detection Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+    [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
+    [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
+
+    == Expected Arc Results          == Actual Arc Results 
+    Cue 0 Block:P0 A                 Cue 0 Block:P0 A
+      |_> points at                    |_> points at 
+    
+    '' Unclaimed Syncs ''            '' Unclaimed Syncs '' 
+\end{lstlisting}
+
+\texttt{cue} is accurately recorded in the session graph whilst virtual time is 
+also still recorded correctly.
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2484,6 +2690,24 @@ same output regardless of the conditional's expression.
 	\end{lstlisting}
 	\captionof{lstlisting}{Sync Detection Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+    == Expected Trace               == Actual Trace
+    [0] -                           [0] -
+    [1] conVT: 0, cumVT: 0          [1] conVT: 0, cumVT: 0
+    [2] conVT: 0, cumVT: 0          [2] conVT: 0, cumVT: 0
+    [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
+
+    == Expected Arc Results          == Actual Arc Results 
+
+    '' Unclaimed Syncs ''            '' Unclaimed Syncs '' 
+    = 0 A                            = 0 A
+\end{lstlisting}
+
+\texttt{sync} is recorded properly alongside the correct virtual time results. 
+\texttt{sync} is recorded into a different data structure when not pared with a 
+\texttt{cue} as it is blocking and will disrupt your performance. The separate 
+data structure is easier to print as an error result if desired.
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2498,6 +2722,47 @@ same output regardless of the conditional's expression.
 	\end{lstlisting}
 	\captionof{lstlisting}{Global Type Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+   == Expected Trace               == Actual Trace
+   [0] -                           [0] -
+   [1]  conVT:   0, cumVT:   0     [1]  conVT:   0, cumVT:   0
+   [2]  conVT:   0, cumVT:   0     [2]  conVT:   0, cumVT:   0
+   [3]  conVT:   0, cumVT:   0     [3]  conVT:   0, cumVT:   0
+   [4]  conVT:   0, cumVT:   0     [4]  conVT:   0, cumVT:   0
+   [5]  conVT:   1, cumVT:   1     [5]  conVT:   1, cumVT:   1
+   [6]  conVT:   0, cumVT:   1     [6]  conVT:   0, cumVT:   1
+   [7]  conVT:   0, cumVT:   0     [7]  conVT:   0, cumVT:   0
+   [8]  conVT:   0, cumVT:   0     [8]  conVT:   0, cumVT:   0
+   [9]  conVT:   0, cumVT:   0     [9]  conVT:   0, cumVT:   0
+   [10] conVT:   0, cumVT:   0     [10] conVT:   0, cumVT:   0
+   [11] conVT:   0, cumVT:   0     [11] conVT:   0, cumVT:   0
+   [12] conVT: 0.5, cumVT: 0.5     [12] conVT: 0.5, cumVT: 0.5
+
+    == Expected Arc Results          == Actual Arc Results 
+    Cue 1 Block:P0 B                 Cue 1 Block:P0 B
+       |_> points at                    |_> points at 
+           -> P1: 4 B                       -> P1: 4 B
+    Cue 3 Block:P1 A                 Cue 3 Block:P1 A
+       |_> points at                    |_> points at 
+           -> P0: 0 A                       -> P0: 0 A
+
+    '' Unclaimed Syncs ''            '' Unclaimed Syncs '' 
+
+    == Expected Local Types          == Actual Local Types
+    SubGraph P0                      SubGraph P0
+      A:(P1P0)?.B:(P0P1)!.time         A:(P1P0)?.B:(P0P1)!.time
+    SubGraph P1                      SubGraph P1
+      A:(P1P0)!.B:(P0P1)?.time         A:(P1P0)!.B:(P0P1)?.time
+
+    Global Type: P1->P0.P0->P1       Global Type: P1->P0.P0->P1
+\end{lstlisting}
+
+This trace shows the virtual time kept during the program, the \texttt{cue} operations 
+by index and which \texttt{sync} operations they link with. The trace accurately 
+reports no unclaimed \texttt{sync}s. After this are the local types of each thread, 
+as named by our analysis, and the global type of the system. All traces shows that 
+the analysis information is correct; no results disagree with one another.
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2512,44 +2777,82 @@ same output regardless of the conditional's expression.
 	\end{lstlisting}
 	\captionof{lstlisting}{Deadlock Detection Test Code}
 \end{minipage}
+\\
+\begin{lstlisting}
+   == Expected Trace               == Actual Trace
+   [0] -                           [0] -
+   [1]  conVT:   0, cumVT:   0     [1]  conVT:   0, cumVT:   0
+   [2]  conVT:   0, cumVT:   0     [2]  conVT:   0, cumVT:   0
+   [3]  conVT:   0, cumVT:   0     [3]  conVT:   0, cumVT:   0
+   [4]  conVT:   0, cumVT:   0     [4]  conVT:   0, cumVT:   0
+   [5]  conVT:   1, cumVT:   1     [5]  conVT:   1, cumVT:   1
+   [6]  conVT:   0, cumVT:   1     [6]  conVT:   0, cumVT:   1
+   [7]  conVT:   0, cumVT:   0     [7]  conVT:   0, cumVT:   0
+   [8]  conVT:   0, cumVT:   0     [8]  conVT:   0, cumVT:   0
+   [9]  conVT:   0, cumVT:   0     [9]  conVT:   0, cumVT:   0
+   [10] conVT:   0, cumVT:   0     [10] conVT:   0, cumVT:   0
+   [11] conVT:   0, cumVT:   0     [11] conVT:   0, cumVT:   0
+   [12] conVT: 0.5, cumVT: 0.5     [12] conVT: 0.5, cumVT: 0.5
+
+    == Expected Arc Results          == Actual Arc Results 
+    Cue 1 Block:P0 B                 Cue 1 Block:P0 B
+       |_> points at                    |_> points at 
+           -> P1: 3 B                       -> P1: 3 B
+    Cue 3 Block:P1 A                 Cue 3 Block:P1 A
+       |_> points at                    |_> points at 
+           -> P0: 0 A                       -> P0: 0 A
+
+    '' Unclaimed Syncs ''            '' Unclaimed Syncs '' 
+
+    == Expected Local Types          == Actual Local Types
+    SubGraph P0                      SubGraph P0
+      A:(P1P0)?.B:(P0P1)!.time         A:(P1P0)?.B:(P0P1)!.time
+    SubGraph P1                      SubGraph P1
+      B:(P0P1)?.A:(P1P0)!.time         B:(P0P1)?.A:(P1P0)!.time
+
+    Global Type: -                   Global Type: -
+\end{lstlisting}
+
+Similar to previously, this trace shows that the analysis can correctly identify 
+a deadlock situation as the global type of the system as not been printed. 
 
 \subsubsection{Musical Score}
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
-      load_samples [:drum_heavy_kick, :drum_snare_soft]
+ load_samples [:drum_heavy_kick, :drum_snare_soft]
 
-      define :drums do
-        cue :slow_drums
-        6.times do
-          sample :drum_heavy_kick, rate: 0.8
-          sleep 0.5
-        end
-        cue :fast_drums
-        8.times do
-          sample :drum_heavy_kick, rate: 0.8
-          sleep 0.125
-        end
-      end
-      
-      define :snare do
-        cue :snare
-        sample :drum_snare_soft
-        sleep 1
-      end
-      
-      define :synths do
-        puts "how does it feel?"
-        use_synth :mod_saw
-        use_synth_defaults amp: 0.5, attack: 0, sustain: 1, 
-                           release: 0.25, cutoff: 90, mod_range: 12, 
-                           mod_phase: 0.5, mod_invert_wave: 1
-        notes = [:F, :C, :D, :D, :G, :C, :D, :D]
-        notes.each do |n|
-          play note(n, octave: 1)
-          play note(n, octave: 2)
-          sleep 1
-        end
-      end
+ define :drums do
+   cue :slow_drums
+   6.times do
+     sample :drum_heavy_kick, rate: 0.8
+     sleep 0.5
+   end
+   cue :fast_drums
+   8.times do
+     sample :drum_heavy_kick, rate: 0.8
+     sleep 0.125
+   end
+ end
+ 
+ define :snare do
+   cue :snare
+   sample :drum_snare_soft
+   sleep 1
+ end
+ 
+ define :synths do
+   puts "how does it feel?"
+   use_synth :mod_saw
+   use_synth_defaults amp: 0.5, attack: 0, sustain: 1, 
+                      release: 0.25, cutoff: 90, mod_range: 12, 
+                      mod_phase: 0.5, mod_invert_wave: 1
+   notes = [:F, :C, :D, :D, :G, :C, :D, :D]
+   notes.each do |n|
+     play note(n, octave: 1)
+     play note(n, octave: 2)
+     sleep 1
+   end
+ end
     \end{lstlisting}
 \end{minipage}
 
@@ -2572,6 +2875,81 @@ same output regardless of the conditional's expression.
 	\captionof*{lstlisting}{Monday Blues - Coded by Sam Aaron, as found in Sonic 
 	Pi IDE Samples}
 \end{minipage}
+
+This test result is lengthy but is included here in full, with full source, as it 
+is the best example of the current state of this project. We do not present the second 
+pass trace in full; instead we inline it with the relevant discussion points. 
+This is an accurate example of some piece that may be written for a real live coding 
+performance and contains both complicated nesting structures and multiple function 
+definitions. It does not make full use of the communication primitives, using only 
+the \texttt{cue} operation in this test. This seems illogical, as it has nothing to 
+work with, but \texttt{cue} does print to the output box of the Sonic Pi IDE, making 
+it another useful performance resource, and a situation the analysis should be able 
+to handle.
+\\
+\begin{lstlisting}
+  == First Pass Trace
+  [0] -
+  [1]  conVT:    -1, cumVT:     -1, isFunc:  true, inFunc: false
+  [2]  conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
+  [3]  conVT:    -1, cumVT:     -1, isFunc: false, inFunc:  true
+  [4]  conVT:    -1, cumVT:     -2, isFunc:  true, inFunc:  true
+  [5]  conVT:     0, cumVT:     -2, isFunc:  true, inFunc:  true
+  [6]  conVT:   0.5, cumVT:   -1.5, isFunc: false, inFunc:  true
+  [7]  conVT:    -1, cumVT:   -2.5, isFunc: false, inFunc: false
+  [8]  conVT:    -1, cumVT:   -3.5, isFunc:  true, inFunc: false
+  [9]  conVT:     0, cumVT:   -3.5, isFunc:  true, inFunc: false
+  [10] conVT: 0.125, cumVT: -3.375, isFunc: false, inFunc: false
+  [11] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
+  [12] conVT:    -1, cumVT:     -1, isFunc: false, inFunc:  true
+  [13] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
+  [14] conVT:     1, cumVT:      1, isFunc: false, inFunc: false
+  [15] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
+  [16] conVT:    -1, cumVT:     -1, isFunc:  true, inFunc:  true
+  [17] conVT:    -1, cumVT:     -2, isFunc:  true, inFunc:  true
+  [18] conVT:    -1, cumVT:     -3, isFunc:  true, inFunc:  true
+  [19] conVT:    -1, cumVT:     -4, isFunc:  true, inFunc:  true
+  [20] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
+  [21] conVT:     0, cumVT:      0, isFunc:  true, inFunc:  true
+  [22] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
+  [23] conVT:     0, cumVT:      0, isFunc:  true, inFunc:  true
+  [24] conVT:     1, cumVT:      1, isFunc: false, inFunc:  true
+  [25] conVT:    -1, cumVT:      0, isFunc:  true, inFunc:  true
+  [26] conVT:     6, cumVT:     -6, isFunc: false, inFunc:  true
+  [27] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
+  [28] conVT:    -1, cumVT:     -1, isFunc:  true, inFunc:  true
+  [29] conVT:    -1, cumVT:     -2, isFunc:  true, inFunc:  true
+  [30] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
+  [31] conVT:    -1, cumVT:     -1, isFunc:  true, inFunc:  true
+  [32] conVT:    -1, cumVT:     -2, isFunc:  true, inFunc:  true
+  [33] conVT:  12.5, cumVT:   10.5, isFunc: false, inFunc:  true
+  [34] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
+  [35] conVT:    -1, cumVT:     -1, isFunc:  true, inFunc:  true
+
+
+    == Arc Results       
+    Cue 0 Block:P0 slow_drums
+       |_> points at 
+    Cue 1 Block:P1 fast_drums
+       |_> points at 
+    Cue 3 Block:P2 snare
+       |_> points at 
+
+    '' Unclaimed Syncs ''   
+
+    == Local Types
+    SubGraph P0
+      slow_drums:()!
+    SubGraph P1
+      time.fast_drums:()!
+    SubGraph P2
+      time.snare:()!.time
+    SubGraph P3
+      time
+
+
+    Global Type: -  
+\end{lstlisting}
 
 \subsection{Visual Adaptation}
 % screenshot here

@@ -25,6 +25,7 @@ TimeMarker::TimeMarker()
 		std::cout << "Index " << i 
 				<< " has VT " << trace->stats[i]->conVT
 				<< ", Current total: " << trace->stats[i]->cumVT 
+				<< " IS FUNC:: " << trace->stats[i]->getFunc()
 				<< " IN FUNC:: " << trace->stats[i]->isInFunc()
 				<< "\n";
 	}
