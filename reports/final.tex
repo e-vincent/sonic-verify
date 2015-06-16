@@ -193,13 +193,11 @@ within the UK frequently report having suffered funding cuts, and education is
 focused on learning a variety of specific instruments, with little focus on 
 musical technology.
 
-As well as recognising Computer Science and Music within schools, there 
-is an increasing recognition of the power of programming amongst other disciplines. 
-A growing hacker and maker movement has been making programming a 
+There is an increasing recognition of the power of programming amongst other 
+disciplines. A growing hacker and maker movement has been making programming a 
 much more accessible skill \cite{BAD14}; it presents itself as a viable and 
-useful hobby amongst a vast range of ages and professions and this is as much 
-because of the availability of useful resources that would be frequently used 
-in such situations as a school classroom. Existing research has examined the 
+useful hobby amongst a vast range of ages and professions, largely due to the 
+increasing availability of resources. Existing research has examined the 
 viability of programming tools for professional artists, as reported at PPIG 
 \cite{Ch12,BC05}, and the craft practices of existing professional software
 developers who work in professional art contexts \cite{W10}. A powerful example 
@@ -233,26 +231,8 @@ Whilst there has been much in the field to support a programmer as they produce
 type-safe code, the same cannot be said for communication-safe code. Concurrency
 bugs such as deadlocks and thrashing behaviour can be as hard to locate now as
 ever before. Some tools and techniques exist to handle these situations, such as
-mutexes and locks \cite{T95}, but even with such tools there is no garauntee
-that some obscure situation will not arise to break it on the same level as 
-\emph{type-safety}. This is not to say type-safe code is without its bugs, but it 
-can stop many problems from occuring at \emph{compile} time. Time-safety can be 
-considered as another \emph{compile} time safeguard, whilst still potentially not 
-able to handle such \emph{run} time event as data races.
-
-% This is not so much a motivation - switch out for concurrency
-% Sonic Pi is one of many projects designed to support both computing and music 
-% lessons within schools. Sonic Pi is an environment for creating live-coded 
-% music at a level of complexity which is well suited to a first-programming 
-% language \cite{sp}. Many available languages are suitable as a first-programming 
-% language, but not all attempt to make themselves an inviting gateway into the 
-% realm of technical programming and innovation. Sonic Pi seeks to provide an 
-% exploratory and invigorating introduction into programming whilst being complex 
-% enough to lead a user through into much more complicated programming ideas and 
-% use cases with a managable learning curve. By presenting a musical system it 
-% seeks to break down the barrier between the technical elite and the hobbyist. In 
-% this report Sonic Pi will be presented in terms of the formalisation of its 
-% timing effects and the existing concurrency primitives of the language. 
+mutexes and locks \cite{T95}, but even then there is no guarantee
+that it will work. 
 
 \subsection{Objectives}
 In the current version of Sonic Pi \cite{sp} there is no means to verify the 
@@ -266,17 +246,16 @@ moreso for those with little musical experience. The latter can be difficult for
 even some experienced programmers due to the non-deterministic nature of some 
 concurrency bugs.
 
-In building analysis for the timing effects of the program, we aim to develop
-something that is sufficiently lightweight so that it may be run during a live 
-performance of the program. There are several interesting challenges in terms of 
+We aim to develop a lightweight library to analysis the temporal behaviour of a 
+Sonic Pi program. There are several interesting challenges in terms of 
 the heuristics used when parsing the program and what solutions will lead to the 
 best possible results. We plan to utilise the speed of the platform and program 
 architecture and efficient design; it is important that the project is still 
 able to run on Sonic Pi's target architecture. Temporal behaviour should be able 
 to handle basic sequencing, funtion calls, nesting and variable time operations. 
 
-In developing the communication patterns of Sonic Pi we aim to utilise the
-theory of Session Types and apply them to this context. Session Types will
+We aim to build an overview of the communication patterns within a Sonic Pi program 
+by utilising the theor of Session Types. Session Types will
 enable us to define a clearly understandable structure to the communication
 protocol of the program; this will enable the tool to identify difficult bugs
 such as deadlocks and thrashing behaviour. In identify problems in this manner,
@@ -303,14 +282,17 @@ the decomposed types of all processes in the program and the associated global
 type, presenting an intuitive description of the interactions of processes 
 within the source code. This presents an exciting new realm of possibility in
 terms of concurrency verification and the application of Session Types in 
-existing distributed paradigms.
+existing distributed paradigms. We also present two new extentions to Multi-Party 
+Session Types based on the conceps of replication types and broadcasting, as they 
+appear in Sonic Pi. We also present a method of \emph{Global Inference}, an area 
+of Multi-Party Session Types that is still largely undeveloped.
 
 We have implemented a set of tests that systematically verifies the results that
 our project produces; it covers a range of features starting from the most basic
 of sequential programs through into full music sources, with complex function
 call structures and multiple interacting process threads. Finally, we have fitted
 this library into the existing Sonic Pi IDE in a manner that is beneficial to both
-new coders and `old hat's alike. 
+new coders and `old hats' alike. 
 
 \subsection{Report Structure}
 The remainder of this report is broken down as follows:
@@ -329,7 +311,7 @@ The remainder of this report is broken down as follows:
 	the session types of Sonic Pi in turn. We discuss chosen languages and key
 	libraries used in the design of the program and then move into general
 	implementation and interesting algorithms and code from each section. The
-	section concludes with a brief discussion of the architecure of the Sonic 
+	chapter concludes with a brief discussion of the architecure of the Sonic 
 	Pi IDE and how we chose to integrate our verification library.
 	\item Evaluation: Here we evaluate the success of the project. We discuss
 	the limitations of the current state of the project and outline qualitive
@@ -1523,44 +1505,29 @@ applied to the expression stored for the function\footnote{Argument symbols are
 stored as \texttt{lvar} type nodes, making expression detection and evaluation 
 simple to manage.}. A full trace of this is given in Section \ref{evalFunc}.
 
-\subsection{Session Pi}
+\subsection{Session Pi} \label{sessionPi}
 Session Types describe communication protocols via message passing. In Sonic Pi
 the message originates at a \texttt{cue} statement and is `consumed' by the
 \texttt{sync} statement. Given this, we elect to transform the AST used in
-timing analysis into a directed graph, consisting purely of \texttt{CueNode}s,
-\texttt{SyncNodes}s and other \texttt{GraphNode}s to represent the passage
-of time more generally in this analysis. Originally this third node type
-was omitted from the construction of the graph but on consideration of
-message order in Sonic Pi it became clear that chronology was important 
-information to maintain. This is discussed in more detail later in this section.
+timing analysis into a directed graph to better represent the interactions. In this 
+chapter, we first formalise the concepts of Session Types; we also set the 
+context for Global Types and Multi-Party Session Types through a simple example and 
+formalise the idea of \emph{Projection}. After this we describe the design of the 
+graph, which details two core iterations of the graph. Finally, we relate 
+this implementation to the theory presented in \ref{formalST}. We explain our 
+approach to \emph{Global Inference} and present our own extensions to Multi-Party 
+Session Types.
 
-Presented next is the overall design of this section. Once the graph is
-built the entry point to the analysis for this section calls on each sub 
-graph to construct each session type and then the global type.
+\subsubsection{Formal Session Types} \label{formalST}
+Before writing the communication interactions of Sonic Pi, we provide a formalisation 
+of Session Types. This defines a series of constructs that may be used to describe 
+the types of communication a process may have and which other processes it may 
+interact with. By defining and analysing these patterns we are able to verify which 
+programs are safe from concurrency errors like deadlocks and reject those that have 
+bad communication structure. This static verification enables developers to easily 
+reason about the different interactions within their program.
 
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=\textwidth]{images/session.jpg}
-	\caption{Graph UML} \label{graphUML}
-\end{figure}
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=\textwidth]{images/GSG.jpg}
-	\caption{Graph Structure} \label{graphStructure}
-\end{figure}
-
-\subsubsection{Planning the Graph}
-As shown by the Figure \ref{graphStructure}, each \texttt{Graph} is constructed as
-a list of \texttt{SubGraph}s where each \texttt{SubGraph} represents
-one process within the program. The idea behind this is to maintain
-the chronology of the nodes in each process and to enable easy analysis
-of the program on a per-process level. \texttt{SubGraph} handles the construction
-of local types while the \texttt{Graph} class handles the global type.
-
-\paragraph{Initial Design}
-In defining the session types we can consider a modified version of the syntax 
-of Sonic Pi V2.0 defined earlier.
+As in Section \ref{abstractTime}, the syntax of Sonic Pi V2.0 is simple.
 \\
 \begin{lstlisting}
 	P ::= P; S | $\emptyset$
@@ -1575,6 +1542,10 @@ as it is a useful tool in our reasoning. \texttt{A$_{i}$} is thus the set of all
 operations that either do not advance time or do not consist of some communication
 primitive. In this way we can abstract over the operations that do not contribute 
 to communications.
+
+This definition is lacking the syntax for function calls and conditionals as this 
+analysis does not currently support them. These limitations are discussed in greater 
+details towards the end of Section \ref{sessionPi}.
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -1689,6 +1660,29 @@ remove any \texttt{cue} types from the current store, keep the \texttt{sync}
 types and then place the current token at the top of the store and continue 
 until all type block have been consumed.
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/session.jpg}
+	\caption{Graph UML} \label{graphUML}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/GSG.jpg}
+	\caption{Graph Structure} \label{graphStructure}
+\end{figure}
+
+\subsubsection{Planning the Graph}
+As shown by the Figure \ref{graphStructure}, each \texttt{Graph} is constructed as
+a list of \texttt{SubGraph}s where each \texttt{SubGraph} represents
+one process within the program. The idea behind this is to maintain
+the chronology of the nodes in each process and to enable easy analysis
+of the program on a per-process level. \texttt{SubGraph} handles the construction
+of local types while the \texttt{Graph} class handles the global type.
+
+\paragraph{Initial Design}
+In defining the session types we can consider a modified version of the 
+
 % diagram of internal graphs here, showing that nodes in these graphs 
 % are chronological
 \begin{figure}[h!]
@@ -1780,14 +1774,7 @@ on then we are able to return that this global type is not typeable.
 
 % new graph style
 
-\subsubsection{Global Construction}
-
-
-% recap important parts of MPST
-% start by explaining the theory of the approach
-
-% what information was important, why did this link up with session graph?
-
+\subsubsection{Global Inference}
 As discussed previously in Section 4.2.1, the usual approach to multi-party session 
 types is to construct the global type of your program and then project the 
 individual process types from that. With this one can then write each process, 
@@ -2117,14 +2104,11 @@ factorial and pow methods.
 
 Disappointingly, Ruby Rice performs the slowest of this tools in this scenario. 
 On standard desktop environments this amount is little cause for concern as both
-the Sonic Pi IDE and the extention library run smoothly with no trouble. The average
-processing time for this project on [desktop specs] is [time here]. This being said,
-it is important to remember that these results are based on very simple mathematical 
-methods, not something you would likely use embedded C for in a real project.
-
-The crucial question is how well this runs on an actually Raspberry Pi as this is
-the target device for the language. When run on a recent Raspberry Pi 2, average
-performance is [time here].
+the Sonic Pi IDE and the extention library run smoothly with no trouble. This being 
+said, it is important to remember that these results are based on very simple 
+mathematical methods, not something you would likely use embedded C for in a real 
+project. The library is also able to run within the Sonic Pi IDE on its target 
+platform with little to no noticeable difference in run time.
 
 While these results are strong it doesn't go the full distance in answering if the
 library was better served implemented in Ruby or C++11. The library as it is, is able
@@ -2146,15 +2130,6 @@ of time this idea was shelved and a much simpler graph structure was put in plac
 Despite the large code dependancy bgl can introduce, it may be interesting to
 revisit the idea in the future, should the search-algorithms it has ready-implemented
 become required.
-
-% comments on the three different methods available?
-
-% notes on speed of data transfer between ruby and C application
-
-% mention other ruby parser options -> maybe find some benchmark stats
-
-% -> attempt at boost library and why that was dropped?
-
 
 \subsection{Correctness}
 To confirm the correctness of our approach we have built a systematic testing
@@ -3148,6 +3123,11 @@ nodes can be assigned to the correct process \texttt{SubGraph}.
 
 \subsection{Visual Adaptation}
 % screenshot here
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{images/sonic-ide-v2.png}
+	\caption{Sonic Pi V2.1.1 IDE Extension - Apple Mac View} \label{macview}
+\end{figure}
 
 The visual differences to the IDE are quite minimal. One notable feature that is 
 currently missing is the ability not to load this library whilst using the IDE, a 
@@ -3193,6 +3173,15 @@ time at a given point. That said, it is not able to do so with variable
 amounts of sleep. When a function is called with an argument that affects the
 amount of time the process must sleep for, the project cannot detect the
 argument passed into the function and apply this where necessary.
+
+\paragraph{Function Calls for Sessions}
+As noted in Section \ref{formalST}, the Session Type analysis of this project is 
+unable to handle function calls within processes. Currently this limitation extends 
+to the fact the analysis will consider function definitions as their own processes. 
+In the future this project will benefit from employing similar techniques when 
+building the graph structure as when building the timing trace. One option to explore 
+is the idea that the graph collect lists of nodes as defined in the functions and 
+insert these into the process graph when the functions are called. 
 
 \paragraph{Branching Session Types}
 This iteration of the project cannot accurately handle branching statements 
@@ -3251,7 +3240,7 @@ of the analysis and present ideas for improvement.
   % (Visited on 8/6/2015)
 
 \bibitem{crush}
-  \emph{http://www.curse.com/mc-mods/minecraft?filter-project-game-version=}
+  \emph{http://www.curse.com/mc-mods/minecraft?filter-project-game-version=} \\
   (Visited on 14/6/2015)
 
 \bibitem{amber}
