@@ -109,7 +109,7 @@
 
 \subject{{\large Department of Computing \\ Imperial College London} \\
 \LARGE{Individual MEng Project}}
-\title{Musical Concurrent Programming \\ With Sonic Pi}
+\title{Verifying Musical Concurrent Programming \\ for Sonic Pi}
 \author{{\LARGE Eleanor Vincent} \\ {\large Supervisor: Nobuko Yoshida}}
 \date{\today} 
 
@@ -136,7 +136,7 @@ become very long and complex the length of time the piece runs for, and which mu
 threads interact with which, become very difficult to reason about.
 
 In this report we develop a lightweight static analysis and typing tool for Sonic Pi 
-program. We develop a formal specification of the temporal behaviour of Sonic 
+programs. We develop a formal specification of the temporal behaviour of Sonic 
 Pi, and describe our implementation of this system. Alongside this 
 we apply the field of session types to the underlying communication structure of 
 Sonic Pi, formalise its ideas, and present the implementation of this typing 
@@ -161,7 +161,7 @@ through her recovery earlier this year. Secondly, I extend a warm thanks to Domi
 Orchard, whose help and feedback throughout this whole project has been invaluable. 
 
 I would like to give a special mention to Sam Aaron as thanks for building and 
-open-sourcing Sonic Pi as it has been an absolute joy to work with. My thanks also 
+open-sourcing Sonic Pi. It has been an absolute joy to work with. My thanks also 
 go out to my family, for their unwavering support of my degree, my housemates, for 
 keeping me healthy, and my other friends, for their company.
 \end{abstract}
@@ -255,7 +255,7 @@ moreso for those with little musical experience. The latter can be difficult for
 even some experienced programmers due to the non-deterministic nature of some 
 concurrency bugs.
 
-We aim to develop a lightweight library to analysis the temporal behaviour of a 
+We aim to develop a lightweight library to analyse the temporal behaviour of a 
 Sonic Pi program. There are several interesting challenges in terms of 
 the heuristics used when parsing the program and what solutions will lead to the 
 best possible results. We plan to utilise the speed of the platform and program 
@@ -1050,7 +1050,7 @@ into the Sonic Pi IDE\footnote{As found at https://github.com/samaaron/sonic-pi}
 % \newpage
 
 \subsection{Pi Time}
-Before being able to process the source to analysis the virtual time, we must parse 
+Before being able to process the source to analyse the virtual time, we must parse 
 the source into a suitable data structure. A 
 natural approach to this mimics compiler technology: we define some
 grammar by which to parse our programs, and then build some Abstract Syntax Tree 
@@ -1174,8 +1174,9 @@ The syntax of Sonic Pi V2.0 can be outlined simply.
 \\
 \begin{lstlisting}
 	P ::= P; S | $\emptyset$
-	S ::= E | $v$ = E | def $f$ : P | $f$
-	E ::= sleep $\mathbb{R}_{{\geqslant}0}$ | A$^{i}$ | $v$ | if $v$ then P else P
+	S ::= E | $v$ = E | def $f$ : P 
+	E ::= sleep $\mathbb{R}_{{\geqslant}0}$ | A$^{i}$ | $v$ 
+	    | if $v$ then P else P | $f$
 \end{lstlisting}
 
 \texttt{P} represents a full program, 
@@ -1190,14 +1191,10 @@ either function definitions or function calls, and the rule for conditionals.
 \texttt{def $f$ : P} means to say a function with name $f$ is defined with program 
 \texttt{P}; $f$ is a function call to that definition.
 
-In distinguishing the real time elapsed by the program and the virtual time elapsed 
-we write [\texttt{P}]$_{t}$ for the former and [\texttt{P}]$_{v}$ for the latter. 
-Both of these abstract functions return time values and so are positive, 
-real-number values.
-
 \begin{blockquote}
 	\textbf{Definition 1:} \\ 
-	Virtual time is specified for Sonic Pi using the following cases:
+	\texttt{[-]$_{v}$} is an overloaded operator mapping Sonic Pi terms to $\mathbb{N}$
+	$\cup$ {$\infty$}. Using this we define (-)* as n* = $\infty$. Virtual time is specified for Sonic Pi using the following cases:
 	\\
 	\begin{lstlisting}
      $\hphantom{..}$   [P; $v$ = E]$_{v}$ = [P]$_{v}$ + [E]$_{v}$       # Statement Sequences
@@ -1211,25 +1208,26 @@ real-number values.
 	and conditionals:
 	\\
 	\begin{lstlisting}
-            [$f$]$_{v}$ = [def $f$ : P]$_{v}$ = [P]$_{v}$    # Function Call
+      [def $f$ : P]$_{v}$ = 0                     # Function Definition 
+              [$f$]$_{v}$ = [P]$_{v}$   $if$ $\exists$ def $f$: P       # Function Call
 
-	             [loop P]$_{v}$ = [P]$_{v}^{*}$   # Loops
-	  $\hphantom{v}$       [loop P; P']$_{v}$ = [P]$_{v}^{*}$ + [P']$_{v}$
-	                       = [P]$_{v}^{*}$
+         [loop P]$_{v}$ = [P]$_{v}^{*}$                  # Loops
 
-
-                                      # Conditional
+                                         # Conditional
         [if $v$ then P$_{1}$ else P$_{2}$]$_{v}$ = [$v$]$_{v}$ + ([P$_{1}$] $\emph{max}$ [P$_{2}$])
                                = [P$_{1}$] $\emph{max}$ [P$_{2}$]
 	\end{lstlisting}
 
-	The * operation marks a virtual time of infinite length. It is defined as a 
-	subsuming operation. 
+	The * operation marks a virtual time of infinite length. It is defined as an 
+	absorbing operation. 
 	\\
 	\begin{lstlisting}
-	$\mathbb{N}$ $\cup$ {$\infty$}            $\infty$++ = $\infty$
-	*: $\mathbb{N}$ $\rightarrow$ $\mathbb{N}^{*}$           ++$\infty$ = $\infty$
+	$\infty$ + n = $\infty$
+	n + $\infty$ = $\infty$
 	\end{lstlisting}
+
+	With this absorpting behaviour we may also state that: \\
+	 \texttt{[loop P; P']$_{v}$} = \texttt{[loop P]$_{v}$}.
 \end{blockquote}
 
 \begin{figure}[h!]
@@ -1319,14 +1317,14 @@ unconstrained loop is traversed once so that the value of one iteration is known
 All the information returned to the developer is based on running one iteration 
 of the whole source as this is a useful metric for the developer to reason against. 
 This is valid within our specification as we have defined * as mapping natural 
-numbers to infinity. \texttt{[loop P]$_{v}$} in this case equals \texttt{[2]$_{v}^{*}$} 
+numbers to infinity. \texttt{[loop P]$_{v}$} in this case equals \texttt{2$^{*}$} 
 which equals \texttt{$\infty$}.
 
 \paragraph{Functions}
 Snippet \ref{doubleFunc} gives a program where functions have been defined before 
 and after their use. This is a valid ruby program and will compile and run within 
 the Sonic Pi IDE. However, Sonic Pi's current scoping system mean that this program 
-will fail during runtime on reaching statement 4\footnote{The symbol called is not 
+will fail during runtime\footnote{At statement 4, the symbol called is not 
 yet defined within Sonic Pi's scope so the symbol is unrecognised and the thread 
 crashes.}. This kind of error is outside the scope of the project to provide an error 
 report for so we do not save the developer in this instance. Instead we handle it, 
@@ -1608,17 +1606,53 @@ loop when handling session types. For the full performance the session types can
 unfold as many times as you require, but the developer only needs to see that 
 type information once.
 
+The central idea to binary session types is the \emph{session}. A \emph{session} 
+is a set of reciprocal interactions between two parties and serves as a unit of 
+abstraction for describing that interaction. Communications of sessions are done 
+via a \emph{channel} and can be initiated as follows:
+
+\begin{multicols}{2}
+%	\begin{minipage}{\textwidth}
+
+	\begin{minipage}{0.5\textwidth}
+		\begin{verbatim}
+    request a(k) in P    accept a(k) in P 
+		\end{verbatim}
+	\end{minipage}
+	
+	\begin{minipage}{0.5\textwidth}
+
+\hspace*{15pt}: Initiating a Session
+	\end{minipage}
+
+%	\end{minipage}
+\end{multicols}
+
+The \texttt{request} first requests the initiation of a \emph{session} (with 
+\emph{name a}) as well as the generation of a fresh \emph{channel} (with 
+\emph{name k}) which program \texttt{P} will then use for later communication. 
+On the other hand, \texttt{accept} receives the request to initiate the session 
+\emph{a} and generates channel \emph{k} for use in \texttt{P}. In this function, 
+parenthesis and the keyword \texttt{in} show scope binding. We can consider the 
+Sonic Pi IDE to be the session that we are using to generate channels to communicate 
+on. Via our channels we perform the atomic operations of data sending and receiving:
+\\
+\begin{lstlisting}
+        k![e$_1$, ..., e$_n$]; P        # Data Sending  
+        k?(x$_1$, ..., x$_n$) in P      # Data Receiving
+\end{lstlisting}
+
 With binary session types defined we may now formalise the idea of a dual type. The 
 dual relation defines the link between two endpoints of communication between two 
 participants in binary sessions. The endpoint of communication for each participant 
-can be thought of as the next message to consume. In this grammar we have one dual 
-relation that we are concerned with. 
+can be thought of as the next message to consume. We have two dual 
+relations that we are concerned with: 
 
 \begin{blockquote}
-	\texttt{! = dual(?)}
+	\texttt{!} = \texttt{dual(?)}, \texttt{?} = \texttt{dual(!)}
 \end{blockquote}
 
-This is an important statement as it is what we use to define the way our protocols 
+These are important statements as they are what we use to define the way our protocols 
 interact with each other. In addition to these binary type relations, this project 
 uses the multi-party session typing paradigm, which presents a slight
 improvement to this syntax, allowing our communication to occur between more
@@ -1664,7 +1698,6 @@ here is as follows:
 \\
 \begin{lstlisting}
           G ::= p $\rightarrow$ q : $\langle$S$\rangle$.G           # Value Exchange
-              | p $\rightarrow$ q : $\langle$T$\rangle$.G           # Channel Exchange
               | $\texttt{\textbf{t}}$ | end               # Recursion/End
       
           S ::= bool | ... | G       # Sorts
@@ -1699,19 +1732,28 @@ of.
   \hspace{40pt} \texttt{end} \upharpoonright \texttt{q = end}
 \end{align*}
 
-This approach is not so feasible in this instance as we have already been 
-presented with the full source. Instead we are required to build the global
-type from the individual processes, the aim being to verify
-the communication of the program. This consists largely of 
-matching operations on the channels they operate on. Whilst notably more
+The usual approach to multi-party 
+session types is to construct the global type of your program and then project the 
+individual process types from that. With this, one can then write each process, 
+ensuring that all communication protocols remain consistent as development proceeds. 
+Projection is a simple and decidable approach to session times.
+
+This is not how we handle multi-party session types. This approach is not so feasible 
+in this instance as we have already been presented with the full source. In this 
+project we examine \emph{Global Inference} as we are building the global type out of 
+a set of pre-written local types. Whilst notably more
 difficult, this approach is also, thankfully, proveably decidable. There is
 no situation where any algorithmic approach to the problem will not terminate
 with some answer. In the cases where our program's global type is not
-typeable, this suggests some communication error within the provided program.
+typeable, this suggests some communication error within the provided program. 
+This report presents a simple, but elegant, way of handling global inference in this 
+case. We also present two new constructs, as nothing already available in the theory 
+of multi-party session types could describe the situation we required. These are 
+detailed further in Section \ref{inference}.
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.77\textwidth]{images/session.jpg}
+	\includegraphics[width=\textwidth]{images/session.jpg}
 	\caption{Graph UML} \label{graphUML}
 \end{figure}
 \newpage
@@ -1735,12 +1777,16 @@ a \texttt{cue} operation, which sends out an asynchronous message to all process
 To complement this is a \texttt{sync} operation, a blocking operation that causes 
 the process to wait to receive a message. Immediately we draw the parallel between 
 these actions and the sending/receiving messages that Session Types describe. 
-Linking back to the dual relation, \texttt{cue} acts as our \texttt{!} type and 
-\texttt{sync} acts as our \texttt{?} type. \texttt{SubGraph} handles the construction 
+Linking back to the dual relation, \texttt{cue} acts as our send (which we type with a
+\texttt{!} session type) and 
+\texttt{sync} acts as our receive (which we type with a \texttt{?} session type). \texttt{SubGraph} handles the construction 
 of local types while the \texttt{Graph} class handles the global type.
 
 Our approach to building the global type with this graph is simple. We describe it 
-here with pseudo code:
+here with pseudo code. It introduces a concept of `tokens' in the system. We use this 
+phrase to refer to each session type statement in the local types (e.g. in 
+\texttt{B:(P0P1)!.A:(P1P0)?} each token is separated by . in the string, meaning 
+this string has token length two).
 
 \begin{blockquote}
 	\begin{lstlisting}
@@ -1798,15 +1844,22 @@ There is a small limitation in this design as it will allow certain untypable
 programs to be typed.
 
 Take the two code snippets below. Snippet \ref{typed} is typeable and Snippet 
-\ref{untyped} is not, yet both will produce this sesstion type:
+\ref{untyped} is not, yet both will produce this typable sesstion type with the 
+algorithm described so far:
 \\
 \begin{lstlisting}
   P0 := foo:(P0P1)!.bar:(P1P0)?
   P1 := bar:(P1P0)!.foo:(P0P1)?
 \end{lstlisting}
 
-The analysis falls apart here because the basic method of iterating over each local 
-type does not translate well when handling sub-typing.
+In these cases \texttt{:foo} and \texttt{:bar} are both the name of the channel 
+\emph{and} the name of the current process. As the library is currently unable to 
+assign user-provided names to the processes, we choose to comment in the name that 
+the library will generate for the process. This also serves to make the distinction 
+between channel name and process interaction clear.
+
+The analysis falls apart with the current algorithm of focus because the basic method 
+of iterating over each local type does not translate well when handling sub-typing.
 
 \begin{multicols}{2} 
 	\begin{minipage}{0.4\textwidth}
@@ -1923,9 +1976,9 @@ time', so we may consider operation ordering to be maintained in this instance.
 
 
 \paragraph{Keeping Time}
-To handle this feature we introduce a blank \texttt{GraphNode} into the graph 
-structure described in Section \ref{planningGraph}. This node represents when virtual 
-time has incremented in the program, helping us identify which communication 
+To handle sub-typing effectively, we introduce a blank \texttt{GraphNode} into the 
+graph structure described in Section \ref{planningGraph}. This node represents when 
+virtual time has incremented in the program, helping us identify which communication 
 operations interact with which.
 
 This does not break the order relation
@@ -1977,19 +2030,9 @@ message from the other one!
 
 % new graph style
 
-\subsubsection{Global Inference}
-As discussed previously in Section \ref{formalST}, the usual approach to multi-party 
-session types is to construct the global type of your program and then project the 
-individual process types from that. With this one can then write each process, 
-ensuring that all communication protocols remain consistent as development proceeds. 
-Projection is a simple and decidable approach to session times.
-
-This is not how we handle multi-party session types. In this project we examine 
-\emph{Global Inference} as we are building the global type out of a set of pre-written 
-local types. This is a difficult problem and is not a subject often approach in this 
-field. This report presents a simple, but elegant, way of handling global inference 
-in this case. We also present two new constructs, as nothing already available in 
-the theory of multi-party session types could describe the situation we required.
+\subsubsection{Global Inference} \label{inference}
+Here we outline how we implement the global inference initially discussed in Section 
+\ref{formalST}. 
 
 Given the dual types \texttt{A:P0P1?} and \texttt{A:P0P1!} we can transform 
 this into the global typing \texttt{P0->P1}, representing the fact that a 
@@ -2109,7 +2152,7 @@ where one can trasmit a message on one channel to multiple receivers, better kno
 as `broadcasting'. In this case
 this projects presents an interesting evolution of session types for this field.
 We have implemented multiple modes that our project can operate under to reflect
-this, so developers can choose to analysis under standard session typing or under 
+this, so developers can choose to analyse under standard session typing or under 
 the `Sonic Pi' typing outlined here.
 \newpage
 
@@ -2620,7 +2663,7 @@ Function: func 1                  Function: func 1
 \end{lstlisting}
 
 The analysis will print out a list of those function definiitions found during 
-the analysis. Here we have correctly identified that a function, called 
+the first iteration. Here we have correctly identified that a function, called 
 \texttt{func} was defined at statement index 1. We can also see it has correctly 
 identified which statements where inside this function and the virtual time data 
 throughout is accurate.
@@ -3293,7 +3336,7 @@ against this API and it may prove interesting in the future to adapt the library
 to be able to run alongside this API. 
 
 \subsection{Achievement Summary}
-We have produced a lightweight shared library that can statically analysis a 
+We have produced a lightweight shared library that can statically analyse a 
 Sonic Pi program. We have made a tool that can assist the developer with both temporal 
 and concurrent reasoning of their Sonic Pi programs. The tool will output information 
 on both the state of virtual time throughout the source, and also output information 
