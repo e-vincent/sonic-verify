@@ -135,8 +135,9 @@ to define the concept of time in the context of musical coding. When musical pie
 become very long and complex the length of time the piece runs for, and which music 
 threads interact with which, become very difficult to reason about.
 
-In this report we develop a formal specification of the temporal behaviour of Sonic 
-Pi, and describe our implementation of timing music. Alongside this 
+In this report we develop a lightweight static analysis and typing tool for Sonic Pi 
+program. We develop a formal specification of the temporal behaviour of Sonic 
+Pi, and describe our implementation of this system. Alongside this 
 we apply the field of session types to the underlying communication structure of 
 Sonic Pi, formalise its ideas, and present the implementation of this typing 
 system. By running the systematic testing suite we have designed, we prove the 
@@ -154,7 +155,15 @@ reasoning.
 
 \thispagestyle{empty}
 \begin{abstract}
-\noindent\lipsum[1]
+Firstly, I wish to thank my supervisor, Nobuko Yoshida, both for proposing this 
+project, and for being a constant source of motivation, inspiration and support; even 
+through her recovery earlier this year. Secondly, I extend a warm thanks to Dominic 
+Orchard, whose help and feedback throughout this whole project has been invaluable. 
+
+I would like to give a special mention to Sam Aaron as thanks for building and 
+open-sourcing Sonic Pi as it has been an absolute joy to work with. My thanks also 
+go out to my family, for their unwavering support of my degree, my housemates, for 
+keeping me healthy, and my other friends, for their company.
 \end{abstract}
 \afterpage{\thispagestyle{empty}\null\newpage}
 \newpage
@@ -203,10 +212,10 @@ viability of programming tools for professional artists, as reported at PPIG
 developers who work in professional art contexts \cite{W10}. A powerful example 
 of this is the popular uptake of Minecraft in both educational and personal areas. 
 Many uses focus on playing Minecraft on maps designed to teach various scientific 
-concepts\cite{mine1,mine2} but there is the ability to learn programming through 
+concepts \cite{mine1,mine2} but there is the ability to learn programming through 
 mod development itself. Official statistics are difficult to locate but a popular 
 game download website listed 2,000+ Minecraft mods, and 14,000+ texture packs for 
-download; the most popular mod has almost 3 million downloads\cite{crush}, proving 
+download; the most popular mod has almost 3 million downloads \cite{crush}, proving 
 its popular reach. 
 
 In parallel with this we have entered an age where concurrency and 
@@ -1051,7 +1060,7 @@ to build the trace of the program, described in more detail in Section \ref{pTra
 
 Whilst ruby has been valued in Sonic Pi for its hugely forgiving
 syntax in a classroom setting, this feature increases the difficulty of parsing 
-it. The ability to write function calls either with or without parenthesis 
+it. The ability to write function calls either with or without parentheses 
 or omit semi-colons between statements increases the complexity of the ruby 
 grammar to the degree it was infeasible to write such a parser specifically 
 for Sonic-Pi. However, given Sonic-Pi's ruby-like nature, we elected to use 
@@ -1516,7 +1525,7 @@ formalise the idea of \emph{Projection}. After this we describe the design of th
 graph, which details two core iterations of the graph. Finally, we relate 
 this implementation to the theory presented in \ref{formalST}. We explain our 
 approach to \emph{Global Inference} and present our own extensions to Multi-Party 
-Session Types.
+Session Types: the \texttt{\&\&}, and \texttt{||} types.
 
 \subsubsection{Formal Session Types} \label{formalST}
 Before writing the communication interactions of Sonic Pi, we provide a formalisation 
@@ -1579,7 +1588,7 @@ by \texttt{P, Q...}. For this discussion we define the following aspects
 of the \emph{Process} grammar:
 \\
 \begin{lstlisting}
-    P ::= k![$\tilde{e}$]. P                    data sending
+    P ::= k![$\tilde{e}$]; P                    data sending
         | k?($\tilde{x}$) in P                  data reception
         | def D in P                 recursion
 \end{lstlisting}
@@ -1588,16 +1597,34 @@ of the \emph{Process} grammar:
                 and X$_n$($\tilde{x}_n\tilde{k}_n$) = P$_n$ 
 \end{lstlisting}
 
-``$|$'' is the weakest association; the others listed have the same association. 
-Parenthesis denote binders which bind the corresponding free occurrences. We use 
-standard simulataneous substitution, written $ $. The sets of free 
-names/channels/variables of, for example program \texttt{P}, are written as 
-\texttt{fn(P)}, \texttt{fc(P)}, and \texttt{fv(P)} respectively. Processes without 
-free variables or free channels are called programs.
+% Parenthesis denote binders which bind the corresponding free occurrences. The sets 
+% of free names/channels/variables of, for example process \texttt{P}, are written as 
+% \texttt{fn(P)}, \texttt{fc(P)}, and \texttt{fv(P)} respectively. Processes without 
+% free variables or free channels are called programs.
+We maintain this definition of recursion as it is useful to be able to apply it to 
+the loops in our processes. Similarly to the way we defined an infinity operator in 
+Section \ref{abstractTime}, this allows us to only consider the first iteration of a 
+loop when handling session types. For the full performance the session types can 
+unfold as many times as you require, but the developer only needs to see that 
+type information once.
 
-This project uses the multi-party session typing paradigm, which presents a slight
+With binary session types defined we may now formalise the idea of a dual type. The 
+dual relation defines the link between two endpoints of communication between two 
+participants in binary sessions. The endpoint of communication for each participant 
+can be thought of as the next message to consume. In this grammar we have one dual 
+relation that we are concerned with. 
+
+\begin{blockquote}
+	\texttt{! = dual(?)}
+\end{blockquote}
+
+This is an important statement as it is what we use to define the way our protocols 
+interact with each other. In addition to these binary type relations, this project 
+uses the multi-party session typing paradigm, which presents a slight
 improvement to this syntax, allowing our communication to occur between more
-than two \emph{participants}. \emph{Participants} are the set ranged over by 
+than two \emph{participants}. 
+
+\emph{Participants} are the set ranged over by 
 \emph{p, q,...}
 \\
 \begin{lstlisting}
@@ -1608,197 +1635,52 @@ than two \emph{participants}. \emph{Participants} are the set ranged over by
 With this we can now state which of our participants we are sending our message
 to and on which channel. With this we are now able to begin typing our programs.
 
-When forming the types of threads, the program of Snippet \ref{formTypes}
-would produce types of the form:
+\paragraph{Global Types}
+To begin illustrating global types by example, we present a likely scenario to occur 
+in a piece of music. First drum, \texttt{D1}, sends a `cue' to the melody, 
+\texttt{M1}, to start the song in sync. In responce \texttt{M1} sends a `cue' to 
+both \texttt{D1} and a half-drum, \texttt{D2}.  After some time has passed, 
+\texttt{D2} may have fallen behind time slightly, so \texttt{D1} sends another 
+message to sync these two beats together. After this \texttt{D2} can `cue' a waiting 
+riff, \texttt{M2}, to decorate the music. Decomposing this into several binary 
+session types could be logically very difficult, and most likely we would lose some 
+of the essential sequencing information in the process. Instead, let us transform 
+this scenario into the following global type.
 \\
 \begin{lstlisting}
-    P0 :=  B:(P0P1)!.A:(P1P0)?
-    P1 :=  A:(P1P0)!.B:(P0P1)?
+      D1 $\rightarrow$ M1 . M1 $\rightarrow$ D1 . M1 $\rightarrow$ D2 .
+      D1 $\rightarrow$ D2 . D2 $\rightarrow$ M2 
 \end{lstlisting}
 
-`.' is defined as composition, enabling us to string together our types as
-a simple sequence.
-
-This is the manner in which the library chooses to define the types as this
-results in a simpler string to parse. In these types, \texttt{A} and \texttt{B} 
-are acting as the names of the channel being used to send and receive data.
-The first \texttt{P} instance enclosed in each parenthesis is the sender, the 
-second is the receiver. In printing the types in this manner we are able to 
-store each type in the \texttt{SubGraph} it belongs to and comparison of types
-can be decided quickly with index access to the first and last chars, rather than
-another position in the string.
-
-To begin illustrating global types by example, we present the standard 
-two-buyers-protocol.
-
-First \texttt{B1} sends a title to \texttt{S} and in responce \texttt{S}
-sends a quote to both \texttt{B1} and \texttt{B2}. \texttt{B1} will then
-suggests what contribution it can make to \texttt{B2} who will either
-accept this amount and coordinate the purchase with \texttt{S}, or it will
-abort the discussion. Decomposing this into three binary session types
-could be logically very difficult, and most likely we would lose some of
-the essential sequencing information in the process. Instead, let us transform
-this scenario into the following global type. Global types are presented as
-numbers, so a clear key is also provided:
+This example shows how simply the communication structure of a program, using 
+multiple processes, can be described using Multi-Party Session Types. 
+In our analysis, a message can defined a passing from process \texttt{P0} to 
+process \texttt{P1}, written \texttt{P0->P1}, if the types in processes \texttt{P0} 
+and \texttt{P1} dual each other. The global types describe the various actions of a 
+participant \texttt{p} sending either a value of a given Sort, a channel of a given 
+Type, or some label to the partcipant \texttt{q} and then interaction continues 
+according to the following global type \texttt{G}. The grammar we are interested in 
+here is as follows:
 \\
 \begin{lstlisting}
-    1)  1 $\rightarrow$ 3 : $\langle$string$\rangle$                         B1 = 1
-    2)  3 $\rightarrow$ 1 : $\langle$int$\rangle$                            B2 = 2
-    3)  3 $\rightarrow$ 2 : $\langle$int$\rangle$                             S = 3
-    4)  1 $\rightarrow$ 2 : $\langle$int$\rangle$
-    5)  2 $\rightarrow$ 3 : { ok: 2 $\rightarrow$ 3 : $\langle$string$\rangle$. 3 $\rightarrow$ 2 : $\langle$date$\rangle$. end,
-                quit: end }
+          G ::= p $\rightarrow$ q : $\langle$S$\rangle$.G           # Value Exchange
+              | p $\rightarrow$ q : $\langle$T$\rangle$.G           # Channel Exchange
+              | $\texttt{\textbf{t}}$ | end               # Recursion/End
+      
+          S ::= bool | ... | G       # Sorts
+          U ::= S | T                # Exchange Types
+      
+          T ::= !$\langle$p, S$\rangle$.T              # Send Value
+              | !$\langle$p, T$\rangle$.T              # Send Channel
+              | ?(p, U).T            # Receive
+              | $\texttt{\textbf{t}}$ | end               # Recursion/End
 \end{lstlisting}
 
-In our analysis, a message can defined a passing from process \texttt{P0}
-to process \texttt{P1}, written \texttt{P0->P1}, if the types in processes 
-\texttt{P0} and \texttt{P1} dual each other. The algorithm we have for processing
-each type starts in the first type of each block and stores each token. If
-the next token is a dual of any of the tokens in our store we write out the
-next part of the global type and remove them from the store. If not, we
-remove any \texttt{cue} types from the current store, keep the \texttt{sync} 
-types and then place the current token at the top of the store and continue 
-until all type block have been consumed.
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=\textwidth]{images/session.jpg}
-	\caption{Graph UML} \label{graphUML}
-\end{figure}
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=\textwidth]{images/GSG.jpg}
-	\caption{Graph Structure} \label{graphStructure}
-\end{figure}
-
-\subsubsection{Planning the Graph}
-As shown by the Figure \ref{graphStructure}, each \texttt{Graph} is constructed as
-a list of \texttt{SubGraph}s where each \texttt{SubGraph} represents
-one process within the program. The idea behind this is to maintain
-the chronology of the nodes in each process and to enable easy analysis
-of the program on a per-process level. \texttt{SubGraph} handles the construction
-of local types while the \texttt{Graph} class handles the global type.
-
-\paragraph{Initial Design}
-In defining the session types we can consider a modified version of the 
-
-% diagram of internal graphs here, showing that nodes in these graphs 
-% are chronological
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=\textwidth]{images/GraphOneFix.jpg}
-	\caption{Node Chronology} \label{nodegraphone}
-\end{figure}
-
-The reason we may process tokens in this way is demonstrated in Figure 
-\ref{nodegraphone}. A Sonic Pi program will always increment its virtual 
-time as we run through a program. \texttt{SubGraph}s are written in the order 
-they are defined in the source by line number. Given this, within a 
-\texttt{SubGraph} if \texttt{n1.index < n2.index}, \texttt{n1} has resolved 
-first. In later sections we will refer to this as the `horizontal' relationship 
-between nodes. In two concurrent \texttt{SubGraph}s, \texttt{n.index < m.index} 
-and \texttt{n} will be resolved first by the interpreter but they may have the 
-same virtual time within the program, thus they are compared to each other as 
-well as those tokens processed one previously. We will refer to this as the 
-`vertical' relationship between nodes and is demonstrated in Figure 
-\ref{nodegraphone} by the blue bar linking the different groups together.
-
-There is a small limitation in this design as it will allow certain untypable
-programs to be typed.
-
-An example of this can be shown with the deadlocking code from previously,
-shown again in Snippet \ref{typelock}. As it is, this will produce the same session
-graph as Snippet \ref{formTypes}, which produces a feasible global type.
-The actual result for this should be untypable as both loops will become stuck
-at each \texttt{sync} node. 
-
-\begin{minipage}{\textwidth}
-	\begin{lstlisting}[style = sonicpi]
-	live_loop :foo do
-	    play :e4, release: 0.5
-	    sleep 0.5
-	    sync :bar
-	end
-
-	live_loop :bar do
-	    sample :bd_haus
-	    sleep 1
-	    sync :foo
-	end
-	\end{lstlisting}
-	\captionof{lstlisting}{Deadlock - Types Under This Approach} \label{typelock}
-\end{minipage}
-
-\paragraph{Keeping Time}
-To combat this we updated the construction of the graph to take into account
-a very basic notion of the passage of time. As the AST is being traversed, each
-instance of a \texttt{BodyNode} of value \emph{sleep} will create an empty
-\texttt{GraphNode} in the session graph. This does not break the order relation
-described previously but it does change the grouping of the `vertical' 
-relationship of the nodes. Rather than mapping each column as one relation, with
-the total set of relationship being equal to the maximum number of types in
-any one \texttt{SubGraph}, each `vertical' relation can be defined as the
-set of nodes between each \emph{time} node.
-
-% updated graph diagram here
-% highlights each vertical relation group
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=\textwidth]{images/GraphTwo.jpg}
-	\caption{Fixed Node Chronology}
-\end{figure}
-
-Refering back to Snippet \ref{formTypes}, the program graph constructed now takes
-the form:
-\\
-\begin{lstlisting}
-  P0 :=  B:(P0P1)!.A:(P1P0)?.time
-  P1 :=  A:(P1P0)!.time.B:(P0P1)?.time
-\end{lstlisting}
-
-More importantly the program from snippet 12 will look as follows:
-\\
-\begin{lstlisting}
-  foo := foo:(P0P1)!.time.bar:(P1P0)?
-  bar := bar:(P1P0)!.time.foo:(P0P1)?
-\end{lstlisting}
-
-As before we process each block one `vertical' relation at a time. We take
-care in this iteration to make a note when a block is stuck at a \texttt{sync}
-node as we should not process any further tokens from this block. Rather than
-processing until the each of each token block, we process the first token group
-again in the event any trailing syncs would be triggered by the next loop. In
-the event we run into the same \texttt{sync} node that we are currently blocked
-on then we are able to return that this global type is not typeable.
-
-% new graph style
-
-\subsubsection{Global Inference}
-As discussed previously in Section 4.2.1, the usual approach to multi-party session 
-types is to construct the global type of your program and then project the 
-individual process types from that. With this one can then write each process, 
-ensuring that all communication protocols remain consistent as development 
-proceeds. Projection is a simple and decidable approach to session times.
-
-The global types describe the various actions of a participant \texttt{p} sending
-either a value of a given Sort, a channel of a given Type, or some label to the
-partcipant \texttt{q} and then interaction continues according to the following
-global type \texttt{G}. The grammar we are interested in here is as follows:
-\\
-\begin{lstlisting}
-    G ::= p $\rightarrow$ q : $\langle$S$\rangle$.G
-        | p $\rightarrow$ q : $\langle$T$\rangle$.G
-        | $\texttt{\textbf{t}}$
-        | end
-\end{lstlisting}
-
-To understand how we build a global type from decomposed local types, we first 
-present the simpler operation of \emph{projection}. The global type is the
-description of the program as the whole. It shows which participants 
-communication with which and what data they pass between each other. The decomposed
-local type describes the interaction that specific process is aware of. The 
-definition of \emph{projection} follows:
+\paragraph{Projection}
+The global type is the description of the program as the whole. It shows which 
+participants communication with which and what data they pass between each other. 
+The decomposed local type describes the interaction that specific process is aware 
+of.
 
 \begin{blockquote}
   \textbf{Definition 2:} \emph{The projection of a global type \texttt{G} onto 
@@ -1819,26 +1701,311 @@ definition of \emph{projection} follows:
 
 This approach is not so feasible in this instance as we have already been 
 presented with the full source. Instead we are required to build the global
-type from the individual process types provided, the aim being to verify
-the communication of the program through this process. This consists largely of 
+type from the individual processes, the aim being to verify
+the communication of the program. This consists largely of 
 matching operations on the channels they operate on. Whilst notably more
 difficult, this approach is also, thankfully, proveably decidable. There is
 no situation where any algorithmic approach to the problem will not terminate
 with some answer. In the cases where our program's global type is not
 typeable, this suggests some communication error within the provided program.
 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.77\textwidth]{images/session.jpg}
+	\caption{Graph UML} \label{graphUML}
+\end{figure}
+\newpage
+
+\subsubsection{Planning the Graph} \label{planningGraph}
+As shown by the Figure \ref{graphUML}, each \texttt{Graph} is constructed as
+a list of \texttt{SubGraph}s where each \texttt{SubGraph} represents
+one process within the program. This structure is shown again more explicitly in 
+Figure \ref{graphStructure}, which also shows the various types of arc that this 
+analysis graph makes use of.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/GSG.jpg}
+	\caption{Graph Structure} \label{graphStructure}
+\end{figure}
+
+The idea behind this is to maintain the chronology of the nodes in each process and 
+to enable easy analysis of the program on a per-process level. In Sonic Pi there is 
+a \texttt{cue} operation, which sends out an asynchronous message to all processes. 
+To complement this is a \texttt{sync} operation, a blocking operation that causes 
+the process to wait to receive a message. Immediately we draw the parallel between 
+these actions and the sending/receiving messages that Session Types describe. 
+Linking back to the dual relation, \texttt{cue} acts as our \texttt{!} type and 
+\texttt{sync} acts as our \texttt{?} type. \texttt{SubGraph} handles the construction 
+of local types while the \texttt{Graph} class handles the global type.
+
+Our approach to building the global type with this graph is simple. We describe it 
+here with pseudo code:
+
+\begin{blockquote}
+	\begin{lstlisting}
+  syncStore  <- new
+  prevTokens <- new   # initial attempt with allowing sub-typing
+
+  while every process has tokens
+  |   or every non-empty process is not in syncStore:
+  |   currTokens <- new
+  |   for each process:
+  |   |   # sync is blocking
+  |   |   # so as long as a process has a token in sync
+  |   |   # we can't consume it
+  |   |   if syncStore.members.name != process.name
+  |   |   |   currTokens += process.top
+  |
+  |
+  |   check if currTokens dual each other:
+  |   |   build type; remove from token list
+  |	
+  |   check if currTokens dual any in syncStore
+  |   |   build type; remove from respective store
+  |   
+  |   check if currTokens dual any in prevTokens
+  |   |   build type; remove from respective store
+  |
+  |   syncStore += currTokens.syncTokens
+	\end{lstlisting}
+\end{blockquote}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/GraphOneFix.jpg}
+	\caption{Node Chronology} \label{nodegraphone}
+\end{figure}
+
+The reason we process tokens in this way is demonstrated in Figure 
+\ref{nodegraphone}. A Sonic Pi program will always increment its virtual 
+time as we run through a program. \texttt{SubGraph}s are written in the order 
+they are defined in the source by line number. Given this, within a 
+\texttt{SubGraph} if \texttt{n1.index < n2.index}, \texttt{n1} has resolved 
+first. We will refer to this as the `horizontal' relationship 
+between nodes. In two concurrent \texttt{SubGraph}s, \texttt{n.index < m.index}, 
+and \texttt{n} will be resolved first by the interpreter, but they may have the 
+same virtual time within the program. Given this they are compared to each other as 
+well as those \texttt{sync} tokens processed previously. We will refer to this as 
+the `vertical' relationship between nodes and is demonstrated in Figure 
+\ref{nodegraphone} by the blue bar linking the different groups together.
+
+% diagram of internal graphs here, showing that nodes in these graphs 
+% are chronological
+
+
+There is a small limitation in this design as it will allow certain untypable
+programs to be typed.
+
+Take the two code snippets below. Snippet \ref{typed} is typeable and Snippet 
+\ref{untyped} is not, yet both will produce this sesstion type:
+\\
+\begin{lstlisting}
+  P0 := foo:(P0P1)!.bar:(P1P0)?
+  P1 := bar:(P1P0)!.foo:(P0P1)?
+\end{lstlisting}
+
+The analysis falls apart here because the basic method of iterating over each local 
+type does not translate well when handling sub-typing.
+
+\begin{multicols}{2} 
+	\begin{minipage}{0.4\textwidth}
+		\begin{lstlisting}[style = sonicpi]
+live_loop :foo do    # P0
+    play :e4, release: 0.5
+    sleep 0.5
+    sync :bar
+end
+
+live_loop :bar do    # P1
+    sample :bd_haus
+    sleep 1
+    sync :foo
+end
+		\end{lstlisting}
+		\captionof{lstlisting}{Untypable} \label{untyped}
+	\end{minipage} \hspace{35pt}
+	\begin{minipage}{0.4\textwidth}
+		\begin{lstlisting}[style = sonicpi]
+live_loop :foo do    # P0
+    sync :bar
+    play :e4, release: 0.5
+    sleep 0.5
+end
+
+live_loop :bar do    # P1
+    sync :foo
+    sample :bd_haus
+    sleep 1
+end
+		\end{lstlisting}
+		\captionof{lstlisting}{Typable} \label{typed}
+	\end{minipage}
+\end{multicols}
+\newpage
+
+\paragraph{Sub-Typing}
+\begin{multicols}{2}
+Under the initial algorithm, both \texttt{cue} statements in Snippet \ref{subType} 
+would be processed and then discarded, as \texttt{cue} statements do not persist in 
+the statement store. However, these statements all execute at the same virtual time 
+in the program; both \texttt{cue}s will trigger both \texttt{sync}s in the Sonic 
+Pi environment. Storing the previous round of tokens has also already been shown to 
+be inaccurate.
+\\
+\begin{lstlisting}
+  P0 := B:(P0P1)!.A:(P1P0)?
+  P1 := A:(P0P1)!.B:(P0P1)?
+\end{lstlisting}
+
+In standard binary session types this is inaccurate:
+
+$\hphantom{tabs}$ \texttt{B:(P0P1)!.A:(P1P0)?} 
+\\ $\hphantom{tabular} \neq$ \texttt{dual(A:(P0P1)!.B:(P0P1)?)}
+
+The accurate type for the second process would be \texttt{B:(P0P1)?.A:(P0P1)!}, 
+(or one could keep \texttt{P1} unchanged and swap the terms in the other process). 
+By introducing the concept of time progression, we are able to handle 
+this typing.
+
+	\begin{minipage}{0.5\textwidth}
+
+		\begin{minipage}{\textwidth}
+			\begin{lstlisting}[style = sonicpi]
+	# P0 
+	in_thread do
+	  loop do   
+	    cue :B  
+	    sync :A 
+	    play 60 
+	    sleep 0.5 
+	  end 
+	end           
+
+
+	# P1
+	in_thread do
+	  loop do
+	    cue :A
+	    sync :B
+	    play 64
+	    sleep 0.5
+	  end
+	end
+			\end{lstlisting}
+			\captionof{lstlisting}{Sub-Typing \texttt{cue}} \label{subType}
+		\end{minipage}
+
+	\end{minipage}
+\end{multicols}
+
+Our implementation utilises sub-typing the \texttt{cue} type. \\
+The formal outline for this feature is:
+\\
+\begin{lstlisting}
+     A!.P <: P.A!
+\end{lstlisting}
+
+Given this we may say that:
+\\
+\begin{lstlisting}
+     A:(P0P1)!.B:(P0P1)? <: B:(P0P1)?.A:(P0P1)!
+     B:(P0P1)!.A:(P1P0)? = dual(B:(P0P1)?.A:(P0P1)!)
+
+    $\therefore$ B:(P0P1)!.A:(P1P0)? $\cong$ dual(A:(P0P1)!.B:(P0P1)?)
+\end{lstlisting}
+
+Sub-typing is a useful relation to define within session types, see 
+\cite{HYC08, MY15, MYH09}, and is based on the notion that correctness will 
+always be maintained so long as input order is not disrupted in the message 
+queue. Here, our subtype is based on operations occuring at the same `virtual 
+time', so we may consider operation ordering to be maintained in this instance. 
+
+
+\paragraph{Keeping Time}
+To handle this feature we introduce a blank \texttt{GraphNode} into the graph 
+structure described in Section \ref{planningGraph}. This node represents when virtual 
+time has incremented in the program, helping us identify which communication 
+operations interact with which.
+
+This does not break the order relation
+described previously but it does change the grouping of the `vertical' 
+relationship of the nodes. Rather than mapping each column as one relation, with
+the total set of relationship being equal to the maximum number of types in
+any one \texttt{SubGraph}, each `vertical' relation can be defined as the
+set of nodes between each \emph{time} node.
+
+% updated graph diagram here
+% highlights each vertical relation group
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=\textwidth]{images/GraphTwo.jpg}
+	\caption{Fixed Node Chronology} \label{graphTwo}
+\end{figure}
+
+Refering back to Snippet \ref{typed}, the program graph constructed now takes
+the form:
+\\
+\begin{lstlisting}
+  P0 :=  foo:(P0P1)!.bar:(P1P0)?.time
+  P1 :=  bar:(P1P0)!.foo:(P0P1)?.time
+\end{lstlisting}
+
+More importantly the program from Snippet \ref{untyped} will look as follows:
+\\
+\begin{lstlisting}
+  foo := foo:(P0P1)!.time.bar:(P1P0)?
+  bar := bar:(P1P0)!.time.foo:(P0P1)?
+\end{lstlisting}
+
+When analysing these local types, the only change to the pseudo code presented before 
+is how we consume tokens at the start of each loop. Instead of only taking the 
+top token from each process, we keep collecting tokens until we either hit a 
+\texttt{sync} (it is still a blocking call), or we hit \texttt{time}. Now the analysis 
+simply processes all the tokens in hand and builds the global type according to the 
+same typing rules as before. Figure \ref{graphTwo} shows how the graph structure 
+has changed visually from the previous attempt.
+
+To demonstrate further, take the types presented for Snippet \ref{typed}. With this 
+algorithm we consume all four tokens presented in the same pass. Because of this we 
+can sub-type a \texttt{cue} as needed and the system types correctly. In contrast, 
+with the local types for Snippet \ref{untyped}, we can only consume the top token 
+from each process on the first iteration. We skip the \texttt{time} marker and are 
+then presented with a \texttt{sync} node at the top of each process. Here we can 
+successfully report this to be a deadlocking error. Both participants are waiting for a 
+message from the other one!
+
+% new graph style
+
+\subsubsection{Global Inference}
+As discussed previously in Section \ref{formalST}, the usual approach to multi-party 
+session types is to construct the global type of your program and then project the 
+individual process types from that. With this one can then write each process, 
+ensuring that all communication protocols remain consistent as development proceeds. 
+Projection is a simple and decidable approach to session times.
+
+This is not how we handle multi-party session types. In this project we examine 
+\emph{Global Inference} as we are building the global type out of a set of pre-written 
+local types. This is a difficult problem and is not a subject often approach in this 
+field. This report presents a simple, but elegant, way of handling global inference 
+in this case. We also present two new constructs, as nothing already available in 
+the theory of multi-party session types could describe the situation we required.
+
 Given the dual types \texttt{A:P0P1?} and \texttt{A:P0P1!} we can transform 
 this into the global typing \texttt{P0->P1}, representing the fact that a 
 message is being transfered from \texttt{P0} to \texttt{P1}. \texttt{A} is not
 represented within this global type as it acts as the name of the channel on
-which the message is being sent. In this sense you can consider Sonic Pi
-to be a series of zero size messages being sent on each channel between
-each process.
+which the message is being sent. Standard global types also print the type of 
+message being sent; we currently omit this type information. We can consider Sonic 
+Pi to be a series of `null' messages being sent on each channel between each 
+participant.
 
-Interestingly the syntax of Sonic Pi allows for some interesting situations,
-some of which are not technically typable in strict Session Types but are
-perfectly valid, and sometimes useful, situations to occur in Sonic Pi.
+The syntax of Sonic Pi allows for some interesting situations,
+some of which are not technically typable in standard multi-party session types 
+but are perfectly valid, and sometimes useful, situations to occur in Sonic Pi.
+\newpage
 
+\paragraph{Replication Type}
 The first such situation we consider is when we have several \texttt{cue}
 signals with the potential to trigger one \texttt{sync}.
 
@@ -1866,23 +2033,19 @@ proposes an `\emph{or}' type, denoted by \texttt{||}.
 \end{minipage}
 
 
-Given this notation the
-decomposed types for this set of threads is:
+Given this notation the decomposed types\footnote{For the purpose of these discussions
+we again omit the \texttt{time} element of the type as it is not relevant.} for this 
+set of threads is:
 \\
 \begin{lstlisting}
   P0 := A:(P0P1)!
-  P1 := A:(P0P1||P2P1)?
+  P1 := A:(P0P1 || P2P1)?
   P2 := A:(P2P1)!
 \end{lstlisting}
 
-Notice in this instance we are referring only to the `strict' types of each 
-process, rather than our graphical representation of the process, so the
-\texttt{time} elements discussed in the previous section have been ommitted 
-for this discussion.
-
 In terms of processing the global type, when each of these types line up
 into the same `vertical' relationship, the type constructed has the form 
-\texttt{(P0||P2)->P1}. The algorithm discussed previously does not need
+\texttt{(P0 || P2)->P1}. The algorithm discussed previously does not need
 adapting to handle this new type form. The tokens are not removed from the
 stored pool until every node in the group has been processed. We are only
 required to add in some new code to handle the case where we have detected
@@ -1890,6 +2053,7 @@ the extra information else we may actually print the types as a composition,
 \texttt{P0->P1.P2->P1}. This is a valid session type but is not an accurate
 definition for this situation.
 
+\paragraph{Broadcasting}
 The other situation we considered is when one \texttt{cue} can trigger
 multiple \texttt{sync} statements. This is equally as untypable in strict
 session types but equally as viable from a musical point of view. The developer
@@ -1917,7 +2081,7 @@ print for this are as follows:
 \\
 \begin{lstlisting}
   P0 := A:(P1P0)?
-  P1 := A:(P1P0&&P1P2)!
+  P1 := A:(P1P0 && P1P2)!
   P2 := A:(P1P2)?
 \end{lstlisting}
 
@@ -1925,7 +2089,7 @@ As before, the algorithm for creating global types from this type set is not
 affected. The \texttt{sync} statements will either be in the store from a previous
 iteration of the algorithm or be handled as all statements from the same `vertical'
 relationship will be processed. The global type for this situation will be printed
-as \texttt{P1->(P0\&\&P2)}. In the event these statements are separated by time
+as \texttt{P1->(P0 \&\& P2)}. In the event these statements are separated by time
 progression, the type will print as the usual global type involving two processes.
 \texttt{sync} statements will still be stored as described earlier, either to be
 consumed by a later \texttt{cue} of the correct dual typing or to be hit again
@@ -1949,85 +2113,7 @@ this, so developers can choose to analysis under standard session typing or unde
 the `Sonic Pi' typing outlined here.
 \newpage
 
-\paragraph{Sub-Typing}
-\begin{multicols}{2}
-Introducing the concept of time progression into the graph also handles one other
-case that the initial column approach did not.
-
-Under the initial algorithm, both \texttt{cue} statements in snippet 16 would be
-processed and then discarded, as \texttt{cue} statements do not persist in the 
-statement store. However, these statements all execute at the same virtual time 
-in the program; both \texttt{cue}s will trigger both \texttt{sync}s in the Sonic 
-Pi environment. 
-\\
-\begin{lstlisting}
-  P0 := B:(P0P1)!.A:(P1P0)?
-  P1 := A:(P0P1)!.B:(P0P1)?
-\end{lstlisting}
-
-In standard binary session types this is inaccurate:
-
-$\hphantom{tabs}$ \texttt{B:(P0P1)!.A:(P1P0)?} 
-\\ $\hphantom{tabular} \neq$ \texttt{dual(A:(P0P1)!.B:(P0P1)?)}
-
-The accurate type for the second process would be \texttt{B:(P0P1)?.A:(P0P1)!}, 
-(or one could keep \texttt{P1} unchanged and swap the terms in the other process). 
-To handle this, the project makes use of sub-typing the \texttt{cue} type.
-
-	\begin{minipage}{0.5\textwidth}
-
-		\begin{minipage}{\textwidth}
-			\begin{lstlisting}[style = sonicpi]
-	# P0 
-	in_thread do
-	  loop do   
-	    cue :B  
-	    sync :A 
-	    play 60 
-	    sleep 0.5 
-	  end 
-	end           
-
-
-	# P1
-	in_thread do
-	  loop do
-	    cue :A
-	    sync :B
-	    play 64
-	    sleep 0.5
-	  end
-	end
-			\end{lstlisting}
-			\captionof{lstlisting}{Sub-Typing \texttt{cue}}
-		\end{minipage}
-
-	\end{minipage}
-\end{multicols}
-
-The formal outline for this feature is:
-\\
-\begin{lstlisting}
-     A!.P <: P.A!
-\end{lstlisting}
-
-Given this we may say that:
-\\
-\begin{lstlisting}
-     A:(P0P1)!.B:(P0P1)? <: B:(P0P1)?.A:(P0P1)!
-     B:(P0P1)!.A:(P1P0)? = dual(B:(P0P1)?.A:(P0P1)!)
-
-    $\therefore$ B:(P0P1)!.A:(P1P0)? $\cong$ dual(A:(P0P1)!.B:(P0P1)?)
-\end{lstlisting}
-
-Sub-typing is a useful relation to define within session types, see 
-\cite{HYC08, MY15, MYH09}, and is based on the notion that correctness will 
-always be maintained so long as input order is not disrupted in the message 
-queue. Here, our subtype is based on operations occuring at the same `virtual 
-time', so we may consider operation ordering to be maintained in this instance. 
-
 \subsection{Integration}
-
 The Sonic Pi IDE has two core sections: Server and GUI. The server is written on 
 top of the SuperCollider synthesizer and implemented in Ruby whilst the GUI is 
 built on the Qt framework and thus written in C++.
@@ -2419,7 +2505,7 @@ functions or if it is still useful to mark the statement.
 \end{lstlisting}
 
 This function call is in a similar state to the list test run previously. The 
-parenthesis cause the AST in this case to present a root \texttt{begin} node in 
+parentheses cause the AST in this case to present a root \texttt{begin} node in 
 every case, rather than allowing a single statement as before. Again, the analysis 
 is able to identify this has no effect on the current virtual time and is therefore 
 correct. 
@@ -2772,8 +2858,7 @@ same output regardless of the conditional's expression.
 \subsubsection{\texttt{;} Separation}
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
-      play 60 ; play 62 ; play 64 ; sleep 1
-      play 63 ; play 65 ; play 66 ; sleep 0.5
+      play 60 ; sleep 1 ; play 66 ; sleep 0.5
 	\end{lstlisting}
 	\captionof{lstlisting}{Multiple Statements on Single Line Test Code}
 \end{minipage}
@@ -2782,13 +2867,9 @@ same output regardless of the conditional's expression.
     == Expected Trace               == Actual Trace
     [0] -                           [0] -
     [1] conVT:   0, cumVT:   0      [1] conVT:   0, cumVT:   0
-    [2] conVT:   0, cumVT:   0      [2] conVT:   0, cumVT:   0
-    [3] conVT:   0, cumVT:   0      [3] conVT:   0, cumVT:   0
-    [4] conVT:   1, cumVT:   1      [4] conVT:   1, cumVT:   1
-    [5] conVT:   0, cumVT:   1      [5] conVT:   0, cumVT:   1
-    [6] conVT:   0, cumVT:   1      [6] conVT:   0, cumVT:   1
-    [7] conVT:   0, cumVT:   1      [7] conVT:   0, cumVT:   1
-    [8] conVT: 0.5, cumVT: 1.5      [8] conVT: 0.5, cumVT: 1.5
+    [2] conVT:   1, cumVT:   1      [2] conVT:   1, cumVT:   1
+    [3] conVT:   0, cumVT:   1      [3] conVT:   0, cumVT:   1
+    [4] conVT: 0.5, cumVT: 1.5      [4] conVT: 0.5, cumVT: 1.5
 \end{lstlisting}
 
 To further demonstrate the ability to process multiple statements on one line,
@@ -3213,13 +3294,21 @@ to be able to run alongside this API.
 
 \subsection{Achievement Summary}
 We have produced a lightweight shared library that can statically analysis a 
-Sonic Pi program. This library can integrate successfully with the existing 
-Sonic Pi IDE and produces information on the timing effects of the program and 
-details the structure of the communication protocols used within the source. We 
+Sonic Pi program. We have made a tool that can assist the developer with both temporal 
+and concurrent reasoning of their Sonic Pi programs. The tool will output information 
+on both the state of virtual time throughout the source, and also output information 
+about the communication structure of the program. It can successfully report when 
+the program is deadlocked. We also contribute two new typing ideas for multi-party 
+session types with our \texttt{\&\&} and \texttt{||} types, which handle replication 
+type and broadcasting situations within Sonic Pi. 
+
+This library can integrate successfully with the existing Sonic Pi IDE and we 
 have also provided a small systematic testing environment within the project 
 to prove the correctness of our analysis and demonstrate the current limitations 
-of the analysis and present ideas for improvement.
-
+of the project. With the current set of features implemented, the library is able 
+to accurately run during live perforamnces with very simple musical pieces. Working 
+with fuller pieces, like those presented in the Evaluation, is also very close to 
+being a reality.
 \newpage
 
 

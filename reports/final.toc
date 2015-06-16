@@ -28,32 +28,35 @@
 \contentsline {paragraph}{Variable Sleep}{36}
 \contentsline {subsection}{\numberline {4.2}Session Pi}{37}
 \contentsline {subsubsection}{\numberline {4.2.1}Formal Session Types}{37}
-\contentsline {subsubsection}{\numberline {4.2.2}Planning the Graph}{39}
-\contentsline {paragraph}{Initial Design}{40}
-\contentsline {paragraph}{Keeping Time}{42}
-\contentsline {subsubsection}{\numberline {4.2.3}Global Inference}{43}
-\contentsline {paragraph}{Sub-Typing}{47}
-\contentsline {subsection}{\numberline {4.3}Integration}{48}
-\contentsline {section}{\numberline {5}Evaluation}{49}
-\contentsline {subsection}{\numberline {5.1}Ruby/C++11 \& Performance}{49}
-\contentsline {subsection}{\numberline {5.2}Correctness}{50}
-\contentsline {subsubsection}{\numberline {5.2.1}Chords}{50}
-\contentsline {subsubsection}{\numberline {5.2.2}Sequences}{51}
-\contentsline {subsubsection}{\numberline {5.2.3}Loops}{51}
-\contentsline {subsubsection}{\numberline {5.2.4}Threads}{53}
-\contentsline {subsubsection}{\numberline {5.2.5}Data Structures}{54}
-\contentsline {paragraph}{Lists}{54}
-\contentsline {paragraph}{Chords \& Scales}{54}
-\contentsline {paragraph}{Rings}{55}
-\contentsline {subsubsection}{\numberline {5.2.6}Dead Code}{56}
-\contentsline {subsubsection}{\numberline {5.2.7}Function Calls}{57}
-\contentsline {paragraph}{Function Definition}{57}
-\contentsline {paragraph}{Function Detection}{58}
-\contentsline {paragraph}{Nested Functions}{60}
-\contentsline {paragraph}{Parameterized Functions}{61}
-\contentsline {subsubsection}{\numberline {5.2.8}Conditionals}{61}
-\contentsline {subsubsection}{\numberline {5.2.9}\texttt {;} Separation}{62}
-\contentsline {subsubsection}{\numberline {5.2.10}Communications}{63}
+\contentsline {paragraph}{Global Types}{39}
+\contentsline {paragraph}{Projection}{40}
+\contentsline {subsubsection}{\numberline {4.2.2}Planning the Graph}{41}
+\contentsline {paragraph}{Sub-Typing}{44}
+\contentsline {paragraph}{Keeping Time}{45}
+\contentsline {subsubsection}{\numberline {4.2.3}Global Inference}{46}
+\contentsline {paragraph}{Replication Type}{47}
+\contentsline {paragraph}{Broadcasting}{47}
+\contentsline {subsection}{\numberline {4.3}Integration}{49}
+\contentsline {section}{\numberline {5}Evaluation}{50}
+\contentsline {subsection}{\numberline {5.1}Ruby/C++11 \& Performance}{50}
+\contentsline {subsection}{\numberline {5.2}Correctness}{51}
+\contentsline {subsubsection}{\numberline {5.2.1}Chords}{51}
+\contentsline {subsubsection}{\numberline {5.2.2}Sequences}{52}
+\contentsline {subsubsection}{\numberline {5.2.3}Loops}{52}
+\contentsline {subsubsection}{\numberline {5.2.4}Threads}{54}
+\contentsline {subsubsection}{\numberline {5.2.5}Data Structures}{55}
+\contentsline {paragraph}{Lists}{55}
+\contentsline {paragraph}{Chords \& Scales}{55}
+\contentsline {paragraph}{Rings}{56}
+\contentsline {subsubsection}{\numberline {5.2.6}Dead Code}{57}
+\contentsline {subsubsection}{\numberline {5.2.7}Function Calls}{58}
+\contentsline {paragraph}{Function Definition}{58}
+\contentsline {paragraph}{Function Detection}{59}
+\contentsline {paragraph}{Nested Functions}{61}
+\contentsline {paragraph}{Parameterized Functions}{62}
+\contentsline {subsubsection}{\numberline {5.2.8}Conditionals}{62}
+\contentsline {subsubsection}{\numberline {5.2.9}\texttt {;} Separation}{63}
+\contentsline {subsubsection}{\numberline {5.2.10}Communications}{64}
 \contentsline {subsubsection}{\numberline {5.2.11}Musical Score}{67}
 \contentsline {subsection}{\numberline {5.3}Visual Adaptation}{70}
 \contentsline {section}{\numberline {6}Conclusion}{72}
