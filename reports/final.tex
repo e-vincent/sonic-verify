@@ -124,35 +124,28 @@
 
 \thispagestyle{empty}
 \begin{abstract}
-We are entering into an age of computing where concurrency and 
-distribution have become some of the most pressing issues in need of address. 
-As we continue to outstrip the hardware of our machines, with the increased rate 
-of data that we process, parallelism and exploiting concurrency are the key method
-for us to handle this. An active field of theory for this is Session Types. With
-session types we can model the communication protols of a program much more 
-intuitively than is currently possible.
+The report details the improvements made to Sonic Pi: a musical live coding 
+language. With this style of live, interactive improvisation, time becomes a crucial 
+factor in giving an enjoyable, effective performance. Sonic Pi combines this with 
+multiple concurrency primitives that affect the interactions between the different 
+running threads. The current problem with Sonic Pi is the lack of ability to verify 
+the program before running it; during a live performance this can be disastrous. The 
+challenges this present involve the difficulty in handling concurrent code and how 
+to define the concept of time in the context of musical coding. When musical pieces 
+become very long and complex the length of time the piece runs for, and which music 
+threads interact with which, become very difficult to reason about.
 
-The popularity of `live coding' is also continuing to grow. With the use of 
-programming centered on interactive improvisation it becomes crucial to improve 
-the nature of timing within the program. Timing constraints have vast implications 
-on the field of `real-time computing' where high-performance is important. By 
-mimicing the understood notion of a `type-system' and developing a formalised 
-idea of a `time-system' we can use to verify the timing structure of our programs.
-
-This report describes the improvements made to the existing Sonic Pi language; a 
-musical live coding language designed for educational use as a first language. We 
-develop existing ideas of a formal specification for the temporal behaviour of 
-Sonic Pi and present the implementation of this timing system. Alongside this 
+In this report we develop a formal specification of the temporal behaviour of Sonic 
+Pi, and describe our implementation of timing music. Alongside this 
 we apply the field of session types to the underlying communication structure of 
 Sonic Pi, formalise its ideas, and present the implementation of this typing 
 system. By running the systematic testing suite we have designed, we prove the 
 correctness of our analysis of the program against these two formalisations and 
-also comment on the overall performance of the additions. We are also careful to 
-review our success in presenting the information collected in a manner that 
-complements Sonic Pi's construction as a first programming language. Whilst some 
-features lend themselves to personal explorations, many of the timing effects 
-implemented here lend themselves to the purpose of educating young people on the 
-realms of concurrency and temporal reasoning.
+also comment on the overall performance of the additions. We evaluate the results 
+of our analysis in the context of an educational language. Many of the features 
+implemented lend themselves to personal exploration while others are well suited 
+to the goal of educating young people in the realms of concurrency and temporal 
+reasoning.
 \end{abstract}
 \afterpage{\thispagestyle{empty}\null\newpage}
 \newpage
@@ -190,13 +183,13 @@ The movement is not purely restricted to the UK. In the US there is a similar
 campaign calling to recognise the topic as relevant to all contempary 
 sciences. It calls ``Computational Thinking'' a universally applicable 
 attitude and skill set everyone, not just computer scientists, would be eager 
-to learn and use \cite{Wing06}. A recent Microsoft article, as part of the 
-\#WeSpeakCode campaign, claims that 75\% of students in the Asia Pacific region
+to learn and use \cite{Wing06}. A recent Microsoft article\footnote{Part of the 
+\#WeSpeakCode campaign.} claims that 75\% of students in the Asia Pacific region
 wish that programming could be offered as a core subject in their schools \cite{micro}.
 
 There is a general struggle within the humanities courses available in UK schools 
 to remain relevant in light of a quickly developing technical world. Music schemes 
-within the UK frequently report having suffered funding cuts and education is 
+within the UK frequently report having suffered funding cuts, and education is 
 focused on learning a variety of specific instruments, with little focus on 
 musical technology.
 
@@ -209,9 +202,16 @@ because of the availability of useful resources that would be frequently used
 in such situations as a school classroom. Existing research has examined the 
 viability of programming tools for professional artists, as reported at PPIG 
 \cite{Ch12,BC05}, and the craft practices of existing professional software
-developers who work in professional art contexts \cite{W10}.
+developers who work in professional art contexts \cite{W10}. A powerful example 
+of this is the popular uptake of Minecraft in both educational and personal areas. 
+Many uses focus on playing Minecraft on maps designed to teach various scientific 
+concepts\cite{mine1,mine2} but there is the ability to learn programming through 
+mod development itself. Official statistics are difficult to locate but a popular 
+game download website listed 2,000+ Minecraft mods, and 14,000+ texture packs for 
+download; the most popular mod has almost 3 million downloads\cite{crush}, proving 
+its popular reach. 
 
-At the same time as this we have entered an age where concurrency and 
+In parallel with this we have entered an age where concurrency and 
 distribution have become some of the most pressing issues in computing. As we 
 begin to process hugely increased amounts of data the ideas of parallelism and 
 exploiting concurrency are becoming more and more pronounced. In this day and age
@@ -219,12 +219,12 @@ it is almost impossible to find a person who does not own a mobile, most likely 
 `smart' device, which relies on communication with other such devices to function 
 effectively. 
 
-Concurrency theory has been an active field of research since the 1960s, producing
+Concurrency has been an active field of research since the 1960s, producing
 many formalisms over that time which have improved the field of computing. One 
 such formalism is that of process calculi, a field that $\pi$-calculus is a strong
 member of. Another type of process calculi, CSP, was highly influential in 
 bringing to light such languages as Go: a relatively young language but praised
-for its concurrency primitives and performance. Golang can be found in the backend
+for its concurrency primitives and performance. Go can be found in the backend
 of many notable technology companies. Models of concurrency are being used for
 reasoning and specification as well as at all stages of the development life
 cycle: design, implementation, testing, etc...
@@ -235,7 +235,10 @@ bugs such as deadlocks and thrashing behaviour can be as hard to locate now as
 ever before. Some tools and techniques exist to handle these situations, such as
 mutexes and locks \cite{T95}, but even with such tools there is no garauntee
 that some obscure situation will not arise to break it on the same level as 
-\emph{type-safety}.
+\emph{type-safety}. This is not to say type-safe code is without its bugs, but it 
+can stop many problems from occuring at \emph{compile} time. Time-safety can be 
+considered as another \emph{compile} time safeguard, whilst still potentially not 
+able to handle such \emph{run} time event as data races.
 
 % This is not so much a motivation - switch out for concurrency
 % Sonic Pi is one of many projects designed to support both computing and music 
@@ -252,23 +255,25 @@ that some obscure situation will not arise to break it on the same level as
 % timing effects and the existing concurrency primitives of the language. 
 
 \subsection{Objectives}
-In the current version of Sonic Pi there is no means to verify the timing effects
-or the communication patterns of the program. This is to say, users must judge
-themselves how long the current program is, that the program is timed correctly,
-and that the program is free from concurrency bugs. This can be difficult enough 
-in a static environment; in Sonic Pi there is the additional requirement to do 
-all of these things during a live performance (studio audience included)! The 
-first point can be difficult for novice programmers, potentially moreso for 
-those with little musical experience. The latter can be difficult for even some 
-experienced programmers due to the non-deterministic nature of some concurrency 
-bugs.
+In the current version of Sonic Pi \cite{sp} there is no means to verify the 
+temporal behaviour or the communication patterns of the program. This is to say, 
+users must judge themselves how long the current program is, that the program is 
+timed correctly, and that the program is free from concurrency bugs. This can be 
+difficult enough in a static environment; in Sonic Pi there is the additional 
+requirement to do all of these things during a live performance (studio audience 
+included)! The first point can be difficult for novice programmers, potentially 
+moreso for those with little musical experience. The latter can be difficult for 
+even some experienced programmers due to the non-deterministic nature of some 
+concurrency bugs.
 
-In building analysis for the timing effects of the program, we hope to develop
+In building analysis for the timing effects of the program, we aim to develop
 something that is sufficiently lightweight so that it may be run during a live 
-performance of the program. This leads to interesting challenges in terms of the 
-heuristics used when parsing the program and what solutions will lead to the best 
-possible results. We plan to utilise the speed of the platform and program 
-architecture and efficient design for this matter.
+performance of the program. There are several interesting challenges in terms of 
+the heuristics used when parsing the program and what solutions will lead to the 
+best possible results. We plan to utilise the speed of the platform and program 
+architecture and efficient design; it is important that the project is still 
+able to run on Sonic Pi's target architecture. Temporal behaviour should be able 
+to handle basic sequencing, funtion calls, nesting and variable time operations. 
 
 In developing the communication patterns of Sonic Pi we aim to utilise the
 theory of Session Types and apply them to this context. Session Types will
@@ -276,18 +281,23 @@ enable us to define a clearly understandable structure to the communication
 protocol of the program; this will enable the tool to identify difficult bugs
 such as deadlocks and thrashing behaviour. In identify problems in this manner,
 we will be able to reduce the number of crashes developers experience whilst 
-writing code `on-the-fly'.
+writing code `on-the-fly'. 
+
+The final requirement will be for the analysis to run within the Sonic Pi IDE, 
+and to run quickly enough to be utilised during a real perforamnce environment. 
+The challenge here is to make the analysis sufficiently lightweight enough not to
+slow the IDE while the synth servers are working. 
 
 \subsection{Contributions}
 We have produced a lightweight shared library, often affectionately referred to 
 as Sonic-Verify, that enables a variety of different analysis of a program 
-written for the Sonic Pi IDE. The project analyses the timing effects of the 
+written for the Sonic Pi IDE. The project analyss the timing effects of the 
 program, outputting such information as the total `virtual time' elapsed by the 
 program and more specific detail, such as function durations. This implementation
 of a formal timing system presents an improved environment in which developers
-may code more asthetically pleasing music in a live environment. 
+may code more asthetically pleasing music in a live environment.
 
-This is also the first instance of the theory of Session Types being applied in 
+This is the first instance of the theory of Session Types being applied in 
 a (musical) live programming context. With this analysis we are able to output 
 the decomposed types of all processes in the program and the associated global 
 type, presenting an intuitive description of the interactions of processes 
@@ -339,34 +349,68 @@ the basis of this project. We then move on to explain the subject of both Live
 Programming and Session Types in further detail and seek to relate them back to 
 the current aims of the project.
 
-\subsection{Computing in Schools}
-Some of the earliest significant pieces of work towards the 
-education of computing started with the invention of Logo, an adaptation of 
-the LISP language, most remembered for its use of ``turtle graphics''. Some 
-time after this came the Computers in the Cirriculum Project, funded from 
-1972 to 1991 by the Schools Council with addition aid from the Microelectronics 
-Education Programme introduced in 1981. The first microcomputers appeared in 
-both UK Primary and Secondary Schools in 1979. The Commodore Pets aided both 
-spelling and arthimetic practice as well as the ability to teach either BASIC or 
-Logo. The 1980's saw a huge amount of legislative reform and technical efforts 
-to give young people the ability to work with computers. Unfortunately, over the 
-course of the late 80's and early 90's, this focus on programming ability gave 
-way to simply the education of practical use of existing computer software; 
-there was little to no focus on the programming fundamentals behind 
-these applications \cite{naec}.
+\subsection{Live Programming}
+For much of the prevailing history of programming there has been an idea that 
+the programmer is inherently separated from the system that they are 
+producing. The task of the programmer is to create a system based on some 
+formal specification that will take effect at some unknown point in the 
+future, and the time between implementation and action has no effect on the 
+results that the system will produce. In this way, there is a strong sense of 
+separation between the program, process and task domains where the progam is 
+the code implementation and specifications, the process is the running of the 
+code on a specific machine and the task is the visible real world results
+\cite{SG10}. This is a viewpoint that many would not think to challenge as it 
+is natural to assume that the methodology of a computer programmer would 
+naturally lend itself to implementation of actions that were set for execution 
+in the future and, in general, would process a deterministic set of results 
+that can be repeatedly used as the users required.
 
-In 2013, Ofsted published a report documenting their findings relating to ICT 
-in UK schools from 2008 to 2011 and found that in half of all secondary 
-schools, school leavers had not been given adequete education to move into a 
-technical career in their future. In 2007, 81,100 pupils were enrolled in the 
-ICT GCSE but this had fallen to 31,800 pupils by 2011 \cite{DfEO13} with a 
-notable lack in the education of key skills such as computer programming 
-itself. This lack was found to be as much a lack in knowledge from the 
-teacher's as much as the cirriculum's failure to address the issues.
+Live programming (also referred to as With Time Programming or Just In Time 
+Programming) seeks to apply the improvisional nature of time to the existing 
+methodology of the programmer. With this idea it becomes possible to define a 
+tigher system of feedback between the program and task domains through means 
+of whatever process domain is most suitable. The improvisional nature of the 
+acitity also removes the inherent requirement of a specific program 
+specification and allows for new level of freedom and creativity in the 
+programs being created. 
+
+Given the nature of Live Programming the languages that invoke it are often 
+dynamic languages which allow for the flexibility, conciseness and ease of 
+development \cite{McD07} to enable the act of live programming to feel as 
+natural as standard programming practice.
+
+Live Programming lends itself also to acts of performance, where Live Coders 
+perform to live audiences, often producing such things as live 
+improvisational music or artwork, whilst having some means by which the 
+audience will also see the code written at the same time. For a Live Coder 
+there is frequently no desire to create a final software product or even a set 
+musical score as live programming is about the experimentation rather than the 
+manufacture. From a social and cultural viewpoint, Live Programming lends 
+itself to breaking down the barriers that have been built up between software 
+technology and the creative users \cite{McL13}.
+
+It is interesting that the user's level as a musician will have specific 
+impacts on their experience with the systems in use in the context of live 
+programming and audio languages. Musical scores provide an implicit time 
+representation whilst most musical languages tend to use explicit temporal 
+structures. This generally makes the representation of rhythm within the 
+language guarantee only the ordering of the notes and not the time elapsed 
+between playing each one; the temporal structure provides no clear guarantee as 
+to execution length. In terms of musical experience, non-experienced 
+users may be able to identify an odd sound within this system but be unable to 
+pinpoint exactly what causes the problem. 
+
+The question of time and temporal semantics within computing has been in 
+existence for some time, but live programming as a field is a very young 
+research area, with most of the popular languages appearing over the last 
+decade. This comes as part of a wider movement of programming reaching more of 
+the general populace and as it is applied with more and more creative outlets 
+in mind, this separate way of thinking about the programming environment is 
+likely to produce more interesting projects as time develops. 
 
 \subsection{Sonic Pi}
 Sonic Pi is an imperative live programming language designed as an educational 
-first language. It is a Ruby-based Domain-Specific Language designed for 
+first language. It is a Domain-Specific Language based on Ruby designed for 
 manipulation of synthesisers through time \cite{AB13}. It is interpreted through 
 a VM rather than being directly compiled. It is currently in its 
 second iteration, with the main extension between the two languages being the 
@@ -383,10 +427,30 @@ AOB14}. It also presents an inviting environment to teach concepts such as
 parallelism and concurrency; a core strength of the program as these can be
 notoriously difficult concepts to explain.
 
-This section first gives a brief description of the Raspberry Pi then explores 
-the implementation of Sonic Pi V1.0, mainly to give appropriate context to the 
-timing system that Sonic Pi V2.0 currently imeplments. There is then a 
-short discussion on the features of Sonic Pi V2.0.
+\subsubsection{Computing in Schools}
+Some of the earliest significant pieces of work towards the 
+education of computing started with the invention of Logo, an adaptation of 
+the LISP language, most remembered for its use of ``turtle graphics''. Some 
+time after this came the Computers in the Cirriculum Project, funded from 
+1972 to 1991 by the Schools Council with addition aid from the Microelectronics 
+Education Programme introduced in 1981. The first microcomputers appeared in 
+both UK Primary and Secondary Schools in 1979. The Commodore Pets aided both 
+spelling and arthimetic practice as well as the ability to teach either BASIC or 
+Logo. The 1980s saw a huge amount of legislative reform and technical efforts 
+to give young people the ability to work with computers. Unfortunately, over the 
+course of the late 80's and early 90's, this focus on programming ability gave 
+way to simply the education of practical use of existing computer software; 
+there was little to no focus on the programming fundamentals behind 
+these applications \cite{naec}.
+
+In 2013, Ofsted published a report documenting their findings relating to ICT 
+in UK schools from 2008 to 2011 and found that in half of all secondary 
+schools, school leavers had not been given adequete education to move into a 
+technical career in their future. In 2007, 81,100 pupils were enrolled in the 
+ICT GCSE but this had fallen to 31,800 pupils by 2011 \cite{DfEO13} with a 
+notable lack in the education of key skills such as computer programming 
+itself. This lack was found to be as much a lack in knowledge from the 
+teachers as much as the cirriculums failure to address the issues.
 
 \subsubsection{Raspberry Pi}
 The Raspberry Pi was developed as a very low cost computer system to enable 
@@ -400,7 +464,8 @@ the increased availability of out-of-the-box games consoles over the Amiga, BBC
 Micro, Spectrum ZX and Commodore 64 machines that promoted individual 
 experimentation so freely in the past \cite{rp}.
 
-The Pi is provided as a bare circuit board costing roughly \$25, able to boot 
+The Pi is provided as a bare circuit board costing roughly \$25\footnote{About 
+\pounds16.}, able to boot 
 into a Linux environment with very little other commerical equipment required. 
 The Raspberry Pi Foundation is a non-profit organisation and has sold over a 
 million products since 2012. The main objective is to develop genuine 
@@ -459,7 +524,7 @@ Sonic Pi v1.0 takes advantage of fast clockspeeds of modern processors in order
 to assume the sequence of instructions would execute quickly enough 
 to sounds together. In order to separate them into sequential notes they must 
 be separated with a sleep instruction as demonstrated by Snippet 2. The notation 
-for sleep in Sonic Pi V1.0 is similar to that of the POSIX sleep operation 
+for sleep in Sonic Pi V1.0 is similar to that of the POSIX sleep command 
 \cite{IG13}. The default sound that Sonic Pi uses in these contexts is a 
 pleasant bell sound from the SuperCollider synthesiers.
 
@@ -537,7 +602,7 @@ These issues are summarised in Figure 1. The left-most column represents the
 real computation time of the statement whilst the right-most column shows the 
 point at which each statement would be run. Each statement duration is unique 
 as processor speed and system load variations affect the duration of each 
-statement separately. The durations are therefor non-deterministic in nature 
+statement separately. The durations are therefore non-deterministic in nature 
 and also not consistent across different runs of the same program.
 
 \begin{figure}[ht]
@@ -575,25 +640,22 @@ we are now treating the code snippets as V2.0 programs.
 		  sleep 0.5
 		  play :G ; play :B ; play :D
 	\end{lstlisting}
-	\captionof{lstlisting}{V2.0 Program: Playing three chords (C major, F major, G major)}
+	\captionof{lstlisting}{V2.0 Program: Playing Three Chords} \label{chords}
 \end{minipage}
 
 Each chord line demonstrates Sonic Pi's ability to play notes in parallel, the 
-system still taking advantage of the capabilities of modern processors. \texttt
-{sleep} now acts as a ``temporal barrier'' between statements; it works by 
-blocking computation from proceeding until the given time has elapsed \emph{
-since the program began running}. It does \emph{not} block from the end of the 
-notes played. In terms of Snippet 5, this means that the second chord is 
-played once one second has elapsed and the third chord will not be played 
+system still taking advantage of the capabilities of modern processors\footnote{
+Snippet \ref{chords} demonstrates the ordered effect, as the three chords are 
+played in the order written, and also Sonic Pi's abiltity to run with or without 
+semi-colons.}. \texttt{sleep} now acts as a ``temporal barrier'' between 
+statements; it works by blocking computation from proceeding until the given time 
+has elapsed \emph{since the program began running}. It does \emph{not} block from 
+the end of the notes played. In terms of Snippet 5, this means that the second 
+chord is played once one second has elapsed and the third chord will not be played 
 until 1.5 seconds have elapsed. One can think of \texttt{sleep} as an ``at 
 least'' timing. In other words, once \texttt{sleep t} has been evaluated, we 
 can state that at least \texttt{t} seconds have elapsed since the last \texttt{
-sleep} statement was called. This is similar to how the language ChucK handles 
-the interaction of time using its (multiply) overloaded \texttt{=>} operator 
-\cite{WC03}.
-
-For completeness it is worth noting that Snippet 5 demonstrates the ordered 
-effect as the three chords are played in the order written.
+sleep} statement was called. 
 
 \begin{figure}[ht]
 	\centering
@@ -643,7 +705,7 @@ threads to continue executing.
 
 \paragraph{Threading}
 
-Threading has already been introduced breifly; this section focuses on the 
+Threading has already been introduced briefly; this section focuses on the 
 further improvement that Sonic Pi V2.0 brings to its threading primitive. 
 Within V2.0 there are multiple commands which allow for easy synchronisation 
 of threads whilst the program is running. Threads also implement thread-
@@ -767,17 +829,11 @@ end
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
-	live_loop :foo do
-	    play :e4, release: 0.5
-	    sleep 0.5
-	    sync :bar
-	end
-
-	live_loop :bar do
-	    sample :bd_haus
-	    sleep 1
-	    sync :foo
-	end
+    live_loop :foo do                  live_loop :bar do
+        play :e4, release: 0.5             sample :bd_haus
+        sleep 0.5                          sleep 1
+        sync :bar                          sync :foo
+    end                                end
 	\end{lstlisting}
 	\captionof{lstlisting}{Deadlock - both loops waiting for cue}
 \end{minipage}
@@ -787,9 +843,9 @@ The IDE is as much a part of the educational experience as the language
 itself. Sonic Pi features a bespoke environment that contains only the bare 
 minimum features required to enable pupils to start coding quickly and with 
 minmal confusion. For this reason the IDE only consists of five key components:
-
+\newpage
 \begin{itemize}
-	\item Control Buttons
+	\item Control Buttons (Musical/Interface)
 	\item Workspace Tabs
 	\item Editor Pane
 	\item Information Pane
@@ -815,65 +871,6 @@ music files as custom samples, information and tutorial sections, all whilst
 remain simplistic and easily useable. Features are non-intrusive but 
 incredibly useful in terms of allowing those pupils who thrive with the system 
 to continue to experiment outside the scope of the regular cirruculum lessons.
-
-\subsection{Live Programming}
-For much of the prevailing history of programming there has been an idea that 
-the programmer is inherently separated from the system that they are 
-producing. The task of the programmer is to create a system based on some 
-formal specification that will take effect at some unknown point in the 
-future, and the time between implementation and action has no effect on the 
-results that the system will produce. In this way, there is a strong sense of 
-separation between the program, process and task domains where the progam is 
-the code implementation and specifications, the process is the running of the 
-code on a specific machine and the task is the visible real world results
-\cite{SG10}. This is a viewpoint that many would not think to challenge as it 
-is natural to assume that the methodology of a computer programmer would 
-naturally lend itself to implementation of actions that were set for execution 
-in the future and, in general, would process a deterministic set of results 
-that can be repeatedly used as the users required.
-
-Live programming (also referred to as With Time Programming or Just In Time 
-Programming) seeks to apply the improvisional nature of time to the existing 
-methodology of the programmer. With this idea it becomes possible to define a 
-tigher system of feedback between the program and task domains through means 
-of whatever process domain is most suitable. The improvisional nature of the 
-acitity also removes the inherent requirement of a specific program 
-specification and allows for new level of freedom and creativity in the 
-programs being created. 
-
-Given the nature of Live Programming the languages that invoke it are often 
-dynamic languages which allow for the flexibility, conciseness and ease of 
-development \cite{McD07} to enable the act of live programming to feel as 
-natural as standard programming practice.
-
-Live Programming lends itself also to acts of performance, where Live Coders 
-perform to live audiences, often producing such things as live 
-improvisational music or artwork, whilst having some means by which the 
-audience will also see the code written at the same time. For a Live Coder 
-there is frequently no desire to create a final software product or even a set 
-musical score as live programming is about the experimentation rather than the 
-manufacture. From a social and cultural viewpoint, Live Programming lends 
-itself to breaking down the barriers that have been built up between software 
-technology and the creative users \cite{McL13}.
-
-It is interesting that the user's level as a musician will have specific 
-impacts on their experience with the systems in use in the context of live 
-programming and audio languages. Musical scores provide an implicit time 
-representation whilst most musical languages tend to use explicit temporal 
-structures. This generally makes the representation of rhythm within the 
-language guarantee only the ordering of the notes and not the time elapsed 
-between playing each one; the temporal structure provides no clear guarantee as 
-to execution length. In terms of musical experience, non-experienced 
-users may be able to identify an odd sound within this system but be unable to 
-pinpoint exactly what causes the problem. 
-
-The question of time and temporal semantics within computing has been in 
-existence for some time, but live programming as a field is a very young 
-research area, with most of the popular languages appearing over the last 
-decade. This comes as part of a wider movement of programming reaching more of 
-the general populace and as it is applied with more and more creative outlets 
-in mind, this separate way of thinking about the programming environment is 
-likely to produce more interesting projects as time develops. 
 
 \subsection{Session Types}
 Over recent years there has been a massive increase in the amount of 
@@ -926,8 +923,8 @@ Session Types consist of the following key ideas:
 	communication. It is the incompatibility of interaction patterns that is one 
 	of the main reasons for bugs in commmunication-based programming\footnote{We choose not to present the full formalisation of the type system 
 	in this report as the focus is much more on the construction of the 
-	communication protocols than on their underlying types. Interested parties can 
-	read on this futher in such papers as \cite{HVM98} and \cite{HYC08}}.
+	communication protocols than on their underlying types. Interested readers
+	can read on this futher in such papers as \cite{HVM98} and \cite{HYC08}.}.
 \end{itemize}
 
 \subsubsection{Multi-Party Session Types}
@@ -950,7 +947,7 @@ sessions as the whole conversation between processes cannnot be constructed
 from a single behaviour. To handle this, multi-party session types
 introduces the concept of a global type; an abstraction of the global
 scenario, whereby we can construct the local types of each process and
-again ensure the composability of the interactions\cite{HYC08}. 
+again ensure the composability of the interactions \cite{HYC08}. 
 \newpage
 
 \section{Related Work}
@@ -972,7 +969,7 @@ timing within Live Programming. There is much to be said about choosing
 between explicit and implicit representation of time as well as between the 
 description of time using either internal or external state.
 
-The Tidal language \cite{McL13} uses an interesting formalisation of cyclic 
+The language Tidal \cite{McL13} uses an interesting formalisation of cyclic 
 time. Whilst drawing a continuing analogy with the act of knitting, McLean 
 describes the DSL for musical pattern embedded in the pure functional language 
 Haskell. Tidal represents music as a pure function, enabling the mapping of 
@@ -992,12 +989,14 @@ choice of asynchronous concurrency allows a flexible architecture wherein
 Impromptu's co-operative concurrency model leaves the programmer responsible 
 for time keeping and meeting real-time deadlines.
 
-One of the closest other languages to Sonic Pi V2.0, as mentioned earlier, is 
-the similarly imperative styled language ChucK \cite{WC03}. ChucK is a strongly
+One of the closest other languages to Sonic Pi V2.0 is the language 
+ChucK \cite{WC03}. ChucK is a strongly
 -typed, imperative programming language whose syntax and semantics are 
 governed by its flexible type system. The strength of the language lies in its 
 (multiply) overloaded \texttt{=>} operator and its support of such features as 
-dynamic control rates and strong concurrency principles. The ordering of a 
+dynamic control rates and strong concurrency principles. The similarity between 
+this operator and the use of \texttt{sleep} to advance time make this language 
+a very interesting source of comparison. The ordering of a 
 program is captured naturally by the logic of the operator and ChucK allows 
 the programmer, composer and performer to write truly concurrent code using 
 the framework of the timing semantic (as controlled by this overloaded 
@@ -1023,16 +1022,16 @@ draws analogy with memory management.
 Live Programming is not purely limited to musical languages and has similar 
 applications is such areas as Logic, Dataflow and Artificial Intelligence in
 terms of temporal reasoning. We do not list any such examples here as this is
-not within the scope of this project\footnote{Interested parties are encouraged
+not within the scope of this project\footnote{Interested readers are encouraged
 to read \cite{AOB14} as they do detail some related lanuages in their closing 
 sections.}.
 
 As a demonstration for the potential of the application of Session Types 
-within applications we breifly mention the protocol language Scribble 
+within applications we briefly mention the protocol language Scribble 
 \cite{HMBCY11}, whose protocols are very clearly defined using this theory. 
 This has come about through the recognised need for widescale structing of 
 protocols in light of the increasing amount of communication-based networking. 
-We also present Pabble \cite{NY14}: a system based off of the Scribble design 
+Also of interest is Pabble \cite{NY14}: a system based off of the Scribble design 
 and implemented using multiparty session types; a further extension to the 
 binary session types discussed earlier.
 \newpage
@@ -1040,69 +1039,84 @@ binary session types discussed earlier.
 \section{Design \& Technical Implementation}
 \thispagestyle{empty}
 This chapter of the report focuses on the high level design of the project.
-We start with a short discussion on which languages we have used and why, before
-moving into the main body. This chapter is split into two core parts, one 
-focusing on the design and implementation of the timing effects system, and
-the second focused on the session types and associated graph structure. In 
-discussing the timing effects system we begin with the overall design of the tree
-structure used to process the information, and the class structure of this section
-of the project. After this we focus on the \texttt{pTrace} class, which holds
-the timing data collected for the tree. Here we discuss the formalisation of the
-timing system and our implementation of it. Similarly in the second section we
-discuss the design of the graph and the class structure for this feature and then
-focus on the formalisation of session types and our implementation of them. We 
-finish the chapter with a short focus on how the library is finally integrated
-into the Sonic Pi IDE\footnote{As found at https://github.com/samaaron/sonic-pi}, 
-including a very high-level overview of the architecture of the program.
+The sections are split into two core parts, one 
+focusing on the design and implementation of the temporal behaviour, and
+the second focused on the session types and associated graph structure.
 
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=0.9\textwidth]{images/timing.jpg}
-	\caption{Tree UML} \label{tree}
-\end{figure}
-\newpage
+The temporal behaviour of Sonic Pi is formalised through an effects system, also 
+referred to as an abstract representation of time. We occassionally refer to this 
+as the timing effects system of Sonic Pi, meaning the features implemented to 
+handle reasoning about timing. We first describe this formal abstraction and then 
+relate it to the approach of our implementation, which we present alongside the 
+class structure of the project. 
 
-\subsection{Timing Tree}
-In calculating the virtual time at any point within the program the initial 
-requirement is to parse the given program and store it for later access. A 
+Similarly in the second section we present the formal definitions of session types 
+and then relate the theory to our implementation. The implementation is again 
+presented alongside the class structure of this section.
+
+We finish the chapter with a short focus on how the library is finally integrated
+into the Sonic Pi IDE\footnote{As found at https://github.com/samaaron/sonic-pi}.
+% \newpage
+
+\subsection{Pi Time}
+Before being able to process the source to analysis the virtual time, we must parse 
+the source into a suitable data structure. A 
 natural approach to this mimics compiler technology: we define some
 grammar by which to parse our programs, and then build some Abstract Syntax Tree 
 to store all of the program information. Once this 
 is built successfully we are able to traverse the tree as often as we require 
-to build the trace of the program. Figure \ref{tree} provides an overview of the 
-different classes and their interactions for this section.
+to build the trace of the program, described in more detail in Section \ref{pTrace}.
 
-\subsubsection{Building the AST}
-Whilst ruby has been valued in the Sonic-Pi project for its hugely forgiving
+Whilst ruby has been valued in Sonic Pi for its hugely forgiving
 syntax in a classroom setting, this feature increases the difficulty of parsing 
 it. The ability to write function calls either with or without parenthesis 
-or ommit semi-colons between statements increases the complexity of the ruby 
-grammar to the degree it was infeesable to write such a parser specifically 
+or omit semi-colons between statements increases the complexity of the ruby 
+grammar to the degree it was infeasible to write such a parser specifically 
 for Sonic-Pi. However, given Sonic-Pi's ruby-like nature, we elected to use 
 the open-source ruby-parser\footnote{As found at https://github.com/whitequark/parser}
 for its simplicity and ease of set-up. It is relatively lightweight whilst 
 still providing useful statistics such as line numbers, statement counts and
-column numbers. In transferring this data to our own C++ application we are 
-able to simplify the node count of our AST by wrapping certain nodes into 
-tighter definitions. For example, the parser would output an integer as a node 
-of type \texttt{int} with a child node holding the actual integer value. In 
-building the AST of our C++ application we could wrap these definitions into 
-a single node of type \texttt{IntNode} with held the integer value as a 
-member field. \texttt{float} and \texttt{symbol} nodes acted in a similar
-fashion:
+column numbers. 
+\newpage
 
-% diagramtic example of a sym node
+\subsubsection{Building the AST} \label{build}
+
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=0.85\textwidth]{images/SymInt.jpg}
-	\caption{Node Wrapping} \label{symwrap}
+	\includegraphics[width=0.85\textwidth]{images/program.jpg}
+	\caption{A Simple Program AST} \label{program}
 \end{figure}
 
-Statement lists are captured in the AST by nodes of type \texttt{begin} whilst
-loops and function definitions are denoted by \texttt{block} types. 
-\texttt{block} is a useful node type as it will always take three children, 
-one describing the type of block, the second listing the arguments taken by 
-the block and the final describing the root of the next statement list. 
+The ruby-parser builds the AST with a rose like structure which we continue to 
+utilise throughout our project as it provides many useful node types. The most 
+interesting nodes are \texttt{block} and \texttt{begin}; \texttt{block} for its 
+use in analysis and \texttt{begin} for how it manages statements. 
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+            loop do
+                play 60
+                sleep 1
+                loop do
+                    sleep 1
+                end
+            end
+	\end{lstlisting}
+	\captionof{lstlisting}{Simple Loop} \label{astLoop}
+\end{minipage}
+
+Figure \ref{program} captures the AST of Snippet \ref{astLoop}, shown above. 
+Loops and function definitions are denoted by \texttt{block} types. This \texttt{block}
+can act as a root node, enabling us to work with each loop and function as separate 
+trees during analysis, compounding the results at the end. The full structure of a 
+\texttt{block} is shown in Figure \ref{blocks}. A \texttt{block} will 
+always have three children: the first names the type of block, the second contains 
+the arguments given, and the third is the statement list. This statement list is 
+either marked with \texttt{begin} or contains a single statement node. Figure 
+\ref{program} demonstrates both of these examples. The outermost \texttt{loop} 
+contains three statements, so the AST marks the start of that statement list with 
+\texttt{begin} which holds all the following statements as children. The innermost 
+\texttt{loop} holds only a single statement, so \texttt{begin} is omitted.
 
 % block node diagrams
 \begin{figure}[h!]
@@ -1111,18 +1125,28 @@ the block and the final describing the root of the next statement list.
 	\caption{Block Node Structure} \label{blocks}
 \end{figure}
 
-Whilst in the source code the end of a block is defined using the \texttt{end}
-keyword, in the AST blocks can be viewed as self-contained trees; there is
-no need for an \texttt{end}-type node. Most nodes are not necessarily aware
-that they are in one block, with the parser providing no information
-as to what scope level the code is at, at any given time. Entry to a block is
-easy to detect, but leaving a block is more difficult. In general, when handling
-whether a given node is within a particular function call we are required to
-carry block index information and test whether parent indexes are different
-at each node. It is not enough to store the block depth of each node in our AST
-as sequential functions might think they are part of the same block; the
-distinction is important later on when we start to calculate the contribution
-of each function to the current virtual time of the program.
+This rose-like structure means that our tree is searched in a breadth-first manner. 
+Take the following tree diagram, which demonstrates how node numbering is managed. 
+When searching for index 8, breadth-first search means that we will search each 
+child, 1 then 4 then 10, before visiting any of their subsequent children. By 
+testing that the index is greater than the current index but less than the next child, 
+we reach our target quickly.
+\\
+\begin{lstlisting}
+                                 0
+                           /     |     \
+                          1      4      10
+                         / \    / \    / 
+                        2   3  5   8  11 
+                              / \   \
+                             6   7   9
+\end{lstlisting} 
+
+This child structure makes it simple to detect sequential and nested \texttt{block}s. 
+As shown in Figure \ref{blockdetect}, sequential \texttt{block}s will always share a 
+common parent (\texttt{begin}). Otherwise, as with the nesting in Figure \ref{program}, 
+encountering a new \texttt{block} with a differing parent suggests nesting. This is 
+leveraged later when we detail the timing analysis in \ref{pTrace}.
 
 % block detection diagrams
 \begin{figure}[h!]
@@ -1130,35 +1154,50 @@ of each function to the current virtual time of the program.
 	\includegraphics[width=\textwidth]{images/BlkDetection.jpg}
 	\caption{Block Detection} \label{blockdetect}
 \end{figure}
+\vspace{15pt}
+In transferring this data to our own C++ application we simplify the node count of 
+our AST by wrapping certain nodes into 
+tighter definitions. For example, the ruby-parser outputs an integer as a node 
+of type \texttt{int} with a child holding the actual integer value. We fold these 
+definitions into a single node of type \texttt{IntNode} with held the integer value 
+as a member field. \texttt{float} and \texttt{symbol} nodes act in a similar
+fashion, as demonstrated with \ref{symwrap}.
+
+% diagramtic example of a sym node
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.85\textwidth]{images/SymInt.jpg}
+	\caption{Node Folding} \label{symwrap}
+\end{figure}
 
 
-
-% some basic compiler type theory here would be good
-% building of AST to traverse for information
-
-\subsubsection{\texttt{pTrace}}
-In describing the timing effects system we have implemented it is first necessary
-to formalise the concept of the time system that Sonic Pi operates in. In providing
-the abstract interpretation of a `time system' it becomes possible to prove the
-`time safety' of the program by proving the semantics sound with respect to this 
-system \cite{AOB14}. This enables developers to reason about their programs timing 
-intuitively and allows us to reason about the safety of the program via static 
-analysis.
+\subsubsection{Formalising Abstract Time} \label{abstractTime}
+Before writing the temporal behaviour, we provide an abstract definitions of time 
+for Sonic Pi to work with. This representation can be thought of as a `time system' 
+and enables us to define a concept of `time safety'. By proving the semantics sound, 
+with respect to this system \cite{AOB14}, we are able to reject those programs with 
+bad temporal behaviour. This static verification enables developers to reason about 
+their program's timing intuitively.
 
 The syntax of Sonic Pi V2.0 can be outlined simply.
 \\
 \begin{lstlisting}
 	P ::= P; S | $\emptyset$
-	S ::= E | $v$ = E
-	E ::= sleep $\mathbb{R}_{{\geqslant}0}$ | A$^{i}$ | $v$
+	S ::= E | $v$ = E | def $f$ : P | $f$
+	E ::= sleep $\mathbb{R}_{{\geqslant}0}$ | A$^{i}$ | $v$ | if $v$ then P else P
 \end{lstlisting}
 
 \texttt{P} represents a full program, 
 \texttt{S} are statements (either self-contained expressions or pure bindings 
-to variables), and \texttt{E} defines expressions. \texttt{A$^{i}$} is used to 
+to variables, $v$), and \texttt{E} defines expressions. \texttt{A$^{i}$} is used to 
 refer to all those operations that will not advance time, e.g. the 
 \texttt{play} operation. In defining the syntax this way we are able to abstract 
 over the operations that do not modify virtual time.
+
+We extend the definition given in \cite{AOB14} with $f$ denoting a string used for 
+either function definitions or function calls, and the rule for conditionals. 
+\texttt{def $f$ : P} means to say a function with name $f$ is defined with program 
+\texttt{P}; $f$ is a function call to that definition.
 
 In distinguishing the real time elapsed by the program and the virtual time elapsed 
 we write [\texttt{P}]$_{t}$ for the former and [\texttt{P}]$_{v}$ for the latter. 
@@ -1166,35 +1205,80 @@ Both of these abstract functions return time values and so are positive,
 real-number values.
 
 \begin{blockquote}
+	\textbf{Definition 1:} \\ 
 	Virtual time is specified for Sonic Pi using the following cases:
-
+	\\
 	\begin{lstlisting}
-     $\hphantom{..}$   [P; $v$ = E]$_{v}$ = [P]$_{v}$ + [E]$_{v}$
-               [$\emptyset$]$_{v}$ = 0
-         [sleep t]$_{v}$ = t
-            $\hphantom{.....}$   [$v$]$_{v}$ = 0
-            $\hphantom{...}$ [A$^{i}$]$_{v}$ = 0
+     $\hphantom{..}$   [P; $v$ = E]$_{v}$ = [P]$_{v}$ + [E]$_{v}$       # Statement Sequences
+               [$\emptyset$]$_{v}$ = 0               # Empty Program
+         [sleep t]$_{v}$ = t              # Sleep Statement
+            $\hphantom{.....}$   [$v$]$_{v}$ = 0               # Variable
+            $\hphantom{...}$ [A$^{i}$]$_{v}$ = 0                # Other Statements
+	\end{lstlisting}
+
+	We extend the cases here (as presented from \cite{AOB14}) with functions, loops
+	and conditionals:
+	\\
+	\begin{lstlisting}
+            [$f$]$_{v}$ = [def $f$ : P]$_{v}$ = [P]$_{v}$    # Function Call
+
+	             [loop P]$_{v}$ = [P]$_{v}^{*}$   # Loops
+	  $\hphantom{v}$       [loop P; P']$_{v}$ = [P]$_{v}^{*}$ + [P']$_{v}$
+	                       = [P]$_{v}^{*}$
+
+
+                                      # Conditional
+        [if $v$ then P$_{1}$ else P$_{2}$]$_{v}$ = [$v$]$_{v}$ + ([P$_{1}$] $\emph{max}$ [P$_{2}$])
+                               = [P$_{1}$] $\emph{max}$ [P$_{2}$]
+	\end{lstlisting}
+
+	The * operation marks a virtual time of infinite length. It is defined as a 
+	subsuming operation. 
+	\\
+	\begin{lstlisting}
+	$\mathbb{N}$ $\cup$ {$\infty$}            $\infty$++ = $\infty$
+	*: $\mathbb{N}$ $\rightarrow$ $\mathbb{N}^{*}$           ++$\infty$ = $\infty$
 	\end{lstlisting}
 \end{blockquote}
 
-% next go into how the trace is set up
-% relate this breakdown of syntax into statements to how we store each statement
-We action this specification by parsing our AST on a per-statement basis. Each 
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.9\textwidth]{images/timing.jpg}
+	\caption{Tree UML} \label{tree}
+\end{figure}
+
+\subsubsection{\texttt{pTrace}} \label{pTrace}
+
+
+
+In building this \texttt{pTrace} we are mapping our existing tree structure to a 
+flat list structure. We could have simply stored the timing information into the 
+nodes themselves but direct index access to the informations proves preferential 
+when integrating data into the IDE. As shown in Figure \ref{tree}, each 
 \texttt{NodeTree} holds a reference to a \texttt{pTrace}, the data structure we 
-use to store all of the important analysis results for the current program. The 
-main fields of interest are a \texttt{std::vector} of \texttt{TData} pointers, a
-\texttt{std::vector} of the names of functions defined and a \texttt{std::map} of 
-function names to their virtual time contribution. Initially \texttt{pTrace} only
-held a vector of integers, representing the contributing time, but this proved to 
-be too little information on each statement. 
+use to store all of the important analysis results for the current program. The main 
+structure of interest within this \texttt{pTrace} is the vector of statements 
+allowing us to utilise the \texttt{[]}-operator when examining specific statements.
 
-The program fills the information in \texttt{pTrace} based on the specification 
-above. When the statement is a \texttt{sleep t} statement, it marks that the 
-contributing virtual time, \texttt{conVT}, is of length \texttt{t}. Most other
-statements are given a \texttt{conVT} of zero. To be able to report the total
-virtual time of a run we also calculate the cumulative virtual time, \texttt{cumVT},
-as we process the nodes. This is formalised by the sequence rule in our specification.
+Each index contains a struct of useful data such as the node index of the statement,
+contributive virtual time (referred to here as \texttt{conVT} and indicitive of a 
+sleep statement or function call), cumulative virtual time (referred to as 
+\texttt{conVT} and used to know what the total virtual time is at each statement), 
+and other fields relating to function calls. When the statement is a \texttt{sleep t} 
+statement, it marks that the contributing virtual time, \texttt{conVT}, is of length 
+\texttt{t}. Most other statements, aside from function calls, are given a 
+\texttt{conVT} of zero. Function calls contribute the amount of virtual time they 
+take, the values of which are stored in a map within \texttt{pTrace}.
 
+The analysis processes the tree into \texttt{pTrace} using the specification 
+presented in Section \ref{abstractTime}. This happens in two `passes' by way of 
+interprocedural analysis. The `first pass' refers to a full traversal of the AST, 
+building a \texttt{pTrace} of the correct length and marking each \texttt{sleep} 
+statement, function call and conditional where it occurs. The `second pass' refers 
+to an iteration over the \texttt{pTrace} where we use the data collected to fill 
+in the results of function calls and process conditional brances. 
+
+\paragraph{Loops}
 To start with a simple example, Snippet \ref{simpleLoop} shows the code for the
 following simple trace.
 
@@ -1210,47 +1294,55 @@ following simple trace.
 
 		\end{lstlisting}
 		\captionof{lstlisting}{Simple Loop} \label{simpleLoop}
-	\end{minipage}
-
+	\end{minipage} \hspace{25pt}
 	\begin{minipage}{0.4\textwidth}
 	\begin{lstlisting}
 == Trace
 [0] -                 
 [1] conVT: 0, cumVT: 0, 
-    isFunc: false, inFunc: false
+    isCall: false, inFunc: false
 [2] conVT: 0, cumVT: 0, 
-    isFunc: false, inFunc: false
+    isCall: false, inFunc: false
 [3] conVT: 2, cumVT: 2, 
-    isFunc: false, inFunc: false
+    isCall: false, inFunc: false
 [4] conVt: 0, cumVT: 2, 
-    isFunc: false, inFunc: false
+    isCall: false, inFunc: false
 	\end{lstlisting}
 	\end{minipage}
 
 \end{multicols}
 
 The information for each statement is mapped to the index of the same statement 
-count. Index 0 is never filled as this is always assigned to the root node, due
-to how we parse the tree information, and because it is natural for novice 
-programmers to index from 1 rather than 0. Given this, we always skip handling
-the first index of our trace because it is always a zero slot. Snippet 
-\ref{simpleLoop} demonstrates quite neatly how simple it can be to collect the
-cumulative virtual time as we iterate through the program, with it intially
-seeming as simple as:
-\\
-\begin{lstlisting}
-     [i].cumVT = [i].conVT + [i - 1].cumVT
-\end{lstlisting}
+count. Index 0 is never filled as this is always assigned to the root node, and 
+because it is natural for novice programmers to index from 1 rather than 0. Given 
+this, we often skip handling the first index of our trace because it is always a 
+zero slot \footnote{This is based on the fact a program is normally a sequence of 
+statements or a loop. A check has been put in place should certain constructs be 
+processed in isolation. This is addressed specifically in Section \ref{evalCond}.}.
+Snippet \ref{simpleLoop} demonstrates quite neatly how simple it can be to collect 
+the cumulative virtual time as we iterate through the program.
+
+In Section \ref{abstractTime} we define a loop's virtual time as being infinite. 
+This is, however, not a useful result to return to the developer. Instead, each 
+unconstrained loop is traversed once so that the value of one iteration is known. 
+All the information returned to the developer is based on running one iteration 
+of the whole source as this is a useful metric for the developer to reason against. 
+This is valid within our specification as we have defined * as mapping natural 
+numbers to infinity. \texttt{[loop P]$_{v}$} in this case equals \texttt{[2]$_{v}^{*}$} 
+which equals \texttt{$\infty$}.
 
 \paragraph{Functions}
-When we start to handle functions, this simple view of virtual time is not
-quite robust enough. An example is given in Snippet \ref{doubleFunc} below.
-
-It is entirely reasonable that someone might define multiple functions in this 
-way when coding in a live arena. Even if it might be uncommon, it is a valid
-program, making it important we can handle this type of situation. First we'll
-provide the trace in full and then we will break down the approach and relevant 
-theory.
+Snippet \ref{doubleFunc} gives a program where functions have been defined before 
+and after their use. This is a valid ruby program and will compile and run within 
+the Sonic Pi IDE. However, Sonic Pi's current scoping system mean that this program 
+will fail during runtime on reaching statement 4\footnote{The symbol called is not 
+yet defined within Sonic Pi's scope so the symbol is unrecognised and the thread 
+crashes.}. This kind of error is outside the scope of the project to provide an error 
+report for so we do not save the developer in this instance. Instead we handle it, 
+as it compiles within the environment and is sent for evaluation by the underlying 
+servers. Thankfully, our interprocedural analysis allows us to handle this case for 
+free, so we use it here as a strong example of function calls and their temporal 
+behaviour. 
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -1272,13 +1364,13 @@ theory.
 \begin{lstlisting}
     == Trace
     [0] -
-    [1] conVT: 0, cumVT: 0, isFunc: false, inFunc: true
-    [2] conVT: 0, cumVT: 0, isFunc: false, inFunc: true
-    [3] conVT: 0, cumVT: 0, isFunc: true,  inFunc: false
-    [4] conVT: 1, cumVT: 1, isFunc: true,  inFunc: false
-    [5] conVT: 0, cumVT: 1, isFunc: false, inFunc: false
-    [6] conVT: 0, cumVT: 0, isFunc: false, inFunc: true
-    [7] conVT: 1, cumVT: 1, isFunc: false, inFunc: true
+    [1] conVT: 0, cumVT: 0, isCall: false, inFunc: true
+    [2] conVT: 0, cumVT: 0, isCall: false, inFunc: true
+    [3] conVT: 0, cumVT: 0, isCall: true,  inFunc: false
+    [4] conVT: 1, cumVT: 1, isCall: true,  inFunc: false
+    [5] conVT: 0, cumVT: 1, isCall: false, inFunc: false
+    [6] conVT: 0, cumVT: 0, isCall: false, inFunc: true
+    [7] conVT: 1, cumVT: 1, isCall: false, inFunc: true
 \end{lstlisting}
 
 The issues that Snippet \ref{doubleFunc} identifies is how to insert the correct
@@ -1287,7 +1379,7 @@ encountered the function being called. The simple way to handle this is by proce
 the data in two passes. On the first pass of a program we collect information
 such as which lines are function calls and what all of our function definitions
 and times are. It is not printed in these traces but one of the extra things that
-\texttt{TData} will hold is, if the current line is a function call, which function
+each statement index holds is, if the current line is a function call, which function
 does it call.
 
 The trace after the first pass of this program looks as follows:
@@ -1295,18 +1387,18 @@ The trace after the first pass of this program looks as follows:
 \begin{lstlisting}
     == Trace
     [0] -
-    [1] conVT:  0, cumVT:  0, isFunc: false, inFunc: true
-    [2] conVT:  0, cumVT:  0, isFunc: false, inFunc: true
-    [3] conVT: -1, cumVT: -1, isFunc: true,  inFunc: false
-    [4] conVT: -1, cumVT: -1, isFunc: true,  inFunc: false
-    [5] conVT:  0, cumVT: -2, isFunc: false, inFunc: false
-    [6] conVT:  0, cumVT:  0, isFunc: false, inFunc: true
-    [7] conVT:  1, cumVT:  1, isFunc: false, inFunc: true
+    [1] conVT:  0, cumVT:  0, isCall: false, inFunc: true
+    [2] conVT:  0, cumVT:  0, isCall: false, inFunc: true
+    [3] conVT: -1, cumVT: -1, isCall: true,  inFunc: false
+    [4] conVT: -1, cumVT: -1, isCall: true,  inFunc: false
+    [5] conVT:  0, cumVT: -2, isCall: false, inFunc: false
+    [6] conVT:  0, cumVT:  0, isCall: false, inFunc: true
+    [7] conVT:  1, cumVT:  1, isCall: false, inFunc: true
 \end{lstlisting}
 
 Once this is processed it is again a simple case of adding up the cumulative virtual
 time as we traverse the trace. \texttt{-1} is reserved as a keycode in tandem with
-the \texttt{isFunc} marker; if a function has \texttt{conVT = -1} it means this
+the \texttt{isCall} marker; if a function has \texttt{conVT = -1} it means this
 is a function call and will be processed in a later pass. It might seem like the 
 keycode is useless in this case, but as the virtual time keycode is consumed during 
 trace processing, it is useful to maintain the other boolean flag so that function 
@@ -1315,7 +1407,12 @@ calls are more easily identified afterwards.
 The key idea is not to add together times from different blocks. The 
 \texttt{inFunc} note helps with this, as we can detect when we are in a new block 
 of the trace by what value that has. Notice that, in the above trace, index 6 
-has a fresh \texttt{cumVT} value when compared with index 5.
+has a fresh \texttt{cumVT} value when compared with index 5. The issue here is that 
+the \texttt{inFunc} marker is still too simplistic. This handles sequential functions 
+as each statement in \texttt{pTrace} holds information about which function it is 
+part of when \texttt{inFunc} is set. Otherwise the model would be too simple and 
+function times would run into each other. This is detailed more in Section 
+\ref{evalFunc}.
 
 \paragraph{Conditionals}
 Similar to functions, we require a two pass approach to handle conditionals in the 
@@ -1334,26 +1431,28 @@ code. Take the following program code:
 
 In practice it may be difficult to evaluate which branch of a conditional the
 program is going to take. Instead the approach is to find the maximum virtual time 
-of both branches and take the longest one. In terms of timing later in the program 
-this could potentially throw developers on what the actual virtual time of the 
-program will be if the \texttt{sleep} lengths differ by a sizeable margin. On the 
-other hand this is a much safer model in terms of ensuring the time saftey of the 
-program.
+of both branches and take the longest one, as described in Section \ref{abstractTime},
+Definition 1. In terms of timing later in the program this could potentially throw 
+developers on what the actual virtual time of the program will be if the 
+\texttt{sleep} lengths differ by a sizeable margin. On the other hand this is a much 
+safer model in terms of ensuring the `time saftey' of the program\footnote{The real 
+running time of the code is guaranteed to be longer than the virtual time, as proved 
+in \cite{AOB14}, Section 4.1.}.
 
 The trace for Snippet \ref{conditional} is:
 \\
 \begin{lstlisting}
     == First Pass Trace
     [0] -
-    [1] conVT:  -2, cumVT: -2,   isFunc: false, inFunc: false
-    [2] conVT: 0.5, cumVT: -1.5, isFunc: false, inFunc: false
-    [3] conVT:   1, cumVT: -0.5, isFunc: false, inFunc: false
+    [1] conVT:  -2, cumVT: -2,   isCall: false, inFunc: false
+    [2] conVT: 0.5, cumVT: -1.5, isCall: false, inFunc: false
+    [3] conVT:   1, cumVT: -0.5, isCall: false, inFunc: false
 
     == Second Pass Trace
     [0] -
-    [1] conVT:  1, cumVT:    1, isFunc: false, inFunc: false
-    [2] conVT: -3, cumVT: -1.5, isFunc: false, inFunc: false
-    [3] conVT: -3, cumVT: -0.5, isFunc: false, inFunc: false
+    [1] conVT:  1, cumVT:    1, isCall: false, inFunc: false
+    [2] conVT: -3, cumVT: -1.5, isCall: false, inFunc: false
+    [3] conVT: -3, cumVT: -0.5, isCall: false, inFunc: false
 \end{lstlisting}
 
 In the first pass of the trace, we mark the location of the if with the keycode 
@@ -1386,7 +1485,7 @@ environment. Dead code can also be easy to locate thanks to the form of the prog
         sleep 1
       end
 	\end{lstlisting}
-	\captionof*{lstlisting}{Dead Code} \label{dead}
+	\captionof{lstlisting}{Dead Code} \label{dead}
 \end{minipage}
 
 We set \texttt{-3} to be the dead keycode and set all instances of \texttt{conVT} 
@@ -1397,14 +1496,41 @@ flag for dead code on hitting another loop block. Should the trace hit a
 \texttt{in\_thread} block or a \texttt{live\_loop} block then this flag is not set 
 as these pieces of code can run in parallel.
 
-\subsection{Session Graph}
+This is captured in our specification by the subsumption of *. As infinity plus 
+any value is still infinity, we can consider the subsequent program to have 
+virtual time zero, which amounts to not running it.
+
+\paragraph{Variable Sleep}
+
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      define :foo do |n|
+        sleep n
+      end
+	\end{lstlisting}
+	\captionof{lstlisting}{Variable Sleep} \label{variableSleep}
+\end{minipage}
+
+Snippet \ref{variableSleep} shows a common construct in Sonic Pi; the idea of 
+functions allowing variable sleep amounts. This is not currently supported in this 
+iteration of the project\footnote{This is owing to time constraints and feature prioritization.}, but the foundations for it are well-placed. Each 
+\texttt{block} defines an \texttt{arg} child which lists the symbols for all 
+arguments passed to it. Given this we can define a new keycode in our \texttt{pTrace}
+and use the same style of interprocedural analysis as before. In the case of Snippet 
+\ref{variableSleep}, the function can be defined in terms of its total variable time.
+Then, when processing the function call itself, the numerical argument is taken and 
+applied to the expression stored for the function\footnote{Argument symbols are 
+stored as \texttt{lvar} type nodes, making expression detection and evaluation 
+simple to manage.}. A full trace of this is given in Section \ref{evalFunc}.
+
+\subsection{Session Pi}
 Session Types describe communication protocols via message passing. In Sonic Pi
 the message originates at a \texttt{cue} statement and is `consumed' by the
 \texttt{sync} statement. Given this, we elect to transform the AST used in
 timing analysis into a directed graph, consisting purely of \texttt{CueNode}s,
 \texttt{SyncNodes}s and other \texttt{GraphNode}s to represent the passage
 of time more generally in this analysis. Originally this third node type
-was ommitted from the construction of the graph but on consideration of
+was omitted from the construction of the graph but on consideration of
 message order in Sonic Pi it became clear that chronology was important 
 information to maintain. This is discussed in more detail later in this section.
 
@@ -1589,7 +1715,7 @@ programs to be typed.
 
 An example of this can be shown with the deadlocking code from previously,
 shown again in Snippet \ref{typelock}. As it is, this will produce the same session
-graph as Snippet \ref{formTypes}, which produces a feesable global type.
+graph as Snippet \ref{formTypes}, which produces a feasible global type.
 The actual result for this should be untypable as both loops will become stuck
 at each \texttt{sync} node. 
 
@@ -1688,7 +1814,7 @@ local type describes the interaction that specific process is aware of. The
 definition of \emph{projection} follows:
 
 \begin{blockquote}
-  \textbf{Definition 1:} \emph{The projection of a global type \texttt{G} onto 
+  \textbf{Definition 2:} \emph{The projection of a global type \texttt{G} onto 
   a particiapnt \texttt{q} is defined by induction on \texttt{G}}:
 \end{blockquote}
 \begin{align*}
@@ -1704,7 +1830,7 @@ definition of \emph{projection} follows:
   \hspace{40pt} \texttt{end} \upharpoonright \texttt{q = end}
 \end{align*}
 
-This approach is not so feesable in this instance as we have already been 
+This approach is not so feasible in this instance as we have already been 
 presented with the full source. Instead we are required to build the global
 type from the individual process types provided, the aim being to verify
 the communication of the program through this process. This consists largely of 
@@ -1712,11 +1838,11 @@ matching operations on the channels they operate on. Whilst notably more
 difficult, this approach is also, thankfully, proveably decidable. There is
 no situation where any algorithmic approach to the problem will not terminate
 with some answer. In the cases where our program's global type is not
-typable, this suggests some communication error within the provided program.
+typeable, this suggests some communication error within the provided program.
 
 Given the dual types \texttt{A:P0P1?} and \texttt{A:P0P1!} we can transform 
 this into the global typing \texttt{P0->P1}, representing the fact that a 
-messagevis being transfered from \texttt{P0} to \texttt{P1}. \texttt{A} is not
+message is being transfered from \texttt{P0} to \texttt{P1}. \texttt{A} is not
 represented within this global type as it acts as the name of the channel on
 which the message is being sent. In this sense you can consider Sonic Pi
 to be a series of zero size messages being sent on each channel between
@@ -1728,8 +1854,6 @@ perfectly valid, and sometimes useful, situations to occur in Sonic Pi.
 
 The first such situation we consider is when we have several \texttt{cue}
 signals with the potential to trigger one \texttt{sync}.
-
-
 
 In this scenario the \texttt{sync} in \texttt{P1} may be triggered by either
 of the \texttt{cue}s present in the other two threads. Whilst unusual,
@@ -1768,8 +1892,6 @@ Notice in this instance we are referring only to the `strict' types of each
 process, rather than our graphical representation of the process, so the
 \texttt{time} elements discussed in the previous section have been ommitted 
 for this discussion.
-
-
 
 In terms of processing the global type, when each of these types line up
 into the same `vertical' relationship, the type constructed has the form 
@@ -1823,7 +1945,7 @@ consumed by a later \texttt{cue} of the correct dual typing or to be hit again
 and processed as an untypable program.
 
 On initial consideration one might define the \texttt{||}-type as a dual of the
-\texttt{\&\&}-type, and vis versa, but this is inaccurate for the context in which
+\texttt{\&\&}-type, and vice versa, but this is inaccurate for the context in which
 they are used. The main component of these types is still the act of sending or
 receiving a message, so dual typings are still based off of the dual relationship
 of `\texttt{?}' and `\texttt{!}'. The two types we introduce here are more like
@@ -1832,11 +1954,12 @@ multiple messages at the same time. This is not a situation that session types
 usually handle. Session Types are defined by their use of message queues, sending
 message packets (be they single packets or multiple) in sequence along the 
 \emph{same} channel to \emph{single} receivers. It does not define a situation
-where one can trasmit a message on one channel to multiple places. In this case
+where one can trasmit a message on one channel to multiple receivers, better known 
+as `broadcasting'. In this case
 this projects presents an interesting evolution of session types for this field.
 We have implemented multiple modes that our project can operate under to reflect
-this, so developers can choose to analysis under `strict' typing or under the
-`Sonic Pi' typing outlined here.
+this, so developers can choose to analysis under standard session typing or under 
+the `Sonic Pi' typing outlined here.
 \newpage
 
 \paragraph{Sub-Typing}
@@ -1855,7 +1978,7 @@ Pi environment.
   P1 := A:(P0P1)!.B:(P0P1)?
 \end{lstlisting}
 
-In `strict' session types this is inaccurate:
+In standard binary session types this is inaccurate:
 
 $\hphantom{tabs}$ \texttt{B:(P0P1)!.A:(P1P0)?} 
 \\ $\hphantom{tabular} \neq$ \texttt{dual(A:(P0P1)!.B:(P0P1)?)}
@@ -1944,7 +2067,7 @@ simple.
 \end{lstlisting}
 
 Secondly, to better display the timing effects information, we choose to define 
-a new output widget in the \texttt{mainWindow} class of the gui. Qt thankfully 
+a new output widget in the \texttt{mainWindow} class of the gui. Qt, thankfully, 
 simplifies the GUI process considerably, meaning it is not too difficult to produce
 an attractive addition in keeping with the existing theme of Sonic Pi. We are 
 also able to mimic the \texttt{\_\_info} method we use to print to the output log
@@ -2297,7 +2420,7 @@ again with the statements as part of a statement list give:
 \begin{lstlisting}
 == First Pass Trace               == Second Pass Trace
 [0] conVT: -1, cumVT: (prev-1)    [0] conVT: 0, cumVT: 0
-    isFunc: true, inFunc: false       isFunc: true, inFunc: false
+    isCall: true, inFunc: false       isCall: true, inFunc: false
 \end{lstlisting}
 
 This shows that \texttt{chord} and \texttt{scale} are currently being detected 
@@ -2335,7 +2458,7 @@ correct.
 
 The results for this style of function call are the same as those just discussed 
 for chords and scales. Other data structure functions (\texttt{range}, 
-\texttt{bools}, \texttt{knit}, and \texttt{spread}) will have similar results to 
+\texttt{bools}, \texttt{knit}, and \texttt{spread}) have similar results to 
 these.
 
 \subsubsection{Dead Code}
@@ -2410,7 +2533,7 @@ virtual time of a branch it will never reach. The developer will have to notice 
 themselves during the performance when their music always runs for a length of 
 virtual time shorter than what the analysis reports.
 
-\subsubsection{Function Calls}
+\subsubsection{Function Calls} \label{evalFunc}
 \paragraph{Function Definition}
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2426,11 +2549,11 @@ virtual time shorter than what the analysis reports.
 == Expected Trace                 == Actual Trace
 [0] -                             [0] -
 [1] conVT:  0, cumVT: 0,          [1] conVT:  0, cumVT: 0
-    isFunc: false, inFunc: true       isFunc: false, inFunc: true            
+    isCall: false, inFunc: true       isCall: false, inFunc: true            
 [2] conVT:  0, cumVT: 0           [2] conVT:  0, cumVT: 0
-    isFunc: false, inFunc: true       isFunc: false, inFunc: true 
+    isCall: false, inFunc: true       isCall: false, inFunc: true 
 [3] conVT:  1, cumVT: 1           [3] conVT:  1, cumVT: 1
-    isFunc: false, inFunc: true       isFunc: false, inFunc: true 
+    isCall: false, inFunc: true       isCall: false, inFunc: true 
 
 Function: func 1                  Function: func 1
 \end{lstlisting}
@@ -2458,13 +2581,13 @@ throughout is accurate.
 == Expected Trace                 == Actual Trace
 [0] -                             [0] -
 [1] conVT:  0, cumVT: 0,          [1] conVT:  0, cumVT: 0
-    isFunc: false, inFunc: true       isFunc: false, inFunc: true            
+    isCall: false, inFunc: true       isCall: false, inFunc: true            
 [2] conVT:  0, cumVT: 0           [2] conVT:  0, cumVT: 0
-    isFunc: false, inFunc: true       isFunc: false, inFunc: true 
+    isCall: false, inFunc: true       isCall: false, inFunc: true 
 [3] conVT:  1, cumVT: 1           [3] conVT:  1, cumVT: 1
-    isFunc: false, inFunc: true       isFunc: false, inFunc: true 
+    isCall: false, inFunc: true       isCall: false, inFunc: true 
 [4] conVT:  1, cumVT: 1           [4] conVT:  1, cumVT: 1
-    isFunc: true, inFunc: false       isFunc: true, inFunc: false 
+    isCall: true, inFunc: false       isCall: true, inFunc: false 
 
 Function: func 1                  Function: func 1
 \end{lstlisting}
@@ -2477,10 +2600,10 @@ the trace was as follows:
 \begin{lstlisting}
     == First Pass Trace
     [0] -
-    [1] conVT:  0, cumVT: 0, isFunc: false, inFunc:  true
-    [2] conVT:  0, cumVT: 0, isFunc: false, inFunc:  true
-    [3] conVT:  1, cumVT: 1, isFunc: false, inFunc:  true
-    [4] conVT: -1, cumVT: 0, isFunc:  true, inFunc: false
+    [1] conVT:  0, cumVT: 0, isCall: false, inFunc:  true
+    [2] conVT:  0, cumVT: 0, isCall: false, inFunc:  true
+    [3] conVT:  1, cumVT: 1, isCall: false, inFunc:  true
+    [4] conVT: -1, cumVT: 0, isCall:  true, inFunc: false
 \end{lstlisting}
 
 This is provided to show the analysis correctly marked index 4 as being a function 
@@ -2510,23 +2633,23 @@ line.
 == Expected Trace                 == Actual Trace
 [0] -                             [0] -
 [1] conVT: 0, cumVT: 0,           [1] conVT: 0, cumVT: 0
-    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true            
+    isCall: false, inFunc:  true      isCall: false, inFunc:  true            
 [2] conVT: 0, cumVT: 0            [2] conVT: 0, cumVT: 0
-    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true 
+    isCall: false, inFunc:  true      isCall: false, inFunc:  true 
 [3] conVT: 1, cumVT: 1            [3] conVT: 1, cumVT: 1
-    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true 
+    isCall: false, inFunc:  true      isCall: false, inFunc:  true 
 [4] conVT: 0, cumVT: 0            [4] conVT: 0, cumVT: 0
-    isFunc: false, inFunc: false      isFunc: false, inFunc: false 
+    isCall: false, inFunc: false      isCall: false, inFunc: false 
 [5] conVT: 1, cumVT: 1            [5] conVT: 1, cumVT: 1
-    isFunc:  true, inFunc: false      isFunc:  true, inFunc: false 
+    isCall:  true, inFunc: false      isCall:  true, inFunc: false 
 [6] conVT: 2, cumVT: 3            [6] conVT: 2, cumVT: 3
-    isFunc:  true, inFunc: false      isFunc:  true, inFunc: false 
+    isCall:  true, inFunc: false      isCall:  true, inFunc: false 
 [7] conVT: 0, cumVT: 0            [7] conVT: 0, cumVT: 0
-    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true 
+    isCall: false, inFunc:  true      isCall: false, inFunc:  true 
 [8] conVT: 0, cumVT: 0            [8] conVT: 0, cumVT: 0
-    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true 
+    isCall: false, inFunc:  true      isCall: false, inFunc:  true 
 [9] conVT: 2, cumVT: 2            [9] conVT: 2, cumVT: 2
-    isFunc: false, inFunc:  true      isFunc: false, inFunc:  true 
+    isCall: false, inFunc:  true      isCall: false, inFunc:  true 
 
 Function: foo 1                   Function: foo 1
           bar 7                             bar 7
@@ -2538,9 +2661,54 @@ defined before or after its uses.
 \\
 \begin{lstlisting}
     == First Pass Trace (Differences)
-    [5] conVT: -1, cumVT: -1, isFunc: true, inFunc: false 
-    [6] conVT: -1, cumVT: -2, isFunc: true, inFunc: false 
+    [5] conVT: -1, cumVT: -1, isCall: true, inFunc: false 
+    [6] conVT: -1, cumVT: -2, isCall: true, inFunc: false 
 \end{lstlisting}
+
+\paragraph{Nested Functions}
+\begin{minipage}{\textwidth}
+	\begin{lstlisting}[style = sonicpi]
+      define :bottom do
+        sleep 10
+      end
+    
+      define :top do      
+        sleep 2
+        bottom
+      end
+
+      top
+      bottom
+	\end{lstlisting}
+	\captionof*{lstlisting}{Multiple Function Detection Test Code}
+\end{minipage}
+\\
+\begin{lstlisting}
+== Expected Trace                 == Actual Trace
+[0] -                             [0] -
+[1] conVT:  0, cumVT:  0,         [1] conVT:  0, cumVT:  0
+    isCall: false, inFunc:  true      isCall: false, inFunc:  true            
+[2] conVT: 10, cumVT: 10          [2] conVT: 10, cumVT: 10
+    isCall: false, inFunc:  true      isCall: false, inFunc:  true 
+[3] conVT:  0, cumVT:  0          [3] conVT:  0, cumVT:  0
+    isCall: false, inFunc:  true      isCall: false, inFunc:  true 
+[4] conVT:  2, cumVT:  2          [4] conVT:  2, cumVT:  2
+    isCall: false, inFunc:  true      isCall: false, inFunc:  true 
+[5] conVT: 10, cumVT: 12          [5] conVT: 10, cumVT: 12
+    isCall:  true, inFunc:  true      isCall:  true, inFunc:  true 
+[6] conVT: 12, cumVT: 12          [6] conVT: 12, cumVT: 12
+    isCall:  true, inFunc: false      isCall:  true, inFunc: false 
+[7] conVT: 10, cumVT: 22          [7] conVT: 10, cumVT: 22
+    isCall:  true, inFunc: false      isCall:  true, inFunc: false 
+
+Function: bottom 1                   Function: top 1
+          top 3                          bottom 3
+\end{lstlisting}
+
+This demonstrates that both sequential functions and nested functions are handled 
+as required. Given how Sonic Pi's scoping operates, functions will always be defined 
+before they can be called, meaning a nested function can always be given a time when 
+calculating the time of the upper function.
 
 \paragraph{Parameterized Functions}
 \begin{minipage}{\textwidth}
@@ -2559,10 +2727,10 @@ pass cannot produce the correct result.
 \\
 \begin{lstlisting}
     == First Pass Trace
-    [1] conVT:  0, cumVT:  0, isFunc: false, inFunc: false
-    [2] conVT: -1, cumVT: -1, isFunc: false, inFunc:  true
-    [3] conVT:  0, cumVT: -1, isFunc: false, inFunc:  true
-    [4] conVT: -1, cumVT: -2, isFunc: false, inFunc:  true
+    [1] conVT:  0, cumVT:  0, isCall: false, inFunc: false
+    [2] conVT: -1, cumVT: -1, isCall: false, inFunc:  true
+    [3] conVT:  0, cumVT: -1, isCall: false, inFunc:  true
+    [4] conVT: -1, cumVT: -2, isCall: false, inFunc:  true
 \end{lstlisting}
 
 In this syntax the first line is processed as having a function call (for 
@@ -2584,7 +2752,7 @@ written with parametres and what those parametre symbols are. They can then be
 stored in the scope of that block similar to how functions are stored at the global 
 level of the trace. 
 
-\subsubsection{Conditionals}
+\subsubsection{Conditionals} \label{evalCond}
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
       if cond then
@@ -2672,14 +2840,17 @@ correctly throughout the whole trace.
     [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
 
     == Expected Arc Results          == Actual Arc Results 
-    Cue 0 Block:P0 A                 Cue 0 Block:P0 A
+    Cue 0 Block:P0 foo               Cue 0 Block:P0 foo
+      |_> points at                    |_> points at 
+    Cue 1 Block:P0 A                 Cue 1 Block:P0 A
       |_> points at                    |_> points at 
     
     '' Unclaimed Syncs ''            '' Unclaimed Syncs '' 
 \end{lstlisting}
 
 \texttt{cue} is accurately recorded in the session graph whilst virtual time is 
-also still recorded correctly.
+also still recorded correctly. \texttt{live\_loop}s also send out a \texttt{cue} 
+operation and this is also present.
 
 \begin{minipage}{\textwidth}
 	\begin{lstlisting}[style = sonicpi]
@@ -2699,7 +2870,9 @@ also still recorded correctly.
     [3] conVT: 1, cumVT: 1          [3] conVT: 1, cumVT: 1
 
     == Expected Arc Results          == Actual Arc Results 
-
+    Cue 0 Block:P0 foo               Cue 0 Block:P0 foo
+      |_> points at                    |_> points at 
+      
     '' Unclaimed Syncs ''            '' Unclaimed Syncs '' 
     = 0 A                            = 0 A
 \end{lstlisting}
@@ -2890,42 +3063,46 @@ to handle.
 \begin{lstlisting}
   == First Pass Trace
   [0] -
-  [1]  conVT:    -1, cumVT:     -1, isFunc:  true, inFunc: false
-  [2]  conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
-  [3]  conVT:    -1, cumVT:     -1, isFunc: false, inFunc:  true
-  [4]  conVT:    -1, cumVT:     -2, isFunc:  true, inFunc:  true
-  [5]  conVT:     0, cumVT:     -2, isFunc:  true, inFunc:  true
-  [6]  conVT:   0.5, cumVT:   -1.5, isFunc: false, inFunc:  true
-  [7]  conVT:    -1, cumVT:   -2.5, isFunc: false, inFunc: false
-  [8]  conVT:    -1, cumVT:   -3.5, isFunc:  true, inFunc: false
-  [9]  conVT:     0, cumVT:   -3.5, isFunc:  true, inFunc: false
-  [10] conVT: 0.125, cumVT: -3.375, isFunc: false, inFunc: false
-  [11] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
-  [12] conVT:    -1, cumVT:     -1, isFunc: false, inFunc:  true
-  [13] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
-  [14] conVT:     1, cumVT:      1, isFunc: false, inFunc: false
-  [15] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
-  [16] conVT:    -1, cumVT:     -1, isFunc:  true, inFunc:  true
-  [17] conVT:    -1, cumVT:     -2, isFunc:  true, inFunc:  true
-  [18] conVT:    -1, cumVT:     -3, isFunc:  true, inFunc:  true
-  [19] conVT:    -1, cumVT:     -4, isFunc:  true, inFunc:  true
-  [20] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
-  [21] conVT:     0, cumVT:      0, isFunc:  true, inFunc:  true
-  [22] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
-  [23] conVT:     0, cumVT:      0, isFunc:  true, inFunc:  true
-  [24] conVT:     1, cumVT:      1, isFunc: false, inFunc:  true
-  [25] conVT:    -1, cumVT:      0, isFunc:  true, inFunc:  true
-  [26] conVT:     6, cumVT:     -6, isFunc: false, inFunc:  true
-  [27] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
-  [28] conVT:    -1, cumVT:     -1, isFunc:  true, inFunc:  true
-  [29] conVT:    -1, cumVT:     -2, isFunc:  true, inFunc:  true
-  [30] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
-  [31] conVT:    -1, cumVT:     -1, isFunc:  true, inFunc:  true
-  [32] conVT:    -1, cumVT:     -2, isFunc:  true, inFunc:  true
-  [33] conVT:  12.5, cumVT:   10.5, isFunc: false, inFunc:  true
-  [34] conVT:     0, cumVT:      0, isFunc: false, inFunc:  true
-  [35] conVT:    -1, cumVT:     -1, isFunc:  true, inFunc:  true
+  [1]  conVT:    -1, cumVT:     -1, isCall:  true, inFunc: false
+  [2]  conVT:    -1, cumVT:     -2, isCall:  true, inFunc: false
+  [3]  conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [4]  conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [5]  conVT:    -1, cumVT:     -1, isCall:  true, inFunc:  true
+  [6]  conVT:     0, cumVT:     -1, isCall: false, inFunc: false
+  [7]  conVT:   0.5, cumVT:   -1.5, isCall: false, inFunc:  true
+  [8]  conVT:     0, cumVT:   -1.5, isCall: false, inFunc: false
+  [9]  conVT:     0, cumVT:   -1.5, isCall:  true, inFunc: false
+  [10] conVT:     0, cumVT:   -1.5, isCall:  true, inFunc: false
+  [11] conVT: 0.125, cumVT: -1.375, isCall: false, inFunc: false
+  [12] conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [13] conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [14] conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [15] conVT:     1, cumVT:      1, isCall: false, inFunc: false
+  [16] conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [17] conVT:    -1, cumVT:     -1, isCall:  true, inFunc:  true
+  [18] conVT:    -1, cumVT:     -2, isCall:  true, inFunc:  true
+  [19] conVT:    -1, cumVT:     -3, isCall:  true, inFunc:  true
+  [20] conVT:    -1, cumVT:     -4, isCall:  true, inFunc:  true
+  [21] conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [22] conVT:     0, cumVT:      0, isCall:  true, inFunc:  true
+  [23] conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [24] conVT:     0, cumVT:      0, isCall:  true, inFunc:  true
+  [25] conVT:     1, cumVT:      1, isCall: false, inFunc:  true
+  [26] conVT:    -1, cumVT:      0, isCall:  true, inFunc:  true
+  [27] conVT:     6, cumVT:     -6, isCall: false, inFunc:  true
+  [28] conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [29] conVT:    -1, cumVT:     -1, isCall:  true, inFunc:  true
+  [30] conVT:    -1, cumVT:     -2, isCall:  true, inFunc:  true
+  [31] conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [32] conVT:    -1, cumVT:     -1, isCall:  true, inFunc:  true
+  [33] conVT:    -1, cumVT:     -2, isCall:  true, inFunc:  true
+  [34] conVT:  12.5, cumVT:   10.5, isCall: false, inFunc:  true
+  [35] conVT:     0, cumVT:      0, isCall: false, inFunc:  true
+  [36] conVT:    -1, cumVT:     -1, isCall:  true, inFunc:  true
 
+  Function: drums 3
+            snare 12
+            synths 16
 
     == Arc Results       
     Cue 0 Block:P0 slow_drums
@@ -2951,6 +3128,24 @@ to handle.
     Global Type: -  
 \end{lstlisting}
 
+The main failing with this piece is the number of syntax structures that were not 
+previously considered when first working with the program. The analysis marks many
+statements as functions (\texttt{puts}, \texttt{sample}, \texttt{use\_synth}) but 
+has no record of them in the function definitions list. Given this in the second pass 
+it updates most of these records with the incorrect virtual time contributions and 
+can't calculate the accumulated amounts correctly. The analysis does detect each 
+individual use of \texttt{sleep} correctly but total running time of this program 
+would not be possible until the issues involing parameterized loops and functions 
+were solved.
+
+In communication terms, the analysis can detect the use of \texttt{cue} and 
+\texttt{sync} but has highlighted a problem with their use in functions. The graph is 
+not splitting across the blocks correctly, suggesting nested loops do not build 
+correctly, and the graph does not distinguish between block types. This highlights 
+that the session type analysis should also build a function list in the same way 
+as the timing effects system did. Then, when the function is used in a process the 
+nodes can be assigned to the correct process \texttt{SubGraph}.
+
 \subsection{Visual Adaptation}
 % screenshot here
 
@@ -2961,7 +3156,7 @@ time.
 
 For the most part test users relayed that they found the virtual time bar to the 
 left to be a handy little tool. Some noted that the printed session types in the 
-output log where well places but did not have enough experience with the material 
+output log were well placed but did not have enough experience with the material 
 to be able to get the most use out of the information. 
 
 One interesting piece of 
@@ -3054,6 +3249,10 @@ of the analysis and present ideas for improvement.
 \bibitem{micro}
   \emph{http://news.microsoft.com/apac/2015/03/23/three-out-of-four-students-in-asia-pacific-want-coding-as-a-core-subject-in-school-reveals-microsoft-study/}
   % (Visited on 8/6/2015)
+
+\bibitem{crush}
+  \emph{http://www.curse.com/mc-mods/minecraft?filter-project-game-version=}
+  (Visited on 14/6/2015)
 
 \bibitem{amber}
   \emph{https://www.amberbit.com/blog/2014/6/12/calling-c-cpp-from-ruby/}
@@ -3218,6 +3417,21 @@ of the analysis and present ideas for improvement.
   Technical Reports (CIS),
   pp. 288,
   (1987)
+
+\bibitem{mine1}
+  Short, D.,
+  \emph{Teaching Scientic Conceptsusing a Virtual World - Minecraft},
+  Teaching Science,
+  Volume 58, No. 3,
+  pp. 55-58,
+  (2012)
+
+\bibitem{mine2}
+  Smeaton, D.,
+  \emph{Minecraft As A Teaching Tool - A Statistical Study of Teachers' Experience Using Minecraft In The Classroom},
+  7267EDN Research Methods in Education,
+  Griffith University, Austrailia,
+  (2012)
 
 \bibitem{SG10}
   Sorensen, A., and Gardner, H.,

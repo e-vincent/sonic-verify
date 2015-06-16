@@ -1,7 +1,10 @@
-if true then
-  sleep 0.5
-  chord(:E3, :minor)
-else
-  play 50
-  sleep 1
-end
+define :bottom do
+          sleep 2
+        end
+      define :top do      
+        sleep 10
+        bottom
+      end
+
+      top
+      bottom

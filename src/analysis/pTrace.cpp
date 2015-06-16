@@ -161,6 +161,8 @@ float PTrace::getFunctionVT(std::string func)
 		}
 	}
 
+std::cout << "Func " << func << " has time " << result << "\n";
+
 	return result;
 }
 

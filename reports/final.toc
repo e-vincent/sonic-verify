@@ -1,60 +1,64 @@
-\contentsline {section}{\numberline {1}Introduction}{8}
-\contentsline {subsection}{\numberline {1.1}Motivation}{8}
-\contentsline {subsection}{\numberline {1.2}Objectives}{9}
-\contentsline {subsection}{\numberline {1.3}Contributions}{9}
-\contentsline {subsection}{\numberline {1.4}Report Structure}{10}
-\contentsline {section}{\numberline {2}Background}{11}
-\contentsline {subsection}{\numberline {2.1}Computing in Schools}{11}
-\contentsline {subsection}{\numberline {2.2}Sonic Pi}{11}
-\contentsline {subsubsection}{\numberline {2.2.1}Raspberry Pi}{12}
-\contentsline {subsubsection}{\numberline {2.2.2}Sonic Pi V1.0}{12}
-\contentsline {subsubsection}{\numberline {2.2.3}Sonic Pi V2.0}{14}
-\contentsline {paragraph}{Timing Sleep}{14}
-\contentsline {paragraph}{Threading}{16}
-\contentsline {paragraph}{The IDE}{18}
-\contentsline {subsection}{\numberline {2.3}Live Programming}{20}
-\contentsline {subsection}{\numberline {2.4}Session Types}{21}
-\contentsline {subsubsection}{\numberline {2.4.1}Multi-Party Session Types}{22}
-\contentsline {section}{\numberline {3}Related Work}{23}
-\contentsline {section}{\numberline {4}Design \& Technical Implementation}{25}
-\contentsline {subsection}{\numberline {4.1}Timing Tree}{26}
+\contentsline {section}{\numberline {1}Introduction}{9}
+\contentsline {subsection}{\numberline {1.1}Motivation}{9}
+\contentsline {subsection}{\numberline {1.2}Objectives}{10}
+\contentsline {subsection}{\numberline {1.3}Contributions}{11}
+\contentsline {subsection}{\numberline {1.4}Report Structure}{11}
+\contentsline {section}{\numberline {2}Background}{12}
+\contentsline {subsection}{\numberline {2.1}Live Programming}{12}
+\contentsline {subsection}{\numberline {2.2}Sonic Pi}{13}
+\contentsline {subsubsection}{\numberline {2.2.1}Computing in Schools}{13}
+\contentsline {subsubsection}{\numberline {2.2.2}Raspberry Pi}{14}
+\contentsline {subsubsection}{\numberline {2.2.3}Sonic Pi V1.0}{14}
+\contentsline {subsubsection}{\numberline {2.2.4}Sonic Pi V2.0}{16}
+\contentsline {paragraph}{Timing Sleep}{16}
+\contentsline {paragraph}{Threading}{18}
+\contentsline {paragraph}{The IDE}{20}
+\contentsline {subsection}{\numberline {2.3}Session Types}{22}
+\contentsline {subsubsection}{\numberline {2.3.1}Multi-Party Session Types}{23}
+\contentsline {section}{\numberline {3}Related Work}{24}
+\contentsline {section}{\numberline {4}Design \& Technical Implementation}{26}
+\contentsline {subsection}{\numberline {4.1}Pi Time}{26}
 \contentsline {subsubsection}{\numberline {4.1.1}Building the AST}{27}
-\contentsline {subsubsection}{\numberline {4.1.2}\texttt {pTrace}}{28}
-\contentsline {paragraph}{Functions}{30}
-\contentsline {paragraph}{Conditionals}{32}
-\contentsline {paragraph}{Dead Code}{33}
-\contentsline {subsection}{\numberline {4.2}Session Graph}{33}
-\contentsline {subsubsection}{\numberline {4.2.1}Planning the Graph}{34}
-\contentsline {paragraph}{Initial Design}{34}
-\contentsline {paragraph}{Keeping Time}{38}
-\contentsline {subsubsection}{\numberline {4.2.2}Global Construction}{39}
-\contentsline {paragraph}{Sub-Typing}{43}
-\contentsline {subsection}{\numberline {4.3}Integration}{44}
-\contentsline {section}{\numberline {5}Evaluation}{45}
-\contentsline {subsection}{\numberline {5.1}Ruby/C++11 \& Performance}{45}
-\contentsline {subsection}{\numberline {5.2}Correctness}{46}
-\contentsline {subsubsection}{\numberline {5.2.1}Chords}{46}
-\contentsline {subsubsection}{\numberline {5.2.2}Sequences}{47}
-\contentsline {subsubsection}{\numberline {5.2.3}Loops}{47}
-\contentsline {subsubsection}{\numberline {5.2.4}Threads}{49}
-\contentsline {subsubsection}{\numberline {5.2.5}Data Structures}{50}
-\contentsline {paragraph}{Lists}{50}
-\contentsline {paragraph}{Chords \& Scales}{50}
-\contentsline {paragraph}{Rings}{51}
-\contentsline {subsubsection}{\numberline {5.2.6}Dead Code}{52}
-\contentsline {subsubsection}{\numberline {5.2.7}Function Calls}{53}
-\contentsline {paragraph}{Function Definition}{53}
-\contentsline {paragraph}{Function Detection}{54}
-\contentsline {paragraph}{Parameterized Functions}{56}
-\contentsline {subsubsection}{\numberline {5.2.8}Conditionals}{56}
-\contentsline {subsubsection}{\numberline {5.2.9}\texttt {;} Separation}{57}
-\contentsline {subsubsection}{\numberline {5.2.10}Communications}{58}
-\contentsline {subsubsection}{\numberline {5.2.11}Musical Score}{61}
-\contentsline {subsection}{\numberline {5.3}Visual Adaptation}{63}
-\contentsline {section}{\numberline {6}Conclusion}{65}
-\contentsline {subsection}{\numberline {6.1}Future Work}{65}
-\contentsline {paragraph}{Function Parametres}{65}
-\contentsline {paragraph}{Branching Session Types}{65}
-\contentsline {paragraph}{Detailed Time Nodes}{65}
-\contentsline {paragraph}{Minecraft API}{65}
-\contentsline {subsection}{\numberline {6.2}Achievement Summary}{66}
+\contentsline {subsubsection}{\numberline {4.1.2}Formalising Abstract Time}{30}
+\contentsline {subsubsection}{\numberline {4.1.3}\texttt {pTrace}}{32}
+\contentsline {paragraph}{Loops}{32}
+\contentsline {paragraph}{Functions}{33}
+\contentsline {paragraph}{Conditionals}{34}
+\contentsline {paragraph}{Dead Code}{35}
+\contentsline {paragraph}{Variable Sleep}{36}
+\contentsline {subsection}{\numberline {4.2}Session Pi}{37}
+\contentsline {subsubsection}{\numberline {4.2.1}Planning the Graph}{37}
+\contentsline {paragraph}{Initial Design}{38}
+\contentsline {paragraph}{Keeping Time}{42}
+\contentsline {subsubsection}{\numberline {4.2.2}Global Construction}{43}
+\contentsline {paragraph}{Sub-Typing}{47}
+\contentsline {subsection}{\numberline {4.3}Integration}{48}
+\contentsline {section}{\numberline {5}Evaluation}{49}
+\contentsline {subsection}{\numberline {5.1}Ruby/C++11 \& Performance}{49}
+\contentsline {subsection}{\numberline {5.2}Correctness}{50}
+\contentsline {subsubsection}{\numberline {5.2.1}Chords}{50}
+\contentsline {subsubsection}{\numberline {5.2.2}Sequences}{51}
+\contentsline {subsubsection}{\numberline {5.2.3}Loops}{51}
+\contentsline {subsubsection}{\numberline {5.2.4}Threads}{53}
+\contentsline {subsubsection}{\numberline {5.2.5}Data Structures}{54}
+\contentsline {paragraph}{Lists}{54}
+\contentsline {paragraph}{Chords \& Scales}{54}
+\contentsline {paragraph}{Rings}{55}
+\contentsline {subsubsection}{\numberline {5.2.6}Dead Code}{56}
+\contentsline {subsubsection}{\numberline {5.2.7}Function Calls}{57}
+\contentsline {paragraph}{Function Definition}{57}
+\contentsline {paragraph}{Function Detection}{58}
+\contentsline {paragraph}{Nested Functions}{60}
+\contentsline {paragraph}{Parameterized Functions}{61}
+\contentsline {subsubsection}{\numberline {5.2.8}Conditionals}{61}
+\contentsline {subsubsection}{\numberline {5.2.9}\texttt {;} Separation}{62}
+\contentsline {subsubsection}{\numberline {5.2.10}Communications}{63}
+\contentsline {subsubsection}{\numberline {5.2.11}Musical Score}{67}
+\contentsline {subsection}{\numberline {5.3}Visual Adaptation}{70}
+\contentsline {section}{\numberline {6}Conclusion}{71}
+\contentsline {subsection}{\numberline {6.1}Future Work}{71}
+\contentsline {paragraph}{Function Parametres}{71}
+\contentsline {paragraph}{Branching Session Types}{71}
+\contentsline {paragraph}{Detailed Time Nodes}{71}
+\contentsline {paragraph}{Minecraft API}{71}
+\contentsline {subsection}{\numberline {6.2}Achievement Summary}{72}
