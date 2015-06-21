@@ -8,14 +8,12 @@ Builder::Builder()
 	Builder::tree = new ast::NodeTree();
 	visitor = new ast::BasicVisitor();
 	ifChildCount = 0;
-	std::cout << "Verify Builder Constructed" << "\n";
 }
 
 Builder::~Builder()
 {
 	delete Builder::tree;
 	delete visitor;
-	std::cout << "Verify Builder DeConstructed" << "\n";
 }
 
 int Builder::returnTest()
@@ -28,40 +26,52 @@ std::string Builder::returnTestTwo()
 	return "test";//Builder::tree->trace()->sessionTypes[0];
 }
 
-ast::BodyNode* Builder::makeNode(Rice::Symbol token, int index, 
-		int parent, int line, int statement, int blkDepth)
+Rice::Array Builder::returnCumVTs()
 {
-	std::cout << "made a node, honest" << "\n";
-	return new ast::BodyNode(token.str(), index, parent, line, statement, blkDepth);
+	Rice::Array results;
+	analysis::PTrace *trace = Builder::tree->trace();
+
+	for (analysis::TData *data : trace->stats)
+	{
+		results.push(data->cumVT);
+	}
+
+	return results;
+}
+
+ast::BodyNode* Builder::makeNode(Rice::Symbol token, int index, 
+		int parent, int line, int statement, int blkDepth, int blkIndex)
+{
+	return new ast::BodyNode(token.str(), index, parent, line, statement, blkDepth, blkIndex);
 }
 
 ast::IntNode* Builder::makeInt(int num, int index, int parent,
-		int line, int statement, int blkDepth)
+		int line, int statement, int blkDepth, int blkIndex)
 {
-	return new ast::IntNode(num, index, parent, line, statement, blkDepth);
+	return new ast::IntNode(num, index, parent, line, statement, blkDepth, blkIndex);
 }
 
 ast::FloatNode* Builder::makeFloat(float num, int index, int parent,
-		int line, int statement, int blkDepth)
+		int line, int statement, int blkDepth, int blkIndex)
 {
-	return new ast::FloatNode(num, index, parent, line, statement, blkDepth);
+	return new ast::FloatNode(num, index, parent, line, statement, blkDepth, blkIndex);
 }
 
 ast::SymNode* Builder::makeSymbol(std::string sym, int index, int parent,
-		int line, int statement, int blkDepth)
+		int line, int statement, int blkDepth, int blkIndex)
 {
-	return new ast::SymNode(sym, index, parent, line, statement, blkDepth);
+	return new ast::SymNode(sym, index, parent, line, statement, blkDepth, blkIndex);
 }
 
-ast::SendNode* Builder::makeSend(int index, int parent, int line, int statement, int blkDepth)
+ast::SendNode* Builder::makeSend(int index, int parent, int line, int statement, int blkDepth, int blkIndex)
 {
-	return new ast::SendNode(index, parent, line, statement, blkDepth);
+	return new ast::SendNode(index, parent, line, statement, blkDepth, blkIndex);
 }
 
-ast::IfNode* Builder::makeIf(int index, int parent, int line, int statement, int blkDepth)
+ast::IfNode* Builder::makeIf(int index, int parent, int line, int statement, int blkDepth, int blkIndex)
 {
 	ifIndexes.push(index);
-	return new ast::IfNode(index, parent, line, statement, blkDepth);
+	return new ast::IfNode(index, parent, line, statement, blkDepth, blkIndex);
 }
 
 void Builder::makeRoot(Rice::Symbol root)
@@ -71,7 +81,7 @@ void Builder::makeRoot(Rice::Symbol root)
 }
 
 void Builder::addNode(Rice::Symbol nodeType, int index, 
-		int parent, int line, int statement, int blkDepth)
+		int parent, int line, int statement, int blkDepth, int blkIndex)
 {
 	if (!ifIndexes.empty())
 	{
@@ -82,11 +92,11 @@ void Builder::addNode(Rice::Symbol nodeType, int index,
 	if (nodeType.str().compare("send") == 0)
 	{
 		lastSend = index;
-		node = makeSend(index, parent, line, statement, blkDepth);
+		node = makeSend(index, parent, line, statement, blkDepth, blkIndex);
 	}
 	else
 	{
-		node = makeNode(nodeType.str(), index, parent, line, statement, blkDepth);
+		node = makeNode(nodeType.str(), index, parent, line, statement, blkDepth, blkIndex);
 	}
 
 	Builder::tree->addNode(node, parent);
@@ -94,25 +104,25 @@ void Builder::addNode(Rice::Symbol nodeType, int index,
 }
 
 void Builder::addValue(std::string val, int index, int parent, 
-		int line, int statement, int blkDepth)
+		int line, int statement, int blkDepth, int blkIndex)
 {
-	ast::BodyNode* node = makeNode(val, index, parent, line, statement, blkDepth);
+	ast::BodyNode* node = makeNode(val, index, parent, line, statement, blkDepth, blkIndex);
 	Builder::tree->addNode(node, parent);
 	define = (val == "define");
 }
 
 void Builder::addNumber(std::string num, int index, 
-		int parent, int line, int statement, int blkDepth)
+		int parent, int line, int statement, int blkDepth, int blkIndex)
 {
 	float value = std::stof(num.c_str());
 	ast::VisitableNode* node;
 	if (remainder(value, 1) == 0)
 	{
-		node = makeInt((int)value, index, parent, line, statement, blkDepth);
+		node = makeInt((int)value, index, parent, line, statement, blkDepth, blkIndex);
 	} 
 	else
 	{
-		node = makeFloat(value, index, parent, line, statement, blkDepth);
+		node = makeFloat(value, index, parent, line, statement, blkDepth, blkIndex);
 	}
 
 	Builder::tree->addNode(node, parent);
@@ -120,9 +130,9 @@ void Builder::addNumber(std::string num, int index,
 }
 
 void Builder::addSymbol(std::string sym, int index,
-		int parent, int line, int statement, int blkDepth)
+		int parent, int line, int statement, int blkDepth, int blkIndex)
 {
-	ast::SymNode* node = makeSymbol(sym, index, parent, line, statement, blkDepth);
+	ast::SymNode* node = makeSymbol(sym, index, parent, line, statement, blkDepth, blkIndex);
 	Builder::tree->addNode(node, parent);
 
 	// update last send if function name is being defined
@@ -134,9 +144,9 @@ void Builder::addSymbol(std::string sym, int index,
 	}
 }
 
-void Builder::addIf(int index, int parent, int line, int statement, int blkDepth)
+void Builder::addIf(int index, int parent, int line, int statement, int blkDepth, int blkIndex)
 {
-	ast::IfNode* node = makeIf(index, parent, line, statement, blkDepth);
+	ast::IfNode* node = makeIf(index, parent, line, statement, blkDepth, blkIndex);
 	Builder::tree->addNode(node, parent);
 }
 

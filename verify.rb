@@ -5,16 +5,16 @@ path = "src/assets/sp/"
 
  ## Session ##
 #filename = path + "session/sync_many.txt"
-#filename = path + "session/no_deadlock_sub_type.txt"
+filename = path + "session/no_deadlock_sub_type.txt"
 #filename = path + "session/weird_sync.txt"
 #filename = path + "session/double_symbol.txt"
 #filename = path + "session/interaction_three.txt"
 
  ## Timing ##
-filename = path + "timing/conditional.txt"
+#filename = path + "timing/conditional.txt"
 #filename = path + "timing/function_sequential.txt"
 #filename = path + "timing/sequence_loop.txt"
-#filename = path + "timing/simple_loop.txt"
+#filename = path + "timing/function_simple.txt"
 #filename = path + "timing/prog_function.txt"
 
 file 	 = File.open(filename, "rb")
@@ -46,6 +46,7 @@ line		= 0
 intFlag		= false
 symFlag		= false
 ifFlag		= false
+prevBlock   = false
 line		= 0
 
 builder.makeRoot(data.type)
@@ -67,9 +68,23 @@ data.children.each do |child|
 				line = info.location.expression.line
 			end
 
-			if ("send".eql?(info.type.to_s())) || ("if".eql?(info.type.to_s()))
+			if ("if".eql?(info.type.to_s()))
 				statementNo += 1
 			end	
+
+			if ("block".eql?(info.type.to_s()))
+				statementNo += 1
+				prevBlock = true
+			end
+
+			if ("send".eql?(info.type.to_s())) && !prevBlock
+				statementNo += 1
+				prevBlock = false
+			end
+
+			if ("send".eql?(info.type.to_s())) && prevBlock
+				prevBlock = false
+			end
 			
 			# if the current node has the same parent as the top block
 			# pop it because we are outside of the last block tree
@@ -80,11 +95,13 @@ data.children.each do |child|
 			# handling detection of block level
 			# used later to track where in the trace index internal function VT is stored
 			if "block".eql?(info.type.to_s())
-				blkStack.push(curr[2])
+				blkStack.push([curr[2], curr[1]])
 			end
 		end
 
 		if info.respond_to?(:type)
+			size = blkStack.size()
+
 			# ints/floats/symbols consume next token so set a flag to 
 			# skip adding child to stack of nodes still to visit
 			intFlag = "int".eql?(info.type.to_s()) || "float".eql?(info.type.to_s())
@@ -92,18 +109,18 @@ data.children.each do |child|
 			ifFlag  = "if".eql?(info.type.to_s())
 			if intFlag
 				int = info.children[0]
-				builder.addNumber(int.to_s(), curr[1], curr[2], line, statementNo, blkStack.size())
+				builder.addNumber(int.to_s(), curr[1], curr[2], line, statementNo, size, blkStack[size - 1][1])
 			elsif symFlag
 				sym = info.children[0]
-				builder.addSymbol(sym.to_s(), curr[1], curr[2], line, statementNo, blkStack.size())
+				builder.addSymbol(sym.to_s(), curr[1], curr[2], line, statementNo, size, blkStack[size - 1][1])
 			elsif ifFlag
 				cond = info.children[0] # throwing it for the moment => will want a mini tree later?
-				builder.addIf(curr[1], curr[2], line, statementNo, blkStack.size())
+				builder.addIf(curr[1], curr[2], line, statementNo, size, blkStack[size - 1][1])
 			else
-				builder.addNode(info.type, curr[1], curr[2], line, statementNo, blkStack.size())
+				builder.addNode(info.type, curr[1], curr[2], line, statementNo, size, blkStack[size - 1][1])
 			end
 		else
-			builder.addValue(info.to_s(), curr[1], curr[2], line, statementNo, blkStack.size())
+			builder.addValue(info.to_s(), curr[1], curr[2], line, statementNo, size, blkStack[size - 1][1])
 		end
 
 		if info.respond_to?(:children)

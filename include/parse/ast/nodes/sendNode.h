@@ -15,7 +15,7 @@ private:
 protected:
 
 public:
-	SendNode(int index, int parent, int line, int statement, int blkDepth);
+	SendNode(int index, int parent, int line, int statement, int blkDepth, int blkIndex);
 
 	void accept(analysis::PTrace* trace, ast::VTimeVisitor* v);
 	void accept(ast::BasicVisitor* v, std::string sym);

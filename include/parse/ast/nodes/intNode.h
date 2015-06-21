@@ -14,7 +14,7 @@ private:
 protected:
 
 public:
-	IntNode(int num, int index, int parent, int line, int statement, int blkDepth);
+	IntNode(int num, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
 
 	int val();
 	void accept(analysis::PTrace* trace, ast::VTimeVisitor* v);

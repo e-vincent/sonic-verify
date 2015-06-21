@@ -27,6 +27,7 @@ TimeMarker::TimeMarker()
 				<< ", Current total: " << trace->stats[i]->cumVT 
 				<< " IS FUNC:: " << trace->stats[i]->getFunc()
 				<< " IN FUNC:: " << trace->stats[i]->isInFunc()
+				<< " has blkParent: " << trace->stats[i]->blkParent()
 				<< "\n";
 	}
 	std::cout << " === =================== ===\n";
@@ -129,6 +130,10 @@ void TimeMarker::traceFirstPass(ast::NodeTree* tree, ast::VTimeVisitor* visitor,
 	{
 		trace->setLast((&(*it))->statement());
 		(&(*it))->accept(trace, visitor);
+		if ((&(*it))->statement() > 0)
+		{
+			trace->stats[(&(*it))->statement()]->setBlkParent((&(*it))->blkIndex);
+		}
 		if (inIf)
 		{
 			// -3 for dead code as later updater won't process it

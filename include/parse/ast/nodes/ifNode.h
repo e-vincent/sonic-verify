@@ -16,7 +16,7 @@ private:
 	float falseVT;
 
 public:
-	IfNode(int index, int parent, int line, int statement, int blkDepth);
+	IfNode(int index, int parent, int line, int statement, int blkDepth, int blkIndex);
 
 	void setTrueVT(float vt);
 	void setFalseVT(float vt);

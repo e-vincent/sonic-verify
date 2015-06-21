@@ -36,6 +36,7 @@ public:
 
 	void initStats(int counter);
 	void setVT(float vt, int index);
+	void carryVT(int statement);
 	void resolveIfs(ast::VTimeVisitor* visitor);
 	void traceSecondPass();
 

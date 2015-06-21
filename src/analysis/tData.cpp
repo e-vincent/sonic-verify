@@ -10,6 +10,7 @@ TData::TData()
 	funcCall  = false;
 	inFunc	  = false;
 	ifIndex	  = -1;
+	blkIndex = -1;
 }
 
 void TData::setFuncCall(bool b, std::string function)
@@ -28,6 +29,11 @@ void TData::setIfIndex(int index)
 	ifIndex = index;
 }
 
+void TData::setBlkParent(int index)
+{
+	blkIndex = index;
+}
+
 bool TData::isInFunc()
 {
 	return inFunc;
@@ -41,6 +47,11 @@ std::string TData::getFunc()
 int TData::getIfIndex()
 {
 	return ifIndex;
+}
+
+int TData::blkParent()
+{
+	return blkIndex;
 }
 
 } // namespace analysis

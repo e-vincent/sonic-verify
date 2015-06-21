@@ -10,7 +10,6 @@ end
 in_thread do      # P1
   loop do
     cue :A        ## P1P0!
-    sleep 1
     sync :B       ## P0P1?
     play 60
     sleep 0.5

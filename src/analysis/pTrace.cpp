@@ -50,9 +50,26 @@ void PTrace::setVT(float vt, int index)
 {
 	lastSet = index;
 	stats[index]->conVT = vt;
-	if (index != 0)
+	carryVT(index);
+}
+
+void PTrace::carryVT(int statement)
+{
+	if (statement > 0)
 	{
-		stats[index]->cumVT = stats[index - 1]->cumVT + vt;
+		int prev = statement - 1;
+		std::cout << "This " << statement << ": " 
+					<< stats[statement]->blkParent() << ", "
+				  << "Prev " << prev << ": "
+				  	<< stats[prev]->blkParent() << "\n"; 
+		if (stats[statement]->blkParent() != stats[prev]->blkParent())
+		{
+			stats[statement]->cumVT = stats[statement]->conVT;
+		}
+		else
+		{
+			stats[statement]->cumVT = stats[prev]->cumVT + stats[statement]->conVT;
+		}
 	}
 }
 
@@ -74,6 +91,7 @@ void PTrace::createTrace(std::string func, int statement)
 void PTrace::createTrace(int statement)
 {
 	checkFunctionStatus(statement);
+	carryVT(statement);
 }
 
 // TData, func called
@@ -87,6 +105,8 @@ void PTrace::createTrace(int statement, bool funcCalled, std::string func)
 	setVT(-1, statement);
 }
 
+// if this statement has a function call
+// mark if the function is defined
 void PTrace::checkFunctionStatus(int statement)
 {
 	stats[statement]->setInFunc(isInFunc());

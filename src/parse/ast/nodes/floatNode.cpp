@@ -4,8 +4,8 @@
 namespace ast
 {
 
-FloatNode::FloatNode(float num, int index, int parent, int line, int statement, int blkDepth)
-: ast::VisitableNode(index, parent, line, statement, blkDepth)
+FloatNode::FloatNode(float num, int index, int parent, int line, int statement, int blkDepth, int blkIndex)
+: ast::VisitableNode(index, parent, line, statement, blkDepth, blkIndex)
 {
 	this->num	= num;
 	this->value = "float";

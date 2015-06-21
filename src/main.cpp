@@ -16,7 +16,8 @@ void Init_verify()
 		.define_method("setTreeSize", &Builder::setTreeSize)
 		.define_method("exitFuncs", &Builder::exitFuncs)
 		.define_method("returnTest", &Builder::returnTest)
-		.define_method("returnTestTwo", &Builder::returnTestTwo);
+		.define_method("returnTestTwo", &Builder::returnTestTwo)
+		.define_method("returnCumVTs", &Builder::returnCumVTs);
 
 	Rice::Data_Type<InfoFetcher> rb_cInfoFetcher =
 		Rice::define_class<InfoFetcher>("InfoFetcher")

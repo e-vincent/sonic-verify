@@ -4,8 +4,8 @@
 namespace ast
 {
 
-IfNode::IfNode(int index, int parent, int line, int statement, int blkDepth)
-: ast::VisitableNode(index, parent, line, statement, blkDepth)
+IfNode::IfNode(int index, int parent, int line, int statement, int blkDepth, int blkIndex)
+: ast::VisitableNode(index, parent, line, statement, blkDepth, blkIndex)
 {
 		conditionRootIndex = index + 1;
 }

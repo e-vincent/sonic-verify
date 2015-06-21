@@ -4,13 +4,14 @@ namespace ast
 {
 
 VisitableNode::VisitableNode() { }
-VisitableNode::VisitableNode(int index, int parent, int line, int statement, int blkDepth)
+VisitableNode::VisitableNode(int index, int parent, int line, int statement, int blkDepth, int blkIndex)
 {
 	this->index = index;
 	this->parent = parent;
 	this->lineNum = line;
 	this->statementNum = statement;
 	this->blkDepth = blkDepth;
+	this->blkIndex = blkIndex;
 }
 
 std::string VisitableNode::acceptType()

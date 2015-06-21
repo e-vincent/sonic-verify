@@ -14,7 +14,7 @@ private:
 protected:
 
 public:
-	FloatNode(float num, int index, int parent, int line, int statement, int blkDepth);
+	FloatNode(float num, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
 
 	float val();
 	void accept(analysis::PTrace* trace, ast::VTimeVisitor* v);

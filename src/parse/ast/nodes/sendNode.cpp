@@ -5,8 +5,8 @@
 namespace ast
 {
 
-SendNode::SendNode(int index, int parent, int line, int statement, int blkDepth)
-: ast::VisitableNode(index, parent, line, statement, blkDepth)
+SendNode::SendNode(int index, int parent, int line, int statement, int blkDepth, int blkIndex)
+: ast::VisitableNode(index, parent, line, statement, blkDepth, blkIndex)
 {
 	this->value = "send";
 }

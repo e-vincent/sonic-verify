@@ -15,7 +15,7 @@ private:
 protected:
 
 public:
-	SymNode(std::string symbol, int index, int parent, int line, int statement, int blkDepth);
+	SymNode(std::string symbol, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
 
 	void accept(analysis::PTrace* trace, ast::VTimeVisitor* v);
 	std::string acceptType();

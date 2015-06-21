@@ -7,6 +7,8 @@
 #include <map>
 #include <stack>
 
+#include "rice/Array.hpp"
+
 #include "main.h"
 
 #include "parse/ast/basicVisitor.h"
@@ -36,20 +38,21 @@ public:
 
 	int returnTest();
 	std::string returnTestTwo();
+	Rice::Array returnCumVTs();
 
-	ast::BodyNode* makeNode(Rice::Symbol token, int index, int parent, int line, int statement, int blkDepth);
-	ast::IntNode* makeInt(int num, int index, int parent, int line, int statement, int blkDepth);
-	ast::FloatNode* makeFloat(float num, int index, int parent, int line, int statement, int blkDepth);
-	ast::SymNode* makeSymbol(std::string sym, int index, int parent, int line, int statement, int blkDepth);
-	ast::SendNode* makeSend(int index, int parent, int line, int statement, int blkDepth);
-	ast::IfNode* makeIf(int index, int parent, int line, int statement, int blkDepth);
+	ast::BodyNode* makeNode(Rice::Symbol token, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
+	ast::IntNode* makeInt(int num, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
+	ast::FloatNode* makeFloat(float num, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
+	ast::SymNode* makeSymbol(std::string sym, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
+	ast::SendNode* makeSend(int index, int parent, int line, int statement, int blkDepth, int blkIndex);
+	ast::IfNode* makeIf(int index, int parent, int line, int statement, int blkDepth, int blkIndex);
 
 	void makeRoot(Rice::Symbol root);
-	void addNode(Rice::Symbol nodeType, int index, int parent, int line, int statement, int blkDepth);
-	void addValue(std::string val, int index, int parent, int line, int statement, int blkDepth);
-	void addNumber(std::string num, int index, int parent, int line, int statement, int blkDepth);
-	void addSymbol(std::string sym, int index, int parent, int line, int statement, int blkDepth);
-	void addIf(int index, int parent, int line, int statement, int blkDepth);
+	void addNode(Rice::Symbol nodeType, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
+	void addValue(std::string val, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
+	void addNumber(std::string num, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
+	void addSymbol(std::string sym, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
+	void addIf(int index, int parent, int line, int statement, int blkDepth, int blkIndex);
 
 	void setTreeSize(int treeSize, int lineCount);
 	void exitFuncs(int statement);

@@ -1,4 +1,6 @@
 loop do
   play 60
   sleep 2
+  sleep 5
+  sleep 7
 end

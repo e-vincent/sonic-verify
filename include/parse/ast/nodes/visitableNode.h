@@ -30,11 +30,12 @@ protected:
 public:
 	std::list<ast::VisitableNode*> children;
 	std::string value;
+	int blkIndex;
 	int index;
 	int parent;
 
 	VisitableNode();
-	VisitableNode(int index, int parent, int line, int statement, int blkDepth);
+	VisitableNode(int index, int parent, int line, int statement, int blkDepth, int blkIndex);
 
 	virtual void accept(analysis::PTrace*, ast::VTimeVisitor*) = 0;
 	virtual void accept(ast::VTimeVisitor*, indexes&) {};

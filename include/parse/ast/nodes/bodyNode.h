@@ -13,7 +13,7 @@ private:
 protected:
 
 public:
-	BodyNode(std::string node, int index, int parent, int line, int statement, int blkDepth);
+	BodyNode(std::string node, int index, int parent, int line, int statement, int blkDepth, int blkIndex);
 
 	void accept(analysis::PTrace* trace, ast::VTimeVisitor* v);
 	bool isFuncCall();
