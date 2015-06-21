@@ -133,6 +133,7 @@ void TimeMarker::traceFirstPass(ast::NodeTree* tree, ast::VTimeVisitor* visitor,
 		if ((&(*it))->statement() > 0)
 		{
 			trace->stats[(&(*it))->statement()]->setBlkParent((&(*it))->blkIndex);
+			trace->stats[(&(*it))->statement()]->line = (&(*it))->line();
 		}
 		if (inIf)
 		{

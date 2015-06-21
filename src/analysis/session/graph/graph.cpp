@@ -340,4 +340,14 @@ void Graph::resolveTypes(std::string str, std::vector<std::string>& types,
 	}
 }
 
+void Graph::setDataExists(bool state)
+{
+	data = state;
+}
+
+bool Graph::dataExists()
+{
+	return data;
+}
+
 } // namespace graph

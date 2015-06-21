@@ -20,6 +20,7 @@ public:
 
 	float cumVT; // cumulative
 	float conVT; // contribution
+	int line;
 
 	void setFuncCall(bool b, std::string function);
 	void setInFunc(bool b);

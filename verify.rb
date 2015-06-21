@@ -101,6 +101,10 @@ data.children.each do |child|
 
 		if info.respond_to?(:type)
 			size = blkStack.size()
+			blkIndex = -1
+			if size > 0
+				blkIndex = blkStack[size - 1][1]
+			end
 
 			# ints/floats/symbols consume next token so set a flag to 
 			# skip adding child to stack of nodes still to visit
@@ -109,18 +113,18 @@ data.children.each do |child|
 			ifFlag  = "if".eql?(info.type.to_s())
 			if intFlag
 				int = info.children[0]
-				builder.addNumber(int.to_s(), curr[1], curr[2], line, statementNo, size, blkStack[size - 1][1])
+				builder.addNumber(int.to_s(), curr[1], curr[2], line, statementNo, size, blkIndex)
 			elsif symFlag
 				sym = info.children[0]
-				builder.addSymbol(sym.to_s(), curr[1], curr[2], line, statementNo, size, blkStack[size - 1][1])
+				builder.addSymbol(sym.to_s(), curr[1], curr[2], line, statementNo, size, blkIndex)
 			elsif ifFlag
 				cond = info.children[0] # throwing it for the moment => will want a mini tree later?
-				builder.addIf(curr[1], curr[2], line, statementNo, size, blkStack[size - 1][1])
+				builder.addIf(curr[1], curr[2], line, statementNo, size, blkIndex)
 			else
-				builder.addNode(info.type, curr[1], curr[2], line, statementNo, size, blkStack[size - 1][1])
+				builder.addNode(info.type, curr[1], curr[2], line, statementNo, size, blkIndex)
 			end
 		else
-			builder.addValue(info.to_s(), curr[1], curr[2], line, statementNo, size, blkStack[size - 1][1])
+			builder.addValue(info.to_s(), curr[1], curr[2], line, statementNo, size, blkIndex)
 		end
 
 		if info.respond_to?(:children)
@@ -149,6 +153,7 @@ analyser = TimeMarker.new
 # call methods to build from nodeTree
 planner = Planner.new
 planner.setUp()
+planner.printDetails()
 
 int = builder.returnTest()
 string = builder.returnTestTwo();

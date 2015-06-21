@@ -208,6 +208,7 @@ void PTrace::traceSecondPass()
 
 		if (prevChange)
 		{
+			std::cout << "Last: " << lastCumVT << "\n";
 			stats[i]->cumVT = lastCumVT + stats[i]->conVT;
 			lastCumVT = stats[i]->cumVT;
 		}
@@ -221,7 +222,14 @@ void PTrace::traceSecondPass()
 			if (first)
 			{
 				stats[i]->conVT = 0;
-				stats[i]->cumVT = 0;
+				if (stats[i]->blkParent() == stats[i - 1]->blkParent())
+				{
+					stats[i]->cumVT = stats[i - 1]->cumVT;
+				}
+				else
+				{
+					stats[i]->cumVT = 0;
+				}
 				first = false;
 			}
 

@@ -27,6 +27,7 @@ public:
 	~Planner();
 
 	void setUp();
+	void printDetails();
 
 	graph::CueNode* makeCue(int line, std::string symbol);
 	graph::SyncNode* makeSync(int line, std::string symbol);

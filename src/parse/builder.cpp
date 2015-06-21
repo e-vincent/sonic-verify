@@ -33,7 +33,10 @@ Rice::Array Builder::returnCumVTs()
 
 	for (analysis::TData *data : trace->stats)
 	{
-		results.push(data->cumVT);
+		Rice::Array elem;
+		elem.push(data->cumVT);
+		elem.push(data->line);
+		results.push(elem);
 	}
 
 	return results;

@@ -1,0 +1,11 @@
+define :bottom do
+	sleep 2
+end
+
+define :top do      
+	sleep 10
+	bottom
+end
+
+top
+bottom

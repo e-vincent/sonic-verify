@@ -27,6 +27,7 @@ private:
 	std::map<std::pair<arcData, std::string>, std::vector<std::pair<arcData, std::string>>> arcs; 	// one to many map
 	std::string global;
 	int nodeCount;
+	bool data;
 
 public:
 	Graph();
@@ -55,6 +56,9 @@ public:
 	int blockCount();
 	bool dual(char one, char two);
 	void resolveTypes(std::string str, std::vector<std::string>& types, std::string type, int offset);
+
+	void setDataExists(bool state);
+	bool dataExists();
 };
 
 

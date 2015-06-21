@@ -32,5 +32,6 @@ void Init_verify()
 	Rice::Data_Type<analysis::Planner> rb_cPlanner =
 		Rice::define_class<analysis::Planner>("Planner")
 		.define_constructor(Rice::Constructor<analysis::Planner>())
-		.define_method("setUp", &analysis::Planner::setUp);
+		.define_method("setUp", &analysis::Planner::setUp)
+		.define_method("printDetails", &analysis::Planner::printDetails);
 }

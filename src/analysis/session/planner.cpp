@@ -18,21 +18,29 @@ Planner::~Planner()
 void Planner::setUp()
 {
 	makeGraph(Builder::tree);
+}
 
-	// printing test
-	std::cout << "\n\n === Arc Results === \n";
-	graph->printArcs();
-	graph->printTypes();
-	graph->printGlobal();
+void Planner::printDetails()
+{
+	if (graph->dataExists())
+	{
+		// printing test
+		std::cout << "\n\n === Arc Results === \n";
+		graph->printArcs();
+		graph->printTypes();
+		graph->printGlobal();
+	}
 }
 
 graph::CueNode* Planner::makeCue(int line, std::string symbol)
 {
+	graph->setDataExists(true);
 	return new graph::CueNode(getIndex(), line, symbol);
 }
 
 graph::SyncNode* Planner::makeSync(int line, std::string symbol)
 {
+	graph->setDataExists(true);
 	return new graph::SyncNode(getIndex(), line, symbol);
 }
 
